@@ -64,6 +64,22 @@ function _simplesaml_auth_user_register($authname) {
     // We are allowed to register new users.
     _simplesaml_auth_debug(t('Register [%authname]', array('%authname' => $authname)));
 
+    // It's possible that a user with this name already exists, but is not
+    // permitted to login to Drupal via SAML. If so, log out of SAML and
+    // redirect to the front page.
+    $account = user_load_by_name($authname);
+    if ($account) {
+      _simplesaml_auth_debug(t('User [%authname] could not be registered because that username already exists and is not SAML enabled.', array(
+        '%authname' => $authname,
+      )));
+
+      drupal_set_message(t('We are sorry, your user account is not SAML enabled.'));
+      $_simplesamlphp_auth_as->logout(base_path());
+
+      return FALSE;
+    }
+
+    // Register the new user.
     user_external_login_register($authname, 'simplesamlphp_auth');
 
     _simplesaml_auth_debug(t('Registered [%authname] with uid @uid', array(
@@ -89,6 +105,39 @@ function _simplesaml_auth_user_register($authname) {
     $_simplesamlphp_auth_as->logout(base_path());
   }
 }
+
+/**
+ * Updates a SAML authenticated user's account with current username and email.
+ *
+ * @param object $account
+ *   The user account object to update.
+ */
+function _simplesaml_auth_user_update($account) {
+  _simplesaml_auth_debug(t('Updating username [%acctname]', array('%acctname' => $account->name)));
+
+  db_update('users')
+    ->fields(array('name' => $account->name))
+    ->condition('uid', $account->uid)
+    ->execute();
+
+  // Get mail from default attribute.
+  try {
+    $mail_address = _simplesamlphp_auth_get_mail();
+  } catch (Exception $e) {
+    drupal_set_message(t('Your e-mail address was not provided by your identity provider (IDP).'), "error");
+    watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
+  }
+
+  _simplesaml_auth_debug(t('Updating mail [%mailaddr]', array('%mailaddr' => $mail_address)));
+
+  if (!empty($mail_address)) {
+    db_update('users')
+      ->fields(array('mail' => $mail_address))
+      ->condition('uid', $account->uid)
+      ->execute();
+  }
+}
+
 
 /**
  * Logs an SAML-authenticated user into Drupal.

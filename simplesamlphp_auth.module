@@ -127,16 +127,15 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
   global $_simplesamlphp_auth_as;
   global $_simplesamlphp_auth_saml_attributes;
 
-  if (!_simplesamlphp_auth_isEnabled()) {
+  if ( _simplesaml_auth_autoload()) {
     // Exit without initializing.
     return;
   }
 
-  _simplesaml_auth_autoload();
-
   if ($category = 'account') {
     // If user registration has a valid session...
     if ($_simplesamlphp_auth_as->isAuthenticated() && _simplesamlphp_auth_get_authname() == $account->init) {
+
       // Get name from default attributes.
       try {
         _simplesaml_auth_debug(t('Registering user [%acctname]', array('%acctname' => $account->name)));
@@ -146,36 +145,17 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
         watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
       }
 
-      db_update('users')
-        ->fields(array('name' => $account->name))
-        ->condition('uid', $account->uid)
-        ->execute();
+      module_load_include('inc', 'simplesamlphp_auth');
 
-      _simplesaml_auth_debug(t('Updating username [%acctname]', array('%acctname' => $account->name)));
-
-      // Get mail from default attribute.
-      try {
-        $mail_address = _simplesamlphp_auth_get_mail();
-      } catch (Exception $e) {
-        drupal_set_message(t('Your e-mail address was not provided by your identity provider (IDP).'), "error");
-        watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
-      }
-
-      if (!empty($mail_address)) {
-        db_update('users')
-          ->fields(array('mail' => $mail_address))
-          ->condition('uid', $account->uid)
-          ->execute();
-      }
+      // Update username and email address.
+      // @todo Make this conditional.
+      _simplesaml_auth_user_update($account);
 
       if (module_exists('rules')) {
         rules_invoke_event('simplesamlphp_auth_rules_event_register', $account);
       }
 
-      _simplesaml_auth_debug(t('Updating mail [%mailaddr]', array('%mailaddr' => $mail_address)));
-
       // Reload the user object to ensure that all properties are populated.
-      module_load_include('inc', 'simplesamlphp_auth');
       $user = user_load($account->uid);
       _simplesaml_auth_user_login($user);
     }
@@ -229,22 +209,26 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     return;
   }
 
-  if ($form_id == 'user_login_block') {
-    $link = l('Federated Log In', 'saml_login');
-    $links = $form['links']['#markup'];
-    $links = str_replace('</ul>', '<li class="saml">' . $link . '</li></ul>', $links);
-    $form['links']['#markup'] = $links;
-  }
+  $link = l('Federated Log In', 'saml_login');
 
-  if ($form_id == 'user_account_form') {
-    $link = l('Federated Log In', 'saml_login');
+  // Add SAML login link to user login form.
+  if ($form_id == 'user_login_block' || $form_id = 'user_account_form') {
     $links = $form['links']['#markup'];
     $links = str_replace('</ul>', '<li class="saml">' . $link . '</li></ul>', $links);
     $form['links']['#markup'] = $links;
   }
 
   if ($form_id == 'user_login') {
-    $form['links']['#markup'] = l('Federated Log In', 'saml_login');
+    $form['links']['#markup'] = $link;
+  }
+
+  if ($form_id == 'user_register_form' || $form_id == 'user_profile_form') {
+    $form['saml'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable this user to leverage SAML authentication'),
+      '#default_value' => $form_id == 'user_register_form' ? TRUE : (bool) user_get_authmaps($form['#user']->name),
+    );
+    $form['#submit'][] = 'simplesaml_auth_user_profile_form_submit';
   }
 
   // If the user has a simplesamlphp_auth authmap record, then don't require them to know their Drupal password.
@@ -259,7 +243,34 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     if (!variable_get('simplesamlphp_auth_allowsetdrupalpwd')) {
       unset($form['account']['pass']);
     }
+  }
+}
 
+/**
+ * Submit callback to enable SAML authentication for a given user.
+ */
+function simplesaml_auth_user_profile_form_submit(&$form, $form_state) {
+  $values = $form_state['values'];
+
+  if (isset($values['saml'])) {
+    // Enter this username into the authmap table.
+    if ($values['saml']) {
+      db_merge('authmap')
+        ->key(array(
+          'uid' => $values['uid'],
+          'module' => 'simplesamlphp_auth',
+        ))
+        ->fields(array(
+          'authname' => $values['mail'],
+        ))
+        ->execute();
+    }
+    // Remove this username from the authmap table.
+    else {
+      db_delete('authmap')
+        ->condition('uid', $values['uid'])
+        ->execute();
+    }
   }
 }
 
@@ -267,9 +278,8 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
  * Implements hook_block_view().
  */
 function simplesamlphp_auth_block_view($delta = '') {
-  _simplesaml_auth_autoload();
 
-  if (!_simplesamlphp_auth_isEnabled()) {
+  if (!_simplesaml_auth_autoload()) {
     // Exit without executing.
     return;
   }
