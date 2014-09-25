@@ -509,6 +509,14 @@ function _simplesamlphp_auth_evaulaterolerule($roleruleevaluation, $attributes) 
       }
 
       return ($dc[1] == $roleruleevaluation[2]);
+    case '~=':
+      foreach ($attribute as $subattr) {
+        $pos = strpos($subattr, $roleruleevaluation[2]);
+        if ($pos !== FALSE) {
+          return TRUE;
+        }
+      }
+      return FALSE;
   }
 
   return FALSE;
