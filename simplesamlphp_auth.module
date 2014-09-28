@@ -531,12 +531,8 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
   _simplesaml_auth_debug(t('Rolemap: %rolemap', array('%rolemap' => $rolemap)));
 
   // Check if valid local session exists..
-  if ($_simplesamlphp_auth_as->isAuthenticated()) {
+  if (!empty($rolemap) && $_simplesamlphp_auth_as->isAuthenticated()) {
     $attributes = $_simplesamlphp_auth_saml_attributes;
-
-    if (empty($rolemap)) {
-      return $roles;
-    }
 
     _simplesaml_auth_debug(t('Evaluate rolemap: %rolemap', array('%rolemap' => $rolemap)));
 
@@ -567,6 +563,8 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
 
     }
   }
+
+  drupal_alter('simplesamlphp_auth_user_roles', $roles);
 
   return $roles;
 }
