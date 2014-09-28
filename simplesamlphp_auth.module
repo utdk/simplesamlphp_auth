@@ -152,7 +152,7 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
       _simplesaml_auth_user_update($account);
 
       if (module_exists('rules')) {
-        rules_invoke_event('simplesamlphp_auth_rules_event_register', $account);
+        rules_invoke_all('simplesamlphp_auth_rules_event_register', $account);
       }
 
       // Reload the user object to ensure that all properties are populated.
