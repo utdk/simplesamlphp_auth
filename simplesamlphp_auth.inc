@@ -87,7 +87,7 @@ function _simplesaml_auth_user_register($authname) {
       '@uid' => $user->uid
     )));
 
-    if ($user) {
+    if (!empty($user->uid)) {
       // Populate roles based on configuration setting.
       $roles = _simplesamlphp_auth_rolepopulation(variable_get('simplesamlphp_auth_rolepopulation', ''));
       $userinfo = array('roles' => $roles);
@@ -96,12 +96,18 @@ function _simplesaml_auth_user_register($authname) {
 
       return $user;
     }
+    else {
+      // We were unable to register this new user on the site.
+      // We let the user know about this, log an error, and redirect to the home page.
+      drupal_set_message(t("We are sorry. While you have successfully authenticated, we were unable to create an account for you on this site. Please ask the site administrator to provision access for you."));
+      watchdog('simplesamlphp_auth', 'Unable to register %authname using simplesamlphp_auth', array('%authname' => $authname), WATCHDOG_ERROR);
+      $_simplesamlphp_auth_as->logout(base_path());
+    }
   }
   else {
     // We are not allowed to register new users on the site through simpleSAML.
     // We let the user know about this and redirect to the user/login page.
-    $msg = t("We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you.");
-    drupal_set_message(check_plain($msg));
+    drupal_set_message(t("We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you."));
     $_simplesamlphp_auth_as->logout(base_path());
   }
 }
