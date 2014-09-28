@@ -40,10 +40,9 @@ function simplesamlphp_auth_menu() {
     'page callback'    => 'drupal_get_form',
     'page arguments'   => array('simplesamlphp_auth_settings'),
     'access arguments' => array('administer simpleSAMLphp authentication'),
-    'type'             => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
     'file'             => 'simplesamlphp_auth.admin.inc',
+    'type'             => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
   );
-
   $items['saml_login'] = array(
     'title'           => 'Logon to the site',
     'description'     => 'Provides a site login page',
@@ -56,6 +55,13 @@ function simplesamlphp_auth_menu() {
 }
 
 /**
+ * Implements hook_admin_paths().
+ */
+function simplesamlphp_auth_admin_paths() {
+  return array('admin/config/people/simplesamlphp_auth' => TRUE);
+}
+
+/**
  * Implements hook_help().
  */
 function simplesamlphp_auth_help($path, $arg) {
@@ -63,6 +69,7 @@ function simplesamlphp_auth_help($path, $arg) {
     case 'admin/config/people/simplesamlphp_auth':
       $output = t('<p>This module integrates Drupal with a SimpleSAMLphp Service Point (SP), effectively federating Drupal.</p>');
       $output .= t('<p></p>');
+
       return $output;
   }
 }
