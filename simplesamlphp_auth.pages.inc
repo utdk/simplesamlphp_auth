@@ -108,7 +108,8 @@ function simplesamlphp_auth_loginpage() {
 
     // If a ReturnTo has been set.
     if ($go_to_url) {
-      drupal_goto(str_replace($base_url . '/', '', $go_to_url));
+      $parsed_gotourl = drupal_parse_url($go_to_url);
+      drupal_goto($parsed_gotourl['path'], $parsed_gotourl);
     }
     else {
       drupal_goto('user/' . $user->uid);
