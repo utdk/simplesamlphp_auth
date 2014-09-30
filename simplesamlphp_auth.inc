@@ -172,7 +172,7 @@ function _simplesaml_auth_user_login($ext_user) {
   }
 
   if (module_exists('rules')) {
-    rules_invoke_event('simplesamlphp_auth_rules_event_login', $user);
+    rules_invoke_all('simplesamlphp_auth_rules_event_login', $user);
   }
 
   // Finalizing the login, calls hook_user op login.
