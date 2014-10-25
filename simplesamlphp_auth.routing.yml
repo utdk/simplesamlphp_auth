@@ -1,0 +1,15 @@
+simplesamlphp_auth.admin_settings:
+  path: '/admin/config/people/simplesamlphp_auth'
+  defaults:
+    _title: 'SimpleSAMLphp Auth Settings'
+    _form: '\Drupal\simplesamlphp_auth\Form\AdminForm'
+  requirements:
+    _permission: 'administer simpleSAMLphp authentication'
+  options:
+    _admin_route: FALSE
+#simplesamlphp_auth.saml_login:
+#  path: '/saml_login'
+#  defaults:
+#    _controller: '\Drupal\simplesamlphp_auth\Controller\UserAutocompleteController::autocompleteUser'
+#  requirements:
+#    _access: 'TRUE'

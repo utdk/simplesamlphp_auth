@@ -13,38 +13,10 @@ function simplesamlphp_auth_install() {
   user_role_revoke_permissions(DRUPAL_AUTHENTICATED_RID, array('change own password'));
 
   // Disable the open registration to the site and store the original setting.
-  $original = variable_get('user_register', 1);
-  variable_set('user_register', 0);
-  variable_set('simplesamlphp_auth_user_register_original', $original);
-
-}
-
-/**
- * Implements hook_uninstall().
- */
-function simplesamlphp_auth_uninstall() {
-  // Restore the original user registration directive.
-  $original = variable_get('simplesamlphp_auth_user_register_original', 1);
-  variable_set('user_register', $original);
-  variable_del('simplesamlphp_auth_user_register_original');
-
-  // Remove the created system variables.
-  variable_del('simplesamlphp_auth_activate');
-  variable_del('simplesamlphp_auth_installdir');
-  variable_del('simplesamlphp_auth_logout_page');
-  variable_del('simplesamlphp_auth_mailattr');
-  variable_del('simplesamlphp_auth_unique_id');
-  variable_del('simplesamlphp_auth_user_name');
-  variable_del('simplesamlphp_auth_authsource');
-  variable_del('simplesamlphp_auth_rolepopulation');
-  variable_del('simplesamlphp_auth_roleevaleverytime');
-  variable_del('simplesamlphp_auth_forcehttps');
-  variable_del('simplesamlphp_auth_registerusers');
-  variable_del('simplesamlphp_auth_allowsetdrupalpwd');
-  variable_del('simplesamlphp_auth_allowdefaultlogin');
-  variable_del('simplesamlphp_auth_allowdefaultloginroles');
-  variable_del('simplesamlphp_auth_allowdefaultloginusers');
-  variable_del('simplesamlphp_auth_logoutgotourl');
+  $user_settings = \Drupal::config('user.settings');
+  $config = \Drupal::config('simplesamlphp_auth.settings');
+  $config->set('user_register_original', $user_settings->get('register'));
+  $user_settings->set('register', 0);
 }
 
 /**
@@ -53,23 +25,25 @@ function simplesamlphp_auth_uninstall() {
 function simplesamlphp_auth_requirements($phase) {
   $requirements = array();
 
+
   if ($phase == 'runtime') {
-    if (!variable_get('simplesamlphp_auth_activate', 0)) {
+    $config = \Drupal::config('simplesamlphp_auth.settings');
+    if (!$config->get('activate')) {
       $requirements['simplesamlphp_auth'] = array(
         'severity'    => REQUIREMENT_INFO,
         'title'       => 'simpleSAMLphp_auth',
         'value'       => t('SimpleSAMLphp authentication is NOT activated'),
-        'description' => t('It can be activated on the !admin_page.', array('!admin_page' => l(t('configuration page'), 'admin/config/people/simplesamlphp_auth'))),
+        'description' => t('It can be activated on the <a href="@config_page">configuration page</a>.', array('@config_page' => \Drupal::url('simplesamlphp_auth.admin_settings'))),
        );
     }
 
-    $basedir = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
+    $basedir = $config->get('install_dir');
     if (!file_exists($basedir . '/lib/_autoload.php')) {
       $requirements['simplesamlphp_auth'] = array(
         'severity'    => REQUIREMENT_WARNING,
         'title'       => 'simpleSAMLphp_auth',
         'value'       => t('SimpleSAMLphp authentication is missing the required SimpleSAMLphp library'),
-        'description' => t('Please download and install the !simplesamlphp library.', array('!simplesamlphp' => l(t('SimpeSAMLphp'), 'https://simplesamlphp.org/download'))),
+        'description' => t('Please download and install the <a href="@simplesaml_library">simplesamlphp library</a>.', array('@simplesaml_library' => 'https://simplesamlphp.org/download')),
       );
     }
   }

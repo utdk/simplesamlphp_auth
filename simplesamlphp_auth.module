@@ -29,45 +29,11 @@
  */
 
 /**
- * Implements hook_menu().
- */
-function simplesamlphp_auth_menu() {
-  $items = array();
-
-  $items['admin/config/people/simplesamlphp_auth'] = array(
-    'title' => 'SimpleSAMLphp Auth Settings',
-    'description' => 'Control the various settings of the simpleSAMLphp authentication module',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('simplesamlphp_auth_settings'),
-    'access arguments' => array('administer simpleSAMLphp authentication'),
-    'file' => 'simplesamlphp_auth.admin.inc',
-    'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
-  );
-  $items['saml_login'] = array(
-    'title' => 'Logon to the site',
-    'description' => 'Provides a site login page',
-    'page callback' => 'simplesamlphp_auth_loginpage',
-    'access callback' => TRUE,
-    'file' => 'simplesamlphp_auth.pages.inc',
-    'type' => MENU_CALLBACK,
-  );
-
-  return $items;
-}
-
-/**
- * Implements hook_admin_paths().
- */
-function simplesamlphp_auth_admin_paths() {
-  return array('admin/config/people/simplesamlphp_auth' => TRUE);
-}
-
-/**
  * Implements hook_help().
  */
-function simplesamlphp_auth_help($path, $arg) {
-  switch ($path) {
-    case 'admin/config/people/simplesamlphp_auth':
+function simplesamlphp_auth_help($route_name) {
+  switch ($route_name) {
+    case 'simplesamlphp_auth.admin_path':
       $output = t('<p>This module integrates Drupal with a SimpleSAMLphp Service Point (SP), effectively federating Drupal.</p>');
 
       return $output;
@@ -121,9 +87,13 @@ function _simplesaml_auth_autoload() {
 }
 
 /**
- * Implements hook_user_insert().
+ * Implements hook_user_login().
  */
-function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
+/**
+ *  Implements hook_user_login().
+ */
+function simplesamlphp_auth_user_login($account) {
+  //function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
   global $_simplesamlphp_auth_as;
   global $_simplesamlphp_auth_saml_attributes;
 
@@ -165,6 +135,9 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
 /**
  * Implements hook_user_logout().
  */
+/**
+ *  Implements hook_user_logout().
+ */
 function simplesamlphp_auth_user_logout($account) {
   global $user;
   global $_simplesamlphp_auth_as;
@@ -191,9 +164,12 @@ function simplesamlphp_auth_user_logout($account) {
 }
 
 /**
- * Implements hook_user_delete().
+ * Implements hook_user_cancel().
  */
-function simplesamlphp_auth_user_delete($account) {
+/**
+ *  Implements hook_user_cancel().
+ */
+function simplesamlphp_auth_user_cancel($edit, $account, $method) {
   db_delete('authmap')
     ->condition('uid', $account->uid)
     ->condition('authname', $account->name)
@@ -209,7 +185,7 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     return;
   }
 
-  $link = l('Federated Log In', 'saml_login');
+//  $link = l('Federated Log In', 'saml_login');
 
   // Add SAML login link to user login form.
   if ($form_id == 'user_login_block' || $form_id == 'user_account_form') {
@@ -240,9 +216,9 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     $form['#validate'] = array_diff($form['#validate'], array('user_validate_current_pass'));
 
     // If the user is a simplesamlphp_auth user and is NOT allowed to set their Drupal password, remove the fields from the form.
-    if (!variable_get('simplesamlphp_auth_allowsetdrupalpwd')) {
-      unset($form['account']['pass']);
-    }
+//    if (!variable_get('simplesamlphp_auth_allowsetdrupalpwd')) {
+//      unset($form['account']['pass']);
+//    }
   }
 }
 
@@ -327,8 +303,8 @@ function _simplesamlphp_auth_isEnabled($bShowInactiveMsg = FALSE) {
   GLOBAL $user;
 
   $failure = NULL;
-  $isActivated = variable_get('simplesamlphp_auth_activate');
-  $basedir = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
+//  $isActivated = variable_get('simplesamlphp_auth_activate');
+//  $basedir = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
 
   if ($isActivated) {
     // Make sure we know where SimpleSAMLphp is.
