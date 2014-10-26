@@ -28,12 +28,16 @@
  *         notices.
  */
 
+use Drupal\Core\Url;
+use \Drupal\Core\Form\FormStateInterface;
+
 /**
  * Implements hook_help().
  */
 function simplesamlphp_auth_help($route_name) {
   switch ($route_name) {
-    case 'simplesamlphp_auth.admin_path':
+    case 'simplesamlphp_auth.admin_settings':
+    case 'help.page.simplesamlphp_auth':
       $output = t('<p>This module integrates Drupal with a SimpleSAMLphp Service Point (SP), effectively federating Drupal.</p>');
 
       return $output;
@@ -87,9 +91,6 @@ function _simplesaml_auth_autoload() {
 }
 
 /**
- * Implements hook_user_login().
- */
-/**
  *  Implements hook_user_login().
  */
 function simplesamlphp_auth_user_login($account) {
@@ -133,9 +134,6 @@ function simplesamlphp_auth_user_login($account) {
 }
 
 /**
- * Implements hook_user_logout().
- */
-/**
  *  Implements hook_user_logout().
  */
 function simplesamlphp_auth_user_logout($account) {
@@ -163,9 +161,6 @@ function simplesamlphp_auth_user_logout($account) {
   }
 }
 
-/**
- * Implements hook_user_cancel().
- */
 /**
  *  Implements hook_user_cancel().
  */
@@ -248,42 +243,6 @@ function simplesaml_auth_user_profile_form_submit(&$form, $form_state) {
         ->execute();
     }
   }
-}
-
-/**
- * Implements hook_block_view().
- */
-function simplesamlphp_auth_block_view($delta = '') {
-
-  if (!_simplesaml_auth_autoload()) {
-    // Exit without executing.
-    return;
-  }
-
-  switch ($delta) {
-    case 0:
-      $block = array(
-        'subject' => t('simpleSAMLphp login'),
-        'content' => _simplesamlphp_auth_generate_block_text()
-      );
-      break;
-  }
-
-  return $block;
-}
-
-/**
- * Implements hook_block_info().
- */
-function simplesamlphp_auth_block_info() {
-  $block = array(
-    array(
-      'info' => t('simpleSAMLphp authentication'),
-      'cache' => DRUPAL_NO_CACHE,
-    )
-  );
-
-  return $block;
 }
 
 /****************************************************************************
