@@ -1,0 +1,4 @@
+services:
+  simplesamlphp_auth.manager:
+    class: Drupal\simplesamlphp_auth\SimplesamlphpAuthManager
+    arguments: ['@config.factory']
