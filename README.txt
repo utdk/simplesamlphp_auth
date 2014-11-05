@@ -27,7 +27,8 @@ identity attribute values.
 
 -- INSTALLATION --
 
-Assuming the prerequisites have been met, installation of this module is just like any other Drupal module.
+Assuming the prerequisites have been met, installation of this module is just
+like any other Drupal module.
 
 1) Download the module
 2) Uncompress it
@@ -42,6 +43,19 @@ Assuming the prerequisites have been met, installation of this module is just li
 The configuration of the module is fairly straight forward. You will need to
 know the names of the attributes that your SP will be making available to the
 module in order to map them into Drupal.
+
+An additional step is required to allow access to SimpleSAMLphp paths within the
+.htaccess for the Drupal 8 version of this module. Add in the lines below at the
+appropriate place within the Drupal 8 .htaccess or the configuration will cause
+permission denied errors.
+
+  # Copy and adapt this rule to directly execute PHP files in contributed or
+  # custom modules or to run another PHP application in the same directory.
+  RewriteCond %{REQUEST_URI} !/core/modules/statistics/statistics.php$
++ # Allow access to simplesaml paths
++ RewriteCond %{REQUEST_URI} !^/simplesaml
+  # Deny access to any other PHP files that do not match the rules above.
+  RewriteRule "^.+/.*\.php$" - [F]
 
 
 -- TROUBLESHOOTING --
