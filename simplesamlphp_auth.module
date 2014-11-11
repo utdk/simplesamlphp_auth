@@ -121,6 +121,42 @@ function _simplesaml_auth_autoload() {
 }
 
 /**
+ * Implements hook_init().
+ *
+ * If the user has logged out via SAML, log out the user in Drupal as well.
+ */
+function simplesamlphp_auth_init() {
+  if (user_is_anonymous()) {
+    return FALSE;
+  }
+
+  if (!_simplesaml_auth_autoload()) {
+    return FALSE;
+  }
+
+  global $user;
+  global $_simplesamlphp_auth_as;
+  global $_simplesamlphp_auth_saml_attributes;
+
+  // Get users that are allowed default login.
+  $allowed_default_login_users = variable_get('simplesamlphp_auth_allowdefaultloginusers', '');
+  $allowed_uids = explode(",", $allowed_default_login_users);
+
+
+  // Uid is allowed default login.
+  // @todo also perform check by role
+  if (in_array($user->uid, $allowed_uids)) {
+    $user_allowed_default_login = TRUE;
+  }
+
+   // Logs out user if not SAML authenticated and not allowed default login.
+  if (!$_simplesamlphp_auth_as->isAuthenticated() && !$user_allowed_default_login) {
+    module_load_include('pages.inc', 'user');
+    user_logout();
+  }
+}
+
+/**
  * Implements hook_user_insert().
  */
 function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
