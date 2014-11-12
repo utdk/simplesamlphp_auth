@@ -142,7 +142,7 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'select',
       '#size' => 3,
     // @TODO doc we got this from user/src/Plugin/views/access/Role.php
-      '#options' => array_map('\Drupal\Component\Utility\String::checkPlain', user_role_names()),
+      '#options' => array_map('\Drupal\Component\Utility\String::checkPlain', user_role_names(TRUE)),
       '#multiple' => TRUE,
       '#title' => $this->t('Which ROLES should be allowed to login with local accounts?'),
       '#default_value' => $config->get('allow.default_login_roles'),
