@@ -141,10 +141,6 @@ function simplesamlphp_auth_user_login(\Drupal\user\Entity\User $account) {
       // @todo Make this conditional.
       _simplesaml_auth_user_update($account);
 
-      if (module_exists('rules')) {
-        rules_invoke_event('simplesamlphp_auth_rules_event_register', $account);
-      }
-
       // Reload the user object to ensure that all properties are populated.
       $user = user_load($account->uid);
       _simplesaml_auth_user_login($user);
