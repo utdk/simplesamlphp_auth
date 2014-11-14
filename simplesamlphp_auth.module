@@ -46,79 +46,9 @@ function simplesamlphp_auth_help($route_name) {
 }
 
 /**
- * Implements hook_permission().
- */
-function simplesamlphp_auth_permission() {
-  return array(
-    'administer simpleSAMLphp authentication' => array(
-      'title' => t('Administer simpleSAMLphp authentication'),
-      'description' => t('Warning: Give to trusted roles only; this permission has security implications.'),
-    ),
-  );
-}
-
-/**
- * Loads simplesamlphp class and initializes global variables.
- */
-function _simplesaml_auth_autoload() {
-  if (!_simplesamlphp_auth_isEnabled(TRUE)) {
-    drupal_set_message(t("We're sorry this feature is not yet enabled."), 'error');
-
-    return FALSE;
-  }
-
-  global $_simplesamlphp_auth_as;
-  global $_simplesamlphp_auth_saml_attributes;
-  global $_simplesamlphp_auth_saml_config;
-  global $_simplesamlphp_auth_saml_version;
-
-  // Get the simplesamlphp session.
-  $basedir = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
-  if (file_exists($basedir . '/lib/_autoload.php')) {
-    require_once $basedir . '/lib/_autoload.php';
-  }
-  else {
-    return FALSE;
-  }
-
-  $_simplesamlphp_auth_saml_config = SimpleSAML_Configuration::getInstance();
-  $_simplesamlphp_auth_saml_version = $_simplesamlphp_auth_saml_config->getVersion();
-
-  // Load simpleSAMLphp, configuration and metadata.
-  $_simplesamlphp_auth_as = new SimpleSAML_Auth_Simple(variable_get('simplesamlphp_auth_authsource', 'default-sp'));
-  $_simplesamlphp_auth_saml_attributes = $_simplesamlphp_auth_as->getAttributes();
-
-  return TRUE;
-}
-
-/**
  *  Implements hook_user_login().
  */
 function simplesamlphp_auth_user_login(\Drupal\user\Entity\User $account) {
-
-//  $simplesaml = new SimplesamlphpAuthManager();
-
-  //function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
-//  global $_simplesamlphp_auth_as;
-//  global $_simplesamlphp_auth_saml_attributes;
-
-//  $x = $account->getInitialEmail();
-
-//  if (!$simplesaml->hasSimplesaml()) {
-//    return;
-    // logging?
-//  }
-
-//  if ( _simplesaml_auth_autoload()) {
-//    // Exit without initializing.
-//    return;
-//  }
-//  dpm($account);
-
-//  if ($simplesaml->instance->isAuthenticated()) {
-//
-//  }
-
 
     return;
 
@@ -152,6 +82,13 @@ function simplesamlphp_auth_user_login(\Drupal\user\Entity\User $account) {
  *  Implements hook_user_logout().
  */
 function simplesamlphp_auth_user_logout($account) {
+
+  $config = \Drupal::config('simplesamlphp_auth.settings');
+  $logout_url = $config->get('logout_goto_url');
+  if ($logout_url) {
+    // $simplesaml->logout($logout_url);
+  }
+
   return;
   global $user;
   global $_simplesamlphp_auth_as;
@@ -181,20 +118,79 @@ function simplesamlphp_auth_user_logout($account) {
  *  Implements hook_user_cancel().
  */
 function simplesamlphp_auth_user_cancel($edit, $account, $method) {
-  db_delete('authmap')
+  db_delete('simplesamlphp_auth_authmap')
     ->condition('uid', $account->uid)
     ->condition('authname', $account->name)
     ->execute();
 }
 
 /**
- *  Implements hook_form_alter().
+ *  Implements hook_form_FORM_ID_alter().
+ *
+ * @see AccountForm::form()
+ * @see simplesamlphp_auth_user_form_submit()
+ */
+function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  simplesamlphp_auth_user_form_includes($form);
+
+dpm('lolol yeah');
+
+  // If the user has a simplesamlphp_auth authmap record, then don't require them to know their Drupal password.
+  // This will allow them to change their e-mail address, and set a Drupal password if they want to (and are allowed).
+//  if ((isset($form['#user']->init) && $form['#user']->init) && (_simplesaml_auth_user_has_authmap($form['#user']->init) && $form_id == 'user_profile_form')) {
+//    unset($form['account']['current_pass']);
+//    unset($form['account']['current_pass_required_values']);
+//    $form['#validate'] = array_diff($form['#validate'], array('user_validate_current_pass'));
+//    // If the user is a simplesamlphp_auth user and is NOT allowed to set their Drupal password, remove the fields from the form.
+//    if (!variable_get('simplesamlphp_auth_allowsetdrupalpwd')) {
+//      unset($form['account']['pass']);
+//    }
+//  }
+
+//dpm($form);
+
+}
+
+//
+//function node_form_system_themes_admin_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+//  $form['admin_theme']['use_admin_theme'] = array(
+//    '#type' => 'checkbox',
+//    '#title' => t('Use the administration theme when editing or creating content'),
+//    '#default_value' => \Drupal::config('node.settings')->get('use_admin_theme'),
+//  );
+//  $form['#submit'][] = 'node_form_system_themes_admin_form_submit';
+//}
+
+/**
+ *  Implements hook_form_FORM_ID_alter().
+ *
+ * Alters the System module's site information settings form to add a global
+ * default setting for number of posts to show on node listing pages.
+ *
+ *
+ *
+ * @see AccountForm::form()
+ * @see simplesamlphp_auth_user_form_submit()
+ */
+function simplesamlphp_auth_form_user_register_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  simplesamlphp_auth_user_form_includes($form);
+}
+
+
+function simplesamlphp_auth_user_form_includes(&$form) {
+  $form['simplesamlphp_auth_user_enable'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable this user to leverage SAML authentication'),
+//      '#default_value' => $form_id == 'user_register_form' ? TRUE : (bool) user_get_authmaps($form['#user']->name),
+  );
+
+  $form['actions']['submit']['#submit'][] = 'simplesamlphp_auth_user_form_submit';
+}
+
+/**
+ *  Implements hook_form_FORM_ID_alter().
  */
 function simplesamlphp_auth_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-
-//  $x = new \Drupal\simplesamlphp_auth\SimplesamlphpAuthManager();
-
-  //dpm($x);
 
 
 //  return;
@@ -213,66 +209,39 @@ function simplesamlphp_auth_form_user_login_form_alter(&$form, FormStateInterfac
   ))));
 
   // Add SAML login link to user login form.
-//  if ($form_id == 'user_login_block' || $form_id == 'user_account_form') {
     $links = $form['links']['#markup'];
     $links = str_replace('</ul>', '<li class="saml">' . $link . '</li></ul>', $links);
     $form['links']['#markup'] = $links;
-//  }
 
 //  if ($form_id == 'user_login') {
 //    $form['links']['#markup'] = $link;
 //  }
 
-//  if ($form_id == 'user_register_form' || $form_id == 'user_profile_form') {
-    $form['saml'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Enable this user to leverage SAML authentication'),
-//      '#default_value' => $form_id == 'user_register_form' ? TRUE : (bool) user_get_authmaps($form['#user']->name),
-    );
-    $form['#submit'][] = 'simplesaml_auth_user_profile_form_submit';
-//  }
-
-  // If the user has a simplesamlphp_auth authmap record, then don't require them to know their Drupal password.
-  // This will allow them to change their e-mail address, and set a Drupal password if they want to (and are allowed).
-  if ((isset($form['#user']->init) && $form['#user']->init) && (_simplesaml_auth_user_has_authmap($form['#user']->init) && $form_id == 'user_profile_form')) {
-
-    unset($form['account']['current_pass']);
-    unset($form['account']['current_pass_required_values']);
-    $form['#validate'] = array_diff($form['#validate'], array('user_validate_current_pass'));
-
-    // If the user is a simplesamlphp_auth user and is NOT allowed to set their Drupal password, remove the fields from the form.
-//    if (!variable_get('simplesamlphp_auth_allowsetdrupalpwd')) {
-//      unset($form['account']['pass']);
-//    }
-  }
 }
 
 /**
- * Submit callback to enable SAML authentication for a given user.
+ * Form submission handler for user_form.
+ *
+ * @see simplesamlphp_auth_form_user_register_form_alter()
+ * @see simplesamlphp_auth_form_user_form_alter()
  */
-function simplesaml_auth_user_profile_form_submit(&$form, $form_state) {
-  return;
-  $values = $form_state['values'];
-
-  if (isset($values['saml'])) {
-    // Enter this username into the authmap table.
-    if ($values['saml']) {
-      db_merge('authmap')
-        ->key(array(
-          'uid' => $values['uid'],
-          'module' => 'simplesamlphp_auth',
-        ))
-        ->fields(array(
-          'authname' => $values['mail'],
-        ))
-        ->execute();
-    }
-    // Remove this username from the authmap table.
-    else {
-      db_delete('authmap')
-        ->condition('uid', $values['uid'])
-        ->execute();
-    }
+function simplesamlphp_auth_user_form_submit($form, FormStateInterface $form_state) {
+  // Enter this username into the simplesamlphp_auth_authmap table.
+  if ($form_state->getValue('simplesamlphp_auth_user_enable')) {
+    db_merge('simplesamlphp_auth_authmap')
+      ->key(array(
+        'uid' => $form_state->getValue('uid'),
+      ))
+      ->fields(array(
+        'authname' => $form_state->getValue('mail'),
+      ))
+      ->execute();
+  }
+  // Remove this username from the authmap table.
+  else {
+    db_delete('simplesamlphp_auth_authmap')
+      ->condition('uid', $form_state->getValue('uid'))
+      ->execute();
   }
 }
 

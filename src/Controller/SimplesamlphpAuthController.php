@@ -102,9 +102,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
           // Log the user in.
           if ($account instanceof UserInterface) {
             $this->simplesaml->externalLogin($account);
-//            throw new AccessDeniedHttpException;
           }
-//          throw new NotFoundHttpException();
 //          _simplesaml_auth_user_login($ext_user);
         }
       }
@@ -115,8 +113,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
     }
 
     // Do some sanity checking before attempting anything.
-    // @TODO change this to 'not phpsession'
-    if ($this->simplesaml->getStorage() !== 'sql') {
+    if ($this->simplesaml->getStorage() === 'phpsession') {
       // @TODO logging here
       return $this->redirect('user.login');
     }
