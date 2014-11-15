@@ -5,44 +5,6 @@
  * Contains non-hook implementations.
  */
 
-/**
- * Performs login and/or register actions for SAML authenticated users.
- */
-function _simplesaml_auth_login_register() {
-  global $user;
-  global $_simplesamlphp_auth_as;
-
-  // User is logged in - SimpleSAMLphp (but not Drupal).
-  if ($_simplesamlphp_auth_as->isAuthenticated()) {
-
-    // Get unique identifier from saml attributes.
-    $authname = _simplesamlphp_auth_get_authname();
-
-    _simplesaml_auth_debug(t('Authname is [%authname] userid is [%uid]', array(
-      '%authname' => $authname,
-      '%uid' => $user->uid,
-    )));
-
-    if (!empty($authname)) {
-      // User is logged in with SAML authentication and we got the unique
-      // identifier, so try to log into Drupal.
-      _simplesaml_auth_debug(t('Loading Drupal user [%authname]', array('%authname' => $authname)));
-
-      // Retrieve user mapping and attempt to log the user in.
-      $ext_user = user_external_load($authname);
-
-      // If we did not find a Drupal user, register a new one.
-      if (!$ext_user) {
-        $ext_user = _simplesaml_auth_user_register($authname);
-      }
-
-      // Log the user in.
-      _simplesaml_auth_user_login($ext_user);
-
-    }
-  }
-}
-
 
 /**
  * Creates a new Drupal account for a SAML authenticated user.
@@ -138,41 +100,6 @@ function _simplesaml_auth_user_update($account) {
   }
 }
 
-
-/**
- * Logs an SAML-authenticated user into Drupal.
- *
- * @param object $ext_user
- *   The Drupal user object to be logged in.
- *
- * @throws Exception
- */
-function _simplesaml_auth_user_login($ext_user) {
-  global $user;
-
-  // See if we're supposed to re-evaluate role assignments.
-  if (variable_get('simplesamlphp_auth_roleevaleverytime', 0)) {
-    // Populate roles based on configuration setting.
-    _simplesaml_auth_debug(t('User already registered [%authname] updating roles.', array('%authname' => $ext_user->name)));
-    $roles = _simplesamlphp_auth_rolepopulation(variable_get('simplesamlphp_auth_rolepopulation', ''));
-    $userinfo = array('roles' => $roles);
-
-    // Save the updated roles and populate the user object.
-    $user = user_save($ext_user, $userinfo);
-  }
-  else {
-    // No need to evaluate roles, populate the user object.
-    $user = $ext_user;
-  }
-
-  if (module_exists('rules')) {
-    rules_invoke_event('simplesamlphp_auth_rules_event_login', $user);
-  }
-
-  // Finalizing the login, calls hook_user op login.
-  $edit = array();
-  user_login_finalize($edit);
-}
 
 /**
  * Denies non-SAML-authenticated access to the site for configured Drupal roles.
