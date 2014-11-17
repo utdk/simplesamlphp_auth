@@ -69,7 +69,6 @@ class SimplesamlphpAuthManager {
   }
 
   public function externalLogin(UserInterface $account) {
-//    global $user;
 
     // See if we're supposed to re-evaluate role assignments.
 //    if ($this->config->get('role.eval_every_time')) {
@@ -86,22 +85,9 @@ class SimplesamlphpAuthManager {
 //      $user = $ext_user;
 //    }
 
-//    if (module_exists('rules')) {
-//      rules_invoke_event('simplesamlphp_auth_rules_event_login', $user);
-//    }
-
     // Finalizing the login, calls hook_user op login.
     $edit = array();
     user_login_finalize($account);
-
-
-
-
-    // Register the new user.
-//    if ($this->externalRegister($authname)) {
-//      return TRUE;
-//    }
-//    user_external_login_register($authname, 'simplesamlphp_auth');
 
 //    _simplesaml_auth_debug(t('Registered [%authname] with uid @uid', array(
 //      '%authname' => $authname,
@@ -131,14 +117,13 @@ class SimplesamlphpAuthManager {
 
   public function externalRegister($name) {
 
-    // @TODO
-    // First we check the admin settings for simpleSAMLphp and find out if we are allowed to register users.
-    if (!$this->config('register_users')) {
+    // First we check the admin settings for simpleSAMLphp and find out if we
+    // are allowed to register users.
+    if (!$this->config->get('register_users')) {
       // We are not allowed to register new users on the site through simpleSAML.
       // We let the user know about this and redirect to the user/login page.
       drupal_set_message(t("We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you."));
       $this->instance->logout(base_path());
-//      return FALSE;
     }
 
     // We are allowed to register new users.
@@ -162,9 +147,7 @@ class SimplesamlphpAuthManager {
     // @TODO do we need this check even?
     $account = $this->externalLoad($name);
     if (!$account) {
-      // Register this new user.
-
-      // Create the base user, based on drupalCreateUser().
+      // Create the new user.
       $account = entity_create('user', array(
         'name' => $name,
         'pass' => user_password(),
@@ -175,7 +158,7 @@ class SimplesamlphpAuthManager {
       $account->enforceIsNew();
       $account->save();
 
-      // Terminate if an error occurred during user_save().
+      // Terminate if an error occurred during $account->save().
       if (!$account) {
         drupal_set_message(t("Error saving user account."), 'error');
 
@@ -189,11 +172,16 @@ class SimplesamlphpAuthManager {
         ->fields(array('authname' => $name))
         ->execute();
 
-      // Populate roles based on configuration setting.
-//      $roles = _simplesamlphp_auth_rolepopulation(variable_get('simplesamlphp_auth_rolepopulation', ''));
-//      $userinfo = array('roles' => $roles);
-      // @todo - Fjernet rolle-delen her da den gav en bra feilmelding når roller ikke finnes.
-//      $user = user_save($user, $userinfo);
+//      if ($user) {
+//        // Populate roles based on configuration setting.
+//        $roles = _simplesamlphp_auth_rolepopulation(variable_get('simplesamlphp_auth_rolepopulation', ''));
+//        $userinfo = array('roles' => $roles);
+//        // @todo - Fjernet rolle-delen her da den gav en bra feilmelding når roller ikke finnes.
+//        $user = user_save($user, $userinfo);
+//
+//        return $user;
+//      }
+
     }
 
     return $account;
@@ -204,12 +192,47 @@ class SimplesamlphpAuthManager {
     return $this->getAttribute($this->config->get('unique_id'));
   }
 
+  /**
+   * Gets the name attribute.
+   *
+   * @return
+   *   The name attribute.
+   */
+  public function getDefaultName() {
+    return $this->getAttribute($this->config->get('user_name'));
+  }
+
+  /**
+   * Gets the mail attribute.
+   *
+   * @return
+   *   The mail attribute.
+   */
+  public function getDefaultEmail() {
+    return $this->getAttribute($this->config->get('mail_attr'));
+  }
+
+  /**
+   * Gets the authname attribute from the SAML assertion.
+   *
+   * @return string
+   *   The authname attribute.
+   *
+   * @throws Exception
+   *   Throws an exception if no valid unique id attribute is set in SAML session.
+   */
+
+
   protected function getAttribute($attribute) {
     $attributes = $this->instance->getAttributes();
 
     if (isset($attributes)) {
-      if (!isset($attributes[$attribute])) {
-        throw new \Exception(t('Error in simplesamlphp_auth.module: no valid unique id attribute set.'));
+      if (empty($attributes[$attribute][0])) {
+        throw new \Exception(t('Error in simplesamlphp_auth.module: no valid %attribute attribute set.',
+          array(
+            '%attribute' => $attribute,
+          )
+        ));
       }
 
       return $attributes[$attribute][0];

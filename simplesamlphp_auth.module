@@ -50,31 +50,30 @@ function simplesamlphp_auth_help($route_name) {
  */
 function simplesamlphp_auth_user_login($account) {
 
+  $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
+
+  if (!$simplesaml->isActivated()) {
     return;
+  }
 
-  if ($category = 'account') {
-    // If user registration has a valid session...
-    if ($_simplesamlphp_auth_as->isAuthenticated() && _simplesamlphp_auth_get_authname() == $account->init) {
-
-      // Get name from default attributes.
-      try {
-        _simplesaml_auth_debug(t('Registering user [%acctname]', array('%acctname' => $account->name)));
-        $account->name = _simplesamlphp_auth_get_default_name($account->uid);
-      } catch (Exception $e) {
-        drupal_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
-        watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
-      }
-
-      module_load_include('inc', 'simplesamlphp_auth');
-
-      // Update username and email address.
-      // @todo Make this conditional.
-      _simplesaml_auth_user_update($account);
-
-      // Reload the user object to ensure that all properties are populated.
-      $user = user_load($account->uid);
-      _simplesaml_auth_user_login($user);
+  // If user registration has a valid session...
+  if ($simplesaml->isAuthenticated() && $simplesaml->getAuthname() == $account->getInitialEmail()) {
+    // Get name and mail from default attributes.
+    try {
+      $name = $simplesaml->getDefaultName();
+      $mail = $simplesaml->getDefaultEmail();
+    } catch (Exception $e) {
+      drupal_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
+//      watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
     }
+
+    // Update username and email address.
+    // @TODO Make this conditional.
+    // Should this go in the Manager (externalLogin method)
+    $account->setUsername($name);
+    $account->setEmail($mail);
+    $account->save();
+
   }
 }
 
@@ -90,11 +89,6 @@ function simplesamlphp_auth_user_logout($account) {
   }
 
   return;
-  global $user;
-  global $_simplesamlphp_auth_as;
-  global $_simplesamlphp_auth_saml_attributes;
-  global $base_url;
-
   _simplesaml_auth_autoload();
 
   if (!empty($_simplesamlphp_auth_saml_attributes)) {
@@ -216,14 +210,15 @@ function simplesamlphp_auth_form_user_login_form_alter(&$form, FormStateInterfac
  */
 function simplesamlphp_auth_user_form_submit($form, FormStateInterface $form_state) {
 
-  // Enter this username into the simplesamlphp_auth_authmap table.
+  // Enter the user's authname into the simplesamlphp_auth_authmap table.
   if ($form_state->getValue('simplesamlphp_auth_user_enable')) {
+    $account = $form_state->getFormObject()->getEntity();
     db_merge('simplesamlphp_auth_authmap')
       ->key(array(
         'uid' => $form_state->getValue('uid'),
       ))
       ->fields(array(
-        'authname' => $form_state->getValue('mail'),
+        'authname' => $account->getInitialEmail(),
       ))
       ->execute();
   }
@@ -238,143 +233,6 @@ function simplesamlphp_auth_user_form_submit($form, FormStateInterface $form_sta
 /****************************************************************************
  * Private functions ********************************************************
  ****************************************************************************/
-
-/**
- * Checks to see if authentication via SimpleSAMLphp should be activated
- *
- * @param bool bShowInactiveMsg
- *   Whether to display the "module not activated" message
- *
- * @return bool
- *   TRUE is simplesamlphp_auth is enabled.
- */
-function _simplesamlphp_auth_isEnabled($bShowInactiveMsg = FALSE) {
-  GLOBAL $user;
-
-  $failure = NULL;
-//  $isActivated = variable_get('simplesamlphp_auth_activate');
-//  $basedir = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
-
-  if ($isActivated) {
-    // Make sure we know where SimpleSAMLphp is.
-    if (!file_exists($basedir)) {
-      $failure = t('SimpleSAMLphp could not be found at %basedir . The simplesamlphp_auth module cannot function until the path to the local SimpleSAMLphp instance is configured.', array('%basedir' => $basedir));
-
-      watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
-
-    }
-
-  }
-
-  // If there were no failures, then it should be activated.
-  if (!$failure) {
-    return TRUE;
-  }
-  else {
-
-    // communicate but don't be too annoying
-    if ($bShowInactiveMsg && (1 == $user->uid || user_access('access administration pages')) && (preg_match('/admin\/people/', request_uri()) || preg_match('/admin\/modules/', request_uri()) || preg_match('/admin\/config/', request_uri()))) {
-      drupal_set_message($failure);
-    }
-  }
-
-  return FALSE;
-
-}
-
-/**
- * Gets the authname attribute from the SAML assertion.
- *
- * @return string
- *   The authname attribute.
- *
- * @throws Exception
- *   Throws an exception if no valid unique id attribute is set in SAML session.
- */
-function _simplesamlphp_auth_get_authname() {
-  global $_simplesamlphp_auth_saml_attributes;
-
-  $authname = '';
-
-  // Check if valid local session exists.
-  if (isset($_simplesamlphp_auth_saml_attributes)) {
-    _simplesaml_auth_debug(t('_simplesamlphp_auth_get_authname: Valid local SAML session exists'));
-    if (isset($_simplesamlphp_auth_saml_attributes[variable_get('simplesamlphp_auth_unique_id', 'eduPersonPrincipalName')])) {
-      $authname = $_simplesamlphp_auth_saml_attributes[variable_get('simplesamlphp_auth_unique_id', 'eduPersonPrincipalName')][0];
-    }
-    else {
-      throw new Exception(t('Error in simplesamlphp_auth.module: no valid unique id attribute set.'));
-    }
-  }
-
-  return $authname;
-}
-
-/**
- * Gets the default name attribute from the SAML assertion.
- *
- * @return
- *   The name attribute.
- */
-function _simplesamlphp_auth_get_default_name($account) {
-  global $_simplesamlphp_auth_as;
-  global $_simplesamlphp_auth_saml_attributes;
-
-  $default_name = '';
-
-  // Check if valid local session exists..
-  if ($_simplesamlphp_auth_as->isAuthenticated()) {
-    $auth_user_name_attr = variable_get('simplesamlphp_auth_user_name', 'eduPersonPrincipalName');
-    if ((!isset($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr])) ||
-      (!isset($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0])) ||
-      ($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0] == '')
-    ) {
-      throw new Exception(t('There was no set attribute named "%auth_user_name_attr" returned for user %uid.',
-        array(
-          '%auth_user_name_attr' => $auth_user_name_attr,
-          '%uid' => $account,
-        )));
-    }
-    $default_name = $_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0];
-  }
-
-  return $default_name;
-}
-
-/**
- * Gets the mail attribute.
- *
- * @return
- *   The mail attribute.
- */
-function _simplesamlphp_auth_get_mail() {
-  global $_simplesamlphp_auth_as;
-  global $_simplesamlphp_auth_saml_attributes;
-  $mail_address = '';
-  // Check if valid local session exists..
-  if ($_simplesamlphp_auth_as->isAuthenticated()) {
-    if (isset($_simplesamlphp_auth_saml_attributes[variable_get('simplesamlphp_auth_mailattr', 'mail')])) {
-      $mail_address = $_simplesamlphp_auth_saml_attributes[variable_get('simplesamlphp_auth_mailattr', 'mail')][0];
-    }
-    else {
-      throw new Exception(t('Error in simplesamlphp_auth.module: No valid mail attribute set.'));
-    }
-  }
-
-  return $mail_address;
-}
-
-/**
- * Forces HTTPS connections.
- */
-function _simplesamlphp_auth_forcehttps_rewrite($url) {
-  if (variable_get('simplesamlphp_auth_forcehttps', TRUE)) {
-    $url = str_replace('http://', 'https://', $url);
-    _simplesaml_auth_debug('forcehttps rewrite: ' . $url);
-  }
-
-  return $url;
-}
 
 /**
  * Generates the text for the log in block.
@@ -457,6 +315,7 @@ function _simplesamlphp_auth_evaulaterolerule($roleruleevaluation, $attributes) 
  *   An array containing user's roles.
  */
 function _simplesamlphp_auth_rolepopulation($rolemap) {
+  return;
   global $_simplesamlphp_auth_as;
   global $_simplesamlphp_auth_saml_attributes;
   $roles = array();
@@ -502,22 +361,6 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
   }
 
   return $roles;
-}
-
-/**
- * See if the user has an authmap record for simplesamlphp_auth
- */
-function _simplesaml_auth_user_has_authmap($authname) {
-  $authmaps = user_get_authmaps($authname);
-
-  $return = 0;
-
-  if (is_array($authmaps)) {
-    $return = in_array('simplesamlphp_auth', array_keys($authmaps));
-  }
-
-  return $return;
-
 }
 
 /**

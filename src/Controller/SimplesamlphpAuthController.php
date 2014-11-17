@@ -79,7 +79,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
     // The user is not logged into Drupal.
     if ($this->account->isAnonymous()) {
 
-      // User is logged in - SimpleSAMLphp (but not Drupal).
+      // User is logged in to the SimpleSAMLphp IdP, but not to Drupal.
       if ($this->simplesaml->isAuthenticated()) {
 
         // Get unique identifier from saml attributes.
@@ -96,14 +96,12 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
           // If we did not find a Drupal user, register a new one.
           if (!$account) {
             $account = $this->simplesaml->externalRegister($authname);
-//            $ext_user = _simplesaml_auth_user_register($authname);
           }
 
           // Log the user in.
           if ($account instanceof UserInterface) {
             $this->simplesaml->externalLogin($account);
           }
-//          _simplesaml_auth_user_login($ext_user);
         }
       }
     }
@@ -131,7 +129,6 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
         $redirect = $request->server->get('HTTP_REFERER');
       }
     }
-
 
     // If the user is anonymous, set the cookie (if we can) and require authentication.
     if ($this->account->isAnonymous()) {
@@ -179,43 +176,6 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
     // Needs this here @todo
     return $this->redirect('user.login');
 
-//        throw new NotFoundHttpException();
-
-//    return $output;
-
-        // Make sure phpsession is NOT being used.
-//    dpm($this->simplesaml);
-        //    if ($this->simplesaml == 'phpsession') {
-//      watchdog('simplesamlphp_auth', 'A user attempted to login using simplesamlphp but the store.type is phpsession, use memcache or sql for simplesamlphp session storage. See: simplesamlphp/config/config.php.', NULL, WATCHDOG_WARNING);
-//      $fail = TRUE;
-//    }
-
-        // Make sure there is an instance of SimpleSAML_Auth_Simple.
-//    if (!$_simplesamlphp_auth_as) {
-//      watchdog('simplesamlphp_auth', 'A user attempted to login using this module but there was a problem.', NULL, WATCHDOG_WARNING);
-//      $fail = TRUE;
-//    }
-
-        // There was a problem, we can't go on, but we don't want to tell the user any specifics either.
-//    if ($fail) {
-//      drupal_set_message(t("We're sorry. There was a problem attempting login. The issue has been logged for the administrator."), 'error');
-//      drupal_goto('user/login');
-//    }
-
-        /* @var \Drupal\user\UserInterface $user */
-//    $user = $this->userStorage->load($uid);
-        // Verify that the user exists and is active.
-//    elseif ($user->isAuthenticated() && ($timestamp >= $user->getLastLoginTime()) && ($timestamp <= $current) && ($hash === user_pass_rehash($user->getPassword(), $timestamp, $user->getLastLoginTime()))) {
-//      $expiration_date = $user->getLastLoginTime() ? $this->dateFormatter->format($timestamp + $timeout) : NULL;
-//      return $this->formBuilder()->getForm('Drupal\user\Form\UserPasswordResetForm', $user, $expiration_date, $timestamp, $hash);
-//    }
-//        if ($user && $user->isActive()) {
-//          throw new AccessDeniedHttpException();
-//
-//          return $this->redirect('<front>');
-//        }
-//    return $this->redirect('user.login');
-//    throw new AccessDeniedHttpException();
   }
 }
 

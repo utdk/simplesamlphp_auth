@@ -55,6 +55,7 @@ class AdminForm extends ConfigFormBase {
       '#title' => $this->t('Installation directory (default: /var/simplesamlphp)'),
       '#default_value' => $config->get('install_dir'),
       '#description' => $this->t('The base directory of simpleSAMLphp. Absolute path with no trailing slash.'),
+      // @TODO this needs some kind of validation (validateForm / '#after_build'
     );
     $form['basic']['auth_source'] = array(
       '#type' => 'textfield',
