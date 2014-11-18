@@ -52,14 +52,14 @@ class AdminForm extends ConfigFormBase {
     );
     $form['basic']['install_dir'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Installation directory (default: /var/simplesamlphp)'),
+      '#title' => $this->t('Installation directory'),
       '#default_value' => $config->get('install_dir'),
       '#description' => $this->t('The base directory of simpleSAMLphp. Absolute path with no trailing slash.'),
       // @TODO this needs some kind of validation (validateForm / '#after_build'
     );
     $form['basic']['auth_source'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Autenticaton source for this SP (default: default-sp)'),
+      '#title' => $this->t('Authenticaton source for this SP'),
       '#default_value' => $config->get('auth_source'),
       '#description' => $this->t('The name of the source to use from @path/config/authsources.php', array('@path' => $config->get('install_dir'))),
     );
@@ -72,26 +72,26 @@ class AdminForm extends ConfigFormBase {
 
     $form['user_info'] = array(
       '#type' => 'fieldset',
-      '#title' => $this->t('User Info and Syncing'),
+      '#title' => $this->t('User info and syncing'),
       '#collapsible' => FALSE,
     );
     $form['user_info']['user_name'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Which attribute from simpleSAMLphp should be used as user\'s name'),
+      '#title' => $this->t('SimpleSAMLphp attribute to be used as username for the user'),
       '#default_value' => $config->get('user_name'),
       '#description' => $this->t('Example: <i>eduPersonPrincipalName</i> or <i>displayName</i><br />If the attribute is multivalued, the first value will be used.'),
       '#required' => TRUE,
     );
     $form['user_info']['unique_id'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Which attribute from simpleSAMLphp should be used as unique identifier for the user'),
+      '#title' => $this->t('SimpleSAMLphp attribute to be used as unique identifier for the user'),
       '#default_value' => $config->get('unique_id'),
       '#description' => $this->t('Example: <i>eduPersonPrincipalName</i> or <i>eduPersonTargetedID</i><br />If the attribute is multivalued, the first value will be used.'),
       '#required' => TRUE,
     );
     $form['user_info']['mail_attr'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Which attribute from simpleSAMLphp should be used as user mail address'),
+      '#title' => $this->t('SimpleSAMLphp attribute to be used as email address for the user'),
       '#default_value' => $config->get('mail_attr'),
       '#description' => $this->t('Example: <i>mail</i><br />If the user attribute is multivalued, the first value will be used.'),
     );
@@ -103,7 +103,7 @@ class AdminForm extends ConfigFormBase {
     );
     $form['user_info']['role_eval_every_time'] = array(
       '#type' => 'checkbox',
-      '#title' => $this->t('Reevaluate roles every time the user logs in.'),
+      '#title' => $this->t('Reevaluate roles every time the user logs in'),
       '#default_value' => $config->get('role.eval_every_time'),
       '#description' => $this->t('NOTE: This means users could lose any roles that have been assigned manually in Drupal.'),
     );
@@ -116,20 +116,20 @@ class AdminForm extends ConfigFormBase {
     );
     $form['user_provisioning']['register_users'] = array(
       '#type' => 'checkbox',
-      '#title' => $this->t('Register users (i.e., auto-provisioning)'),
+      '#title' => $this->t('Register users'),
       '#default_value' => $config->get('register_users'),
       '#description' => $this->t('Determines wether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you\'ve done some custom work to provision Drupal accounts with the necessary simplesamlphp_auth_authmap entries you will want this checked.<br /><br />NOTE: If unchecked each user must already have been provisioned a Drupal account with an appropriate entry in the simplesamlphp_auth_authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Drupal account will not create the necessary entry in the simplesamlphp_auth_authmap table.'),
     );
 
     $form['authentication'] = array(
       '#type' => 'details',
-      '#title' => $this->t('Drupal Authentication'),
+      '#title' => $this->t('Drupal authentication'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     );
     $form['authentication']['allow_set_drupal_pwd'] = array(
       '#type' => 'checkbox',
-      '#title' => $this->t('Allow SAML users to set Drupal passwords.'),
+      '#title' => $this->t('Allow SAML users to set Drupal passwords'),
       '#default_value' => $config->get('allow.set_drupal_pwd'),
       '#description' => $this->t('Check this box if you want to let people set passwords for their local Drupal accounts. This will allow users to log in using either SAML or a local Drupal account. Disabling this removes the password change fields from the user profile form.<br/>NOTE: In order for them to login using their local Drupal password you must allow local logins with the settings below.'),
     );
@@ -144,21 +144,21 @@ class AdminForm extends ConfigFormBase {
       '#size' => 3,
       '#options' => array_map('\Drupal\Component\Utility\String::checkPlain', user_role_names(TRUE)),
       '#multiple' => TRUE,
-      '#title' => $this->t('Which ROLES should be allowed to login with local accounts?'),
+      '#title' => $this->t('Roles to be allowed to log in locally'),
       '#default_value' => $config->get('allow.default_login_roles'),
       '#description' => $this->t('Roles that should be allowed to login without simpleSAMLphp. Examples are dev/admin roles or guest roles.'),
     );
     $form['authentication']['allow_default_login_users'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Which users should be allowed to login with local accounts?'),
+      '#title' => $this->t('Users to be allowed to log in locally'),
       '#default_value' => $config->get('allow.default_login_users'),
       '#description' => $this->t('Example: <i>1,2,3</i><br />A comma-separated list of user IDs that should be allowed to login without simpleSAMLphp. If left blank, all local accounts can login.'),
     );
     $form['authentication']['logout_goto_url'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Optionally, specify a URL for users to go to after logging out'),
+      '#title' => $this->t('Redirect users after logging out'),
       '#default_value' => $config->get('logout_goto_url'),
-      '#description' => $this->t('Example: ' . $base_url),
+      '#description' => $this->t('Optionally, specify a URL for users to go to after logging out. Example: %base_url', array('%base_url' => $base_url)),
     );
 
     return $form;

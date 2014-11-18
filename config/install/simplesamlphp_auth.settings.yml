@@ -1,19 +1,18 @@
-activate: FALSE
+activate: false
 install_dir: '/var/simplesamlphp'
-logout_page:
 mail_attr: 'mail'
 unique_id: 'eduPersonPrincipalName'
 user_name: 'eduPersonPrincipalName'
 auth_source: 'default-sp'
+force_https: true
 role:
- - population:
- - eval_every_time: 0
-force_https: TRUE
-register_users: TRUE
+  population:
+  eval_every_time: 0
+register_users: true
 allow:
- - set_drupal_pwd: TRUE
- - default_login: TRUE
- - default_login_roles:
- - default_login_users:
+  set_drupal_pwd: true
+  default_login: true
+  default_login_roles:
+  default_login_users:
 logout_goto_url:
 user_register_original:
