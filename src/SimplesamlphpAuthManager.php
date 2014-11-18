@@ -4,7 +4,6 @@ namespace Drupal\simplesamlphp_auth;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\user\UserInterface;
 
 class SimplesamlphpAuthManager {
@@ -86,7 +85,6 @@ class SimplesamlphpAuthManager {
 //    }
 
     // Finalizing the login, calls hook_user op login.
-    $edit = array();
     user_login_finalize($account);
 
 //    _simplesaml_auth_debug(t('Registered [%authname] with uid @uid', array(

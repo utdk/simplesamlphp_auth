@@ -118,7 +118,7 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Register users (i.e., auto-provisioning)'),
       '#default_value' => $config->get('register_users'),
-      '#description' => $this->t('Determines wether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you\'ve done some custom work to provision Drupal accounts with the necessary authmap entries you will want this checked.<br /><br />NOTE: If unchecked each user must already have been provisioned a Drupal account with an appropriate entry in the authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Drupal account will not create the necessary entry in the authmap table.'),
+      '#description' => $this->t('Determines wether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you\'ve done some custom work to provision Drupal accounts with the necessary simplesamlphp_auth_authmap entries you will want this checked.<br /><br />NOTE: If unchecked each user must already have been provisioned a Drupal account with an appropriate entry in the simplesamlphp_auth_authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Drupal account will not create the necessary entry in the simplesamlphp_auth_authmap table.'),
     );
 
     $form['authentication'] = array(
