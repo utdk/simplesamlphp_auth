@@ -30,15 +30,6 @@ class AdminForm extends ConfigFormBase {
 
     $config = $this->config('simplesamlphp_auth.settings');
 
-    // @TODO update these
-    global $_simplesamlphp_auth_saml_version, $base_url;
-    if (!empty($_simplesamlphp_auth_saml_version )) {
-      $ver = explode('.', $_simplesamlphp_auth_saml_version);
-      if ( !($ver[0] >= 1 && $ver[1] >= 5) ) {
-        drupal_set_message(t("Please upgrade SimpleSAMLphp. You are using %ssp_version", array('%ssp_version' => $_simplesamlphp_auth_saml_version)), 'warning');
-      }
-    }
-
     $form['basic'] = array(
       '#type' => 'fieldset',
       '#title' => $this->t('Basic Setup'),
@@ -99,7 +90,7 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'textarea',
       '#title' => $this->t('Automatic role population from simpleSAMLphp attributes'),
       '#default_value' => $config->get('role.population'),
-      '#description' => $this->t('A pipe separated list of rules.<br />Example: <i>roleid1:condition1|roleid2:contition2...</i> <br />For instance: <i>1:eduPersonPrincipalName,@=,uninett.no;affiliation,=,employee|2:mail,=,andreas@uninett.no</i>'),
+      '#description' => $this->t('A pipe separated list of rules.<br />Example: <i>roleid1:condition1|roleid2:condition2...</i> <br />For instance: <i>1:eduPersonPrincipalName,@=,uninett.no;affiliation,=,employee|2:mail,=,andreas@uninett.no</i>'),
     );
     $form['user_info']['role_eval_every_time'] = array(
       '#type' => 'checkbox',
@@ -158,7 +149,7 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Redirect users after logging out'),
       '#default_value' => $config->get('logout_goto_url'),
-      '#description' => $this->t('Optionally, specify a URL for users to go to after logging out. Example: %base_url', array('%base_url' => $base_url)),
+      '#description' => $this->t('Optionally, specify a URL for users to go to after logging out.'),
     );
 
     return $form;

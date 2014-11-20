@@ -35,8 +35,23 @@ class SimplesamlphpAuthBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function isCacheable() {
-    return FALSE;
-  }
-
-}
+//  public function isCacheable() {
+//    return FALSE;
+//  }
+//
+//}
+//
+//if (!_simplesamlphp_auth_isEnabled()) {
+//  // Exit without executing.
+//  return;
+//}
+//
+//// Check if valid local session exists..
+//if ($_simplesamlphp_auth_as->isAuthenticated()) {
+//  $block_content .= '<p>Logged in as: ' . $user->name . '<br />' . l('Log Out', 'user/logout') . '</a></p>';
+//}
+//else {
+//  $block_content .= '<p>' . l('Federated Log In', 'saml_login') . '</p>';
+//}
+//
+//return $block_content;
