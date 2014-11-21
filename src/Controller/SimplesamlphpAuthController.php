@@ -117,7 +117,8 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
       return $this->redirect('user.login');
     }
 
-    // See if a URL has been explicitly provided in ReturnTo. If so, use it (as long as it points to this site).
+    // See if a URL has been explicitly provided in ReturnTo. If so, use it
+    // otherwise, use the HTTP_REFERER. Each must point to the site to be valid.
     $request = $this->requestStack->getCurrentRequest();
 
     if (($return_to = $request->request->get('ReturnTo')) || ($return_to = $request->server->get('HTTP_REFERER'))) {
@@ -159,8 +160,8 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
     }
 
     // Check to see if we've set a cookie. If there is one, give it priority.
-    if ($this->requestStack->getCurrentRequest()->cookies->has('simplesamlphp_auth_returnto')) {
-      $redirect = $this->requestStack->getCurrentRequest()->cookies->get('simplesamlphp_auth_returnto');
+    if ($request->cookies->has('simplesamlphp_auth_returnto')) {
+      $redirect = $request->cookies->get('simplesamlphp_auth_returnto');
 
       // unset the cookie
       setrawcookie('simplesamlphp_auth_returnto', '');

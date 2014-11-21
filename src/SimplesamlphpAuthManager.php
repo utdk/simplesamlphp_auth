@@ -37,6 +37,7 @@ class SimplesamlphpAuthManager {
   /**
    * @param ConfigFactoryInterface $config_factory
    * @param Connection $connection
+   * @param LoggerInterface $logger
    * @throws \Exception
    */
   public function __construct(ConfigFactoryInterface $config_factory, Connection $connection, LoggerInterface $logger) {
@@ -98,8 +99,6 @@ class SimplesamlphpAuthManager {
       return FALSE;
     }
 
-    // @TODO logging
-
     // It's possible that a user with their username set to this authname
     // already exists in the Drupal database, but is not permitted to login to
     // Drupal via SAML. If so, log out of SAML and redirect to the front page.
@@ -143,7 +142,7 @@ class SimplesamlphpAuthManager {
 
   }
 
-  public function roleMatchAdd($account) {
+  public function roleMatchAdd(UserInterface $account) {
 
     // Obtain the role map stored. The role map is a concatenated string of
     // rules which, when SimpleSAML attributes on the user match, will add
@@ -245,14 +244,12 @@ class SimplesamlphpAuthManager {
   }
 
   /**
+   * Checks if SimpleSAMLphp_auth is enabled.
+   *
    * @return bool
    */
   public function isActivated() {
-    if ($this->config->get('activate')) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return $this->config->get('activate');
   }
 
 }
