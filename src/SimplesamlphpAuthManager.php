@@ -6,6 +6,9 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\user\UserInterface;
 use Psr\Log\LoggerInterface;
+use SimpleSAML_Auth_Simple;
+use SimpleSAML_Configuration;
+
 
 class SimplesamlphpAuthManager {
 
@@ -45,20 +48,12 @@ class SimplesamlphpAuthManager {
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
     $this->logger = $logger;
 
-    $simplesamlphp_location = $this->config->get('install_dir');
-    if (file_exists($simplesamlphp_location . '/lib/_autoload.php')) {
-      require_once $simplesamlphp_location . '/lib/_autoload.php';
-      try {
-        $auth_source = $this->config->get('auth_source');
-        $this->instance = new \SimpleSAML_Auth_Simple($auth_source);
-        $this->simplesamlConfig = \SimpleSAML_Configuration::getInstance();
-      } catch (Exception $e) {
-        throw new \Exception('Unable to load SimpleSAML.');
+  }
 
-      }
-    }
-
-    return FALSE;
+  public function load() {
+    $auth_source = $this->config->get('auth_source');
+    $this->instance = new SimpleSAML_Auth_Simple($auth_source);
+    $this->simplesamlConfig = \SimpleSAML_Configuration::getInstance();
   }
 
   public function getStorage() {

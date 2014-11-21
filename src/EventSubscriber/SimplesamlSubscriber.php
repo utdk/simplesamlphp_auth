@@ -44,6 +44,7 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
    * @param GetResponseEvent $event
    */
   public function checkAuthStatus(GetResponseEvent $event) {
+    $this->simplesaml->load();
     if ($this->account->isAnonymous()) {
       return;
     }

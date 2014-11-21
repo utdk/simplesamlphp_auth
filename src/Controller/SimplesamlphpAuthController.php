@@ -105,6 +105,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
    *   A redirection to either a designated page or the user login page.
    */
   public function authenticate() {
+    $this->simplesaml->load();
     global $base_url;
 
     // Ensure the module has been turned on before continuing with the request.
@@ -154,9 +155,9 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
             $this->simplesaml->externalLogin($account);
           }
         }
-
-        $this->simplesaml->externalAuthenticate();
       }
+
+      $this->simplesaml->externalAuthenticate();
     }
 
     // Check to see if we've set a cookie. If there is one, give it priority.
