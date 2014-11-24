@@ -168,7 +168,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
       setrawcookie('simplesamlphp_auth_returnto', '');
     }
 
-    if ($redirect) {
+    if (isset($redirect)) {
       $response = new RedirectResponse($redirect, RedirectResponse::HTTP_FOUND);
       return $response;
     }

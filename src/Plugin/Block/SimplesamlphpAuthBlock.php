@@ -8,50 +8,53 @@
 namespace Drupal\simplesamlphp_auth\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\LinkGeneratorTrait;
+use Drupal\Core\Url;
 
 /**
- * Provides a 'Simplesaml Status' block.
+ * Provides a 'Most recent poll' block.
  *
  * @Block(
  *   id = "simplesamlphp_auth_block",
- *   admin_label = @Translation("simpleSAMLphp authentication"),
+ *   admin_label = @Translation("SimpleSAMLphp Auth Status"),
  * )
  */
 class SimplesamlphpAuthBlock extends BlockBase {
+
+  use LinkGeneratorTrait;
 
   /**
    * {@inheritdoc}
    */
   public function build() {
 
-    // @TODO this or feed the constructor a simplesaml obj?
-    $account = \Drupal::currentUser();
+    $activated = \Drupal::config('simplesamlphp_auth.settings')->get('activate');
+
+    $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
+    $simplesaml->load();
+
+    if ($activated) {
+      if ($simplesaml->isAuthenticated()) {
+        $content = $this->t('Logged in as %authname<br />!logout', array(
+          '%authname' => $simplesaml->getAuthname(),
+          '!logout' => $this->l('Log Out', new Url('user.logout')),
+        ));
+      }
+      else {
+        $content = $this->t('!login', array(
+          '!login' => $this->l('Federated Log In', new Url('simplesamlphp_auth.saml_login'))
+        ));
+      }
+    }
+    else {
+      $content = $this->t('SimpleSAML not enabled');
+    }
+
     return array(
-      '#title' => $this->t('simpleSAMLphp login'),
-      // @TODO return _simplesamlphp_auth_generate_block_text
+      '#title' => $this->t('SimpleSAMLphp Auth Status'),
+      '#markup' => $content,
     );
   }
-
-  /**
-   * {@inheritdoc}
-   */
-//  public function isCacheable() {
-//    return FALSE;
-//  }
-//
-//}
-//
-//if (!_simplesamlphp_auth_isEnabled()) {
-//  // Exit without executing.
-//  return;
-//}
-//
-//// Check if valid local session exists..
-//if ($_simplesamlphp_auth_as->isAuthenticated()) {
-//  $block_content .= '<p>Logged in as: ' . $user->name . '<br />' . l('Log Out', 'user/logout') . '</a></p>';
-//}
-//else {
-//  $block_content .= '<p>' . l('Federated Log In', 'saml_login') . '</p>';
-//}
-//
-//return $block_content;
+}

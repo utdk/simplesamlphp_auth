@@ -82,19 +82,30 @@ function simplesamlphp_auth_user_login($account) {
  */
 function simplesamlphp_auth_user_logout($account) {
 
-  $config = \Drupal::config('simplesamlphp_auth.settings');
-  $logout_url = $config->get('logout_goto_url');
+  $logout_url = \Drupal::config('simplesamlphp_auth.settings')->get('logout_goto_url');
+  $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
+  $simplesaml->load();
+
+  // Have to destroy the session here as some configurations of SimpleSAMLphp_auth
+  // can create infinite loops. By removing IdP auth before Drupal auth, checks
+  // for local authentication will trigger before the session is destroyed
+  // naturally. We must therefore destroy the session manually here.
+  session_destroy();
+
   if ($logout_url) {
-    // $simplesaml->logout($logout_url);
+    $simplesaml->instance->logout($logout_url);
+  }
+  else {
+    $simplesaml->instance->logout();
   }
 }
 
 /**
- *  Implements hook_user_cancel().
+ *  Implements hook_ENTITY_TYPE_delete().
  */
-function simplesamlphp_auth_user_cancel($edit, $account, $method) {
+function simplesamlphp_auth_user_delete(Drupal\Core\Entity\EntityInterface $entity) {
   db_delete('simplesamlphp_auth_authmap')
-    ->condition('uid', $account->id())
+    ->condition('uid', $entity->id())
     ->execute();
 }
 
@@ -158,6 +169,10 @@ function simplesamlphp_auth_user_form_includes(&$form) {
     '#type' => 'checkbox',
     '#title' => t('Enable this user to leverage SAML authentication'),
   );
+
+  // We store the authname as the initial email. If we're using SimpleSAML we
+  // need to enforce an email address.
+  $form['account']['mail']['#required'] = TRUE;
 
   $form['actions']['submit']['#submit'][] = 'simplesamlphp_auth_user_form_submit';
 }
