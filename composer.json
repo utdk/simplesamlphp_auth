@@ -3,7 +3,7 @@
     "description": "Allows users to authenticate to a remote SAML identity provider (IdP) via a locally configured SimpleSAMLphp service point (SP).",
     "type": "drupal-module",
     "license": "GPL-2.0+",
-    "homepage": "http://drupal.org/project/php_ffmpeg",
+    "homepage": "https://www.drupal.org/project/simplesamlphp_auth",
     "authors": [
         {
             "name": "Adam Malone",
