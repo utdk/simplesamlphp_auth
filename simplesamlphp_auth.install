@@ -57,6 +57,20 @@ function simplesamlphp_auth_install() {
   $config = \Drupal::config('simplesamlphp_auth.settings');
   $config->set('user_register_original', $user_settings->get('register'));
   $user_settings->set('register', 0);
+  $user_settings->save();
+  $config->save();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function simplesamlphp_auth_uninstall() {
+
+  // Restore the original user registration directive.
+  $user_settings = \Drupal::config('user.settings');
+  $config = \Drupal::config('simplesamlphp_auth.settings');
+  $user_settings->set('register', $config->get('user_register_original'));
+  $user_settings->save();
 }
 
 /**
@@ -64,7 +78,6 @@ function simplesamlphp_auth_install() {
  */
 function simplesamlphp_auth_requirements($phase) {
   $requirements = array();
-
 
   if ($phase == 'runtime') {
     $config = \Drupal::config('simplesamlphp_auth.settings');
