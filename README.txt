@@ -24,6 +24,9 @@ identity attribute values.
    If you are on a shared host or a machine that you cannot install memcache on
    then consider using the sql handler (store.type => 'sql').
 
+2) You must have installed Composer Manager and allowed it to download the
+   simplesamlphp libraries.
+
 
 -- INSTALLATION --
 

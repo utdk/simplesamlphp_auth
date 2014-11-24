@@ -89,16 +89,6 @@ function simplesamlphp_auth_requirements($phase) {
         'description' => t('It can be activated on the <a href="@config_page">configuration page</a>.', array('@config_page' => \Drupal::url('simplesamlphp_auth.admin_settings'))),
        );
     }
-
-    $basedir = $config->get('install_dir');
-    if (!file_exists($basedir . '/lib/_autoload.php')) {
-      $requirements['simplesamlphp_auth'] = array(
-        'severity'    => REQUIREMENT_WARNING,
-        'title'       => 'simpleSAMLphp_auth',
-        'value'       => t('SimpleSAMLphp authentication is missing the required SimpleSAMLphp library'),
-        'description' => t('Please download and install the <a href="@simplesaml_library">simplesamlphp library</a>.', array('@simplesaml_library' => 'https://simplesamlphp.org/download')),
-      );
-    }
   }
 
   return $requirements;

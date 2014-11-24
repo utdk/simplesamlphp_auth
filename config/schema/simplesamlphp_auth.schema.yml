@@ -7,9 +7,6 @@ simplesamlphp_auth.settings:
     activate:
       type: boolean
       label: 'Activate authentication via SimpleSAMLphp'
-    install_dir:
-      type: string
-      label: 'Installation directory'
     auth_source:
       type: string
       label: 'Authentication source for this SP'

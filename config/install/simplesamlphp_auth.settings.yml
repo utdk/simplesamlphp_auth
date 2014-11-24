@@ -1,5 +1,4 @@
 activate: false
-install_dir: '/var/simplesamlphp'
 mail_attr: 'mail'
 unique_id: 'eduPersonPrincipalName'
 user_name: 'eduPersonPrincipalName'

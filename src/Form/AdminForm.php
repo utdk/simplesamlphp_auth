@@ -41,18 +41,11 @@ class AdminForm extends ConfigFormBase {
       '#default_value' => $config->get('activate'),
       '#description' => $this->t('Checking this box before configuring the module could lock you out of Drupal.'),
     );
-    $form['basic']['install_dir'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Installation directory'),
-      '#default_value' => $config->get('install_dir'),
-      '#description' => $this->t('The base directory of simpleSAMLphp. Absolute path with no trailing slash.'),
-      // @TODO this needs some kind of validation (validateForm / '#after_build'
-    );
     $form['basic']['auth_source'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Authenticaton source for this SP'),
       '#default_value' => $config->get('auth_source'),
-      '#description' => $this->t('The name of the source to use from @path/config/authsources.php', array('@path' => $config->get('install_dir'))),
+      '#description' => $this->t('The name of the source to use (Usually in authsources.php).'),
     );
     $form['basic']['force_https'] = array(
       '#type' => 'checkbox',
@@ -161,7 +154,6 @@ class AdminForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->config('simplesamlphp_auth.settings')
       ->set('activate', $form_state->getValue('activate'))
-      ->set('install_dir', $form_state->getValue('install_dir'))
       ->set('auth_source', $form_state->getValue('auth_source'))
       ->set('force_https', $form_state->getValue('force_https'))
       ->set('user_name', $form_state->getValue('user_name'))
