@@ -64,7 +64,7 @@ function simplesamlphp_auth_user_login($account) {
       $mail = $simplesaml->getDefaultEmail();
     } catch (Exception $e) {
       drupal_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
-//      watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
+      \Drupal::logger('simplesamlphp_auth')->critical($e->getMessage());
     }
 
     // Update username and email address.

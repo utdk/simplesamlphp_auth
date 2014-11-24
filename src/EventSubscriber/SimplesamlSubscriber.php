@@ -72,6 +72,7 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
       }
     }
 
+    \Drupal::logger('simplesamlphp_auth')->notice('User %name not authorized to log in using local account.', array('%name', $this->account->getUsername()));
     user_logout();
 
     $response = new RedirectResponse('/', RedirectResponse::HTTP_FOUND);
