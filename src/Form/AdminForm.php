@@ -83,7 +83,16 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'textarea',
       '#title' => $this->t('Automatic role population from simpleSAMLphp attributes'),
       '#default_value' => $config->get('role.population'),
-      '#description' => $this->t('A pipe separated list of rules.<br />Example: <i>roleid1:condition1|roleid2:condition2...</i> <br />For instance: <i>1:eduPersonPrincipalName,@=,uninett.no;affiliation,=,employee|2:mail,=,andreas@uninett.no</i>'),
+      '#description' => $this->t('A pipe separated list of rules. Each rule consists of a Drupal role id, a SimpleSAML attribute name, an operation and a value to match. <i>e.g. role_id1:attribute_name,operation,value|role_id2:attribute_name2,operation,value... etc</i><br /><br />Each operation may be either "@", "@=" or "~=". <ul><li>"=" requires the value exactly matches the attribute;</li><li>"@=" requires the portion after a "@" in the attribute to match the value;</li><li>"~=" allows the value to match any part of any element in the attribute array.</li></ul>For instance:<br /><i>staff:eduPersonPrincipalName,@=,uninett.no;affiliation,=,employee|admin:mail,=,andreas@uninett.no</i><br />would ensure any user with an eduPersonPrinciplaName SAML attribute matching .*@uninett.no would be assigned a staff role and the user with the mail attribute exactly matching andreas@uninett.no would assume the admin role.'),
+
+      // A '=' requires the $value exactly matches the $attribute, A '@='
+      // requires the portion after a '@' in the $attribute to match theuninett.no
+      // $value and a '~=' allows the value to match any part of any
+      // element in the $attribute array.
+
+      // The full role map string, when mapped to the variables below, presents
+      // itself thus:
+      // $role_id:$key,$op,$value;$key,$op,$value;$key,$op,$value|$role_id:$key,$op,$value... etc
     );
     $form['user_info']['role_eval_every_time'] = array(
       '#type' => 'checkbox',
