@@ -51,6 +51,7 @@ function simplesamlphp_auth_help($route_name) {
 function simplesamlphp_auth_user_login($account) {
 
   $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
+  $simplesaml->load();
 
   if (!$simplesaml->isActivated()) {
     return;
