@@ -163,7 +163,7 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
   global $_simplesamlphp_auth_as;
   global $_simplesamlphp_auth_saml_attributes;
 
-  if ( _simplesaml_auth_autoload()) {
+  if (!_simplesaml_auth_autoload()) {
     // Exit without initializing.
     return;
   }
