@@ -142,10 +142,12 @@ function simplesamlphp_auth_init() {
   $allowed_default_login_users = variable_get('simplesamlphp_auth_allowdefaultloginusers', '');
   $allowed_uids = explode(",", $allowed_default_login_users);
 
+  // Get roles that are allowed default login.
+  $allowed_default_login_roles = variable_get('simplesamlphp_auth_allowdefaultloginroles', array());
 
-  // Uid is allowed default login.
-  // @todo also perform check by role
-  if (in_array($user->uid, $allowed_uids)) {
+  // Check if user is allowed default login.
+  if (variable_get('simplesamlphp_auth_allowdefaultlogin', TRUE) &&
+    (in_array($user->uid, $allowed_uids) || !empty(array_intersect_key($user->roles, $allowed_default_login_roles)))) {
     $user_allowed_default_login = TRUE;
   }
 
