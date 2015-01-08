@@ -74,7 +74,7 @@ function simplesamlphp_auth_permission() {
   return array(
     'administer simpleSAMLphp authentication' => array(
       'title' => t('Administer simpleSAMLphp authentication'),
-      'description' => t('Warning: Give to trusted roles only; this permission has security implications.'),
+      'restrict access' => TRUE,
     ),
   );
 }
