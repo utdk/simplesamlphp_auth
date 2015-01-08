@@ -56,13 +56,6 @@ function simplesamlphp_auth_menu() {
 }
 
 /**
- * Implements hook_admin_paths().
- */
-function simplesamlphp_auth_admin_paths() {
-  return array('admin/config/people/simplesamlphp_auth' => TRUE);
-}
-
-/**
  * Implements hook_help().
  */
 function simplesamlphp_auth_help($path, $arg) {
