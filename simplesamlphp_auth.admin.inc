@@ -43,6 +43,12 @@ function simplesamlphp_auth_settings() {
     '#default_value' => variable_get('simplesamlphp_auth_authsource', 'default-sp'),
     '#description' => t('The name of the source to use from /var/simplesamlphp/config/authsources.php'),
   );
+  $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_login_path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Login path'),
+    '#default_value' => variable_get('simplesamlphp_auth_login_path', 'saml_login'),
+    '#description' => t('Path for logging into SAML - Do not include proceeding slash.'),
+  );
   $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_forcehttps'] = array(
     '#type' => 'checkbox',
     '#title' => t('Force https for login links'),

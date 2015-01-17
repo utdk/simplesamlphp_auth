@@ -32,6 +32,7 @@
  * Implements hook_menu().
  */
 function simplesamlphp_auth_menu() {
+  $login_path = variable_get('simplesamlphp_auth_login_path', 'saml_login');
   $items = array();
 
   $items['admin/config/people/simplesamlphp_auth'] = array(
@@ -43,7 +44,7 @@ function simplesamlphp_auth_menu() {
     'file' => 'simplesamlphp_auth.admin.inc',
     'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
   );
-  $items['saml_login'] = array(
+  $items[$login_path] = array(
     'title' => 'Logon to the site',
     'description' => 'Provides a site login page',
     'page callback' => 'simplesamlphp_auth_loginpage',
