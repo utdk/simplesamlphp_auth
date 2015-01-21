@@ -84,9 +84,7 @@ function simplesamlphp_auth_permission() {
  * Loads simplesamlphp class and initializes global variables.
  */
 function _simplesaml_auth_autoload() {
-  if (!_simplesamlphp_auth_isEnabled(TRUE)) {
-    drupal_set_message(t("We're sorry this feature is not yet enabled."), 'error');
-
+  if (!_simplesamlphp_auth_isEnabled()) {
     return FALSE;
   }
 
