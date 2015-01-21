@@ -48,7 +48,7 @@ function simplesamlphp_auth_menu() {
     'title' => 'Logon to the site',
     'description' => 'Provides a site login page',
     'page callback' => 'simplesamlphp_auth_loginpage',
-    'access callback' => TRUE,
+    'access callback' => '_simplesamlphp_auth_isEnabled',
     'file' => 'simplesamlphp_auth.pages.inc',
     'type' => MENU_CALLBACK,
   );
@@ -369,6 +369,9 @@ function _simplesamlphp_auth_isEnabled($bShowInactiveMsg = FALSE) {
 
     }
 
+  }
+  else {
+    $failure = t('SimpleSAMLphp auth is not yet activated.');
   }
 
   // If there were no failures, then it should be activated.
