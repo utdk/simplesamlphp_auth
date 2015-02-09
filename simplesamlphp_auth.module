@@ -239,7 +239,7 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     return;
   }
 
-  $link = l('Federated Log In', 'saml_login');
+  $link = l(t('Federated Log In'), 'saml_login');
 
   // Add SAML login link to user login form.
   if ($form_id == 'user_login_block' || $form_id == 'user_account_form') {
