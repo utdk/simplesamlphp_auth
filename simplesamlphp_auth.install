@@ -2,7 +2,7 @@
 
 /**
  * @file
- * the install file for the simplesamlphp_auth module
+ * The install file for the simplesamlphp_auth module.
  */
 
 /**
@@ -51,6 +51,7 @@ function simplesamlphp_auth_uninstall() {
  * Implements hook_requirements().
  */
 function simplesamlphp_auth_requirements($phase) {
+  $t = get_t();
   $requirements = array();
 
   if ($phase == 'runtime') {
@@ -58,9 +59,9 @@ function simplesamlphp_auth_requirements($phase) {
       $requirements['simplesamlphp_auth'] = array(
         'severity'    => REQUIREMENT_WARNING,
         'title'       => 'SimpleSAMLphp auth',
-        'value'       => t('SimpleSAMLphp authentication is NOT activated'),
-        'description' => t('It can be activated on the !admin_page.', array('!admin_page' => l(t('configuration page'), 'admin/config/people/simplesamlphp_auth'))),
-       );
+        'value'       => $t('SimpleSAMLphp authentication is NOT activated'),
+        'description' => $t('It can be activated on the !admin_page.', array('!admin_page' => l($t('configuration page'), 'admin/config/people/simplesamlphp_auth'))),
+      );
     }
 
     $basedir = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
@@ -68,8 +69,8 @@ function simplesamlphp_auth_requirements($phase) {
       $requirements['simplesamlphp_auth'] = array(
         'severity'    => REQUIREMENT_ERROR,
         'title'       => 'SimpleSAMLphp auth',
-        'value'       => t('SimpleSAMLphp authentication is missing the required SimpleSAMLphp library'),
-        'description' => t('Please download and install the !simplesamlphp library.', array('!simplesamlphp' => l(t('SimpeSAMLphp'), 'https://simplesamlphp.org/download'))),
+        'value'       => $t('SimpleSAMLphp authentication is missing the required SimpleSAMLphp library'),
+        'description' => $t('Please download and install the !simplesamlphp library.', array('!simplesamlphp' => l($t('SimpeSAMLphp'), 'https://simplesamlphp.org/download'))),
       );
     }
   }

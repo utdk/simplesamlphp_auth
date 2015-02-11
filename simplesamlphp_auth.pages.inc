@@ -6,7 +6,10 @@
  */
 
 /**
- * Represents the Drupal page (saml_login), which triggers user authentication against the SimpleSAMLphp service provider.
+ * Returns markup for SimpleSAMLphp login page.
+ *
+ * Represents the Drupal page (saml_login), which triggers user authentication
+ * against the SimpleSAMLphp service provider.
  */
 function simplesamlphp_auth_loginpage() {
 
@@ -50,7 +53,8 @@ function simplesamlphp_auth_loginpage() {
     $fail = TRUE;
   }
 
-  // There was a problem, we can't go on, but we don't want to tell the user any specifics either.
+  // There was a problem, we can't go on, but we don't want to tell the user any
+  // specifics either.
   if ($fail) {
     drupal_set_message(t("We're sorry. There was a problem attempting login. The issue has been logged for the administrator."), 'error');
     drupal_goto('user/login');
@@ -60,13 +64,15 @@ function simplesamlphp_auth_loginpage() {
 
   // Support for deep linking.
 
-  // See if a URL has been explicitly provided in ReturnTo. If so, use it (as long as it points to this site).
+  // See if a URL has been explicitly provided in ReturnTo. If so, use it (as
+  // long as it points to this site).
   if ((isset($_REQUEST['ReturnTo']) && $_REQUEST['ReturnTo']) &&
     (valid_url($_REQUEST['ReturnTo']) && stristr($_REQUEST['ReturnTo'], $base_url))) {
 
     $return_to = $_REQUEST['ReturnTo'];
 
-    // If not, see if a REFERER URL is available. If so, use it (as long as it points to this site).
+    // If not, see if a REFERER URL is available. If so, use it (as long as it
+    // points to this site).
   }
   elseif ((isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER']) &&
     (valid_url($_SERVER['HTTP_REFERER']) && stristr($_SERVER['HTTP_REFERER'], $base_url))
@@ -75,17 +81,17 @@ function simplesamlphp_auth_loginpage() {
     $return_to = $_SERVER['HTTP_REFERER'];
   }
 
-  // If the user is anonymous, set the cookie (if we can) and require authentication.
+  // If the user is anonymous, set the cookie (if we can) and require
+  // authentication.
   if ($user->uid == 0) {
 
     if ($return_to) {
-      // Set the cookie so we can deliver the user to the place they started
+      // Set the cookie so we can deliver the user to the place they started.
       setrawcookie('simplesamlphp_auth_returnto', $return_to, time() + 60 * 60);
     }
 
     // Require the user to be authenticated.
     $_simplesamlphp_auth_as->requireAuth();
-
 
     // If the user is authenticated, send them along.
   }
@@ -95,10 +101,10 @@ function simplesamlphp_auth_loginpage() {
 
     // Check to see if we've set a cookie. If there is one, give it priority.
     if (isset($_COOKIE['simplesamlphp_auth_returnto']) && $_COOKIE['simplesamlphp_auth_returnto']) {
-      // use the cookie for the ReturnTo
+      // Use the cookie for the ReturnTo.
       $go_to_url = $_COOKIE['simplesamlphp_auth_returnto'];
 
-      // unset the cookie
+      // Unset the cookie.
       setrawcookie('simplesamlphp_auth_returnto', '');
 
     }

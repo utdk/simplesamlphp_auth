@@ -58,7 +58,8 @@ function _simplesaml_auth_user_register($authname) {
   global $user;
   global $_simplesamlphp_auth_as;
 
-  // First we check the admin settings for simpleSAMLphp and find out if we are allowed to register users.
+  // First we check the admin settings for simpleSAMLphp and find out if we are
+  // allowed to register users.
   if (variable_get('simplesamlphp_auth_registerusers', TRUE)) {
 
     // We are allowed to register new users.
@@ -84,21 +85,21 @@ function _simplesaml_auth_user_register($authname) {
 
     _simplesaml_auth_debug(t('Registered [%authname] with uid @uid', array(
       '%authname' => $authname,
-      '@uid' => $user->uid
+      '@uid' => $user->uid,
     )));
 
     if (!empty($user->uid)) {
       // Populate roles based on configuration setting.
       $roles = _simplesamlphp_auth_rolepopulation(variable_get('simplesamlphp_auth_rolepopulation', ''));
       $userinfo = array('roles' => $roles);
-      // @todo - Fjernet rolle-delen her da den gav en bra feilmelding når roller ikke finnes.
       $user = user_save($user, $userinfo);
 
       return $user;
     }
     else {
       // We were unable to register this new user on the site.
-      // We let the user know about this, log an error, and redirect to the home page.
+      // We let the user know about this, log an error, and redirect to the home
+      // page.
       drupal_set_message(t("We are sorry. While you have successfully authenticated, we were unable to create an account for you on this site. Please ask the site administrator to provision access for you."));
       watchdog('simplesamlphp_auth', 'Unable to register %authname using simplesamlphp_auth', array('%authname' => $authname), WATCHDOG_ERROR);
       $_simplesamlphp_auth_as->logout(base_path());
@@ -107,13 +108,13 @@ function _simplesaml_auth_user_register($authname) {
   else {
     // We are not allowed to register new users on the site through simpleSAML.
     // We let the user know about this and redirect to the user/login page.
-    drupal_set_message(t("We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you."));
+    drupal_set_message(t("We are sorry. Although you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provide access for you."));
     $_simplesamlphp_auth_as->logout(base_path());
   }
 }
 
 /**
- * Updates a SAML authenticated user's account with current username and email.
+ * Updates a SAML-authenticated user's account with current username and email.
  *
  * @param object $account
  *   The user account object to update.
@@ -129,7 +130,8 @@ function _simplesaml_auth_user_update($account) {
   // Get mail from default attribute.
   try {
     $mail_address = _simplesamlphp_auth_get_mail();
-  } catch (Exception $e) {
+  }
+  catch (Exception $e) {
     drupal_set_message(t('Your e-mail address was not provided by your identity provider (IDP).'), "error");
     watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
   }
@@ -191,9 +193,10 @@ function simplesaml_auth_moderate_local_login() {
   if (!variable_get('simplesamlphp_auth_allowdefaultlogin', TRUE)) {
     // If the user has NOT been authenticated via simpleSAML...
     if (!$_simplesamlphp_auth_as->isAuthenticated()) {
-      // :FYI: Until Drupal issue #754560 is corrected this message will never be seen by the user.
+      // FYI: Until Drupal issue #754560 is corrected this message will never be
+      // seen by the user.
       drupal_set_message(t("We are sorry, users are not permitted to log in using local accounts."));
-      // Destroy the user's session (log them out).
+      // Destroy the user's session (log out).
       _simplesamlphp_auth_destroy_drupal_session();
     }
   }
@@ -201,33 +204,37 @@ function simplesaml_auth_moderate_local_login() {
   else {
     // If the user has NOT been authenticated via simpleSAML.
     if (!$_simplesamlphp_auth_as->isAuthenticated()) {
-      // See if we limit this privilege to specified users
-      $strAllwDefLogUsers = variable_get('simplesamlphp_auth_allowdefaultloginusers', '');
-      $arrAllwDefLogUsers = array();
+      // See if we limit this privilege to specified users.
+      $str_users_allowed_local = variable_get('simplesamlphp_auth_allowdefaultloginusers', '');
       // See if we limit this privilege to specified roles.
-      $arrAllwDefLogRoles = variable_get('simplesamlphp_auth_allowdefaultloginroles', FALSE);
+      $array_roles_allowed_local = variable_get('simplesamlphp_auth_allowdefaultloginroles', array());
 
-      // If user IDs or roles are specified, we let them in, but everyone else gets logged out.
-      if (drupal_strlen($strAllwDefLogUsers) || $arrAllwDefLogRoles) {
+      // If user IDs or roles are specified, we let them in, but everyone else
+      // gets logged out.
+      if (drupal_strlen($str_users_allowed_local) || $array_roles_allowed_local) {
 
         // Convert the string into an array.
-        // @todo Perform a test to make sure that only numbers, spaces, or commas are in the string.
-        $arrAllwDefLogUsers = explode(',', $strAllwDefLogUsers);
+        // @todo Perform a test to make sure that only numbers, spaces, or
+        // commas are in the string.
+        $array_users_allowed_local = explode(',', $str_users_allowed_local);
 
         // If we still have something to work with.
-        if (0 < count($arrAllwDefLogUsers) || 0 < count($arrAllwDefLogRoles)) {
-          /* Log the user out of Drupal if:
-             1) the current user's uid is NOT in the list of allowed uids...
-             2) or their role does not match and allowed mixed mode role. */
-          $matchRoles = array_intersect(array_keys($user->roles), $arrAllwDefLogRoles);
-          if (!in_array($user->uid, $arrAllwDefLogUsers) && count($matchRoles) == 0) {
-            // User is logged into Drupal, but may not be logged into simpleSAML.
-            // If this is the case we're supposed to log the user out of Drupal.
+        if (0 < count($array_users_allowed_local) || 0 < count($array_roles_allowed_local)) {
+          // Log the user out of Drupal if:
+          // 1) the current user's uid is NOT in the list of allowed uids
+          // 2) or their role does not match and allowed mixed mode role.
+          $match_roles = array_intersect(array_keys($user->roles), $array_roles_allowed_local);
+          if (!in_array($user->uid, $array_users_allowed_local) && count($match_roles) == 0) {
+            // User is logged into Drupal, but may not be logged into
+            // simpleSAML.  If this is the case we're supposed to log the user
+            // out of Drupal.
 
-            // :FYI: Until Drupal issue #754560 is corrected this message will never be seen by the user.
+            // FYI: Until Drupal issue #754560 is corrected this message will
+            // never be seen by the user.
             drupal_set_message(t("We are sorry, you are not permitted to log in using a local account."));
 
-            // The least we can do is write something to the watchdog so someone will know what's happening.
+            // The least we can do is write something to the watchdog so someone
+            // will know what's happening.
             watchdog('simplesamlphp_auth', 'User %name not authorized to log in using local account.', array('%name' => $user->name));
 
             _simplesamlphp_auth_destroy_drupal_session();
@@ -246,8 +253,8 @@ function simplesaml_auth_moderate_local_login() {
  * Return any attributes provided by the SAML IDP.
  *
  * @param $attribute
- *   The attribute whose value to return.  Can be skipped if all attribute
- *   values are requested.
+ *   (optional) The attribute whose value to return.  Can be skipped if all
+ *   attribute values are requested.
  *
  * @return
  *   If an attribute was provided, the value of the attribute is returned.
@@ -263,10 +270,8 @@ function simplesamlphp_auth_get_attributes($attribute = NULL) {
     $result = NULL;
 
     // If the specified attribute is set, grab it.
-    if (isset($_simplesamlphp_auth_saml_attributes)) {
-      if (isset($_simplesamlphp_auth_saml_attributes[$attribute])) {
-        $result = $_simplesamlphp_auth_saml_attributes[$attribute];
-      }
+    if (isset($_simplesamlphp_auth_saml_attributes[$attribute])) {
+      $result = $_simplesamlphp_auth_saml_attributes[$attribute];
     }
   }
 
@@ -282,14 +287,14 @@ function simplesamlphp_auth_get_attributes($attribute = NULL) {
     }
   }
 
-  // Return whatever we've got.`
+  // Return whatever we have.
   return $result;
 }
 
 /**
  * Determine if the current user is authenticated through SAML.
  *
- * @return
+ * @return bool
  *   TRUE if the current user is authenticated through SAML.  FALSE otherwise.
  */
 function simplesamlphp_auth_is_authenticated() {
@@ -298,7 +303,8 @@ function simplesamlphp_auth_is_authenticated() {
   // Assume that the user isn't authenticated until proven otherwise.
   $authenticated = FALSE;
 
-  // If the associated global variable exists, and the auth flag is set, note it.
+  // If the associated global variable exists, and the auth flag is set, note
+  // it.
   if (isset($_simplesamlphp_auth_as) && $_simplesamlphp_auth_as->isAuthenticated()) {
     $authenticated = TRUE;
   }

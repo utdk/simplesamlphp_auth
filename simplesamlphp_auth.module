@@ -5,7 +5,7 @@
  * simpleSAMLphp authentication module for Drupal.
  *
  * This authentication module is based on the shibboleth authentication module,
- * with changes to adopt to use simpleSAMLphp.
+ * with changes to adapt to use simpleSAMLphp.
  *
  * ISSUES and TODOs:
  *  ISSUE: User is always dropped on user page after login, instead of where
@@ -14,7 +14,7 @@
  *         be considerably increased if this were resolved.
  *  FYI: Drupal now requires knowledge of the local user password in order to
  *       change e-mail address, etc. This could be an issue for users of
- *       accounts that are autoprovisioned by this module, though Drupal does
+ *       accounts that are auto-provisioned by this module, though Drupal does
  *       give users the ability to reset their password to something they know
  *       via the Request new password feature.
  *  KLUDGE: Drupal does not kill the session on logout, even with
@@ -62,8 +62,7 @@ function simplesamlphp_auth_menu() {
 function simplesamlphp_auth_help($path, $arg) {
   switch ($path) {
     case 'admin/config/people/simplesamlphp_auth':
-      $output = t('<p>This module integrates Drupal with a SimpleSAMLphp Service Point (SP), effectively federating Drupal.</p>');
-
+      $output = '<p>' . t('This module integrates Drupal with a SimpleSAMLphp Service Point (SP), effectively federating Drupal.') . '</p>';
       return $output;
   }
 }
@@ -144,7 +143,7 @@ function simplesamlphp_auth_init() {
     $user_allowed_default_login = TRUE;
   }
 
-   // Logs out user if not SAML authenticated and not allowed default login.
+  // Logs out user if not SAML authenticated and not allowed default login.
   if (!$_simplesamlphp_auth_as->isAuthenticated() && !$user_allowed_default_login) {
     module_load_include('pages.inc', 'user');
     user_logout();
@@ -166,12 +165,12 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
   if ($category == 'account') {
     // If user registration has a valid session...
     if ($_simplesamlphp_auth_as->isAuthenticated() && _simplesamlphp_auth_get_authname() == $account->init) {
-
       // Get name from default attributes.
       try {
         _simplesaml_auth_debug(t('Registering user [%acctname]', array('%acctname' => $account->name)));
         $account->name = _simplesamlphp_auth_get_default_name($account->uid);
-      } catch (Exception $e) {
+      }
+      catch (Exception $e) {
         drupal_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
         watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
       }
@@ -208,7 +207,8 @@ function simplesamlphp_auth_user_logout($account) {
 
     $config = SimpleSAML_Configuration::getInstance();
 
-    // :KLUDGE: for some reason Drupal is not killing the session, even if I were to call drupal_session_destroy_uid() here.
+    // KLUDGE: for some reason Drupal is not killing the session, even if I
+    // were to call drupal_session_destroy_uid() here.
     session_destroy();
 
     $gotourl = base_path();
@@ -241,7 +241,6 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
   }
 
   $link = l(t('Federated Log In'), 'saml_login');
-
   // Add SAML login link to user login form.
   if ($form_id == 'user_login_block' || $form_id == 'user_account_form') {
     $links = $form['links']['#markup'];
@@ -262,15 +261,18 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     $form['#submit'][] = 'simplesaml_auth_user_profile_form_submit';
   }
 
-  // If the user has a simplesamlphp_auth authmap record, then don't require them to know their Drupal password.
-  // This will allow them to change their e-mail address, and set a Drupal password if they want to (and are allowed).
+  // If the user has a simplesamlphp_auth authmap record, then don't require
+  // them to know their Drupal password. This will allow them to change their
+  // e-mail address, and set a Drupal password if they want to (and are
+  // allowed).
   if ((isset($form['#user']->init) && $form['#user']->init) && (_simplesaml_auth_user_has_authmap($form['#user']->init) && $form_id == 'user_profile_form')) {
 
     unset($form['account']['current_pass']);
     unset($form['account']['current_pass_required_values']);
     $form['#validate'] = array_diff($form['#validate'], array('user_validate_current_pass'));
 
-    // If the user is a simplesamlphp_auth user and is NOT allowed to set their Drupal password, remove the fields from the form.
+    // If the user is a simplesamlphp_auth user and is NOT allowed to set their
+    // Drupal password, remove the fields from the form.
     if (!variable_get('simplesamlphp_auth_allowsetdrupalpwd')) {
       unset($form['account']['pass']);
     }
@@ -309,21 +311,20 @@ function simplesaml_auth_user_profile_form_submit(&$form, $form_state) {
  * Implements hook_block_view().
  */
 function simplesamlphp_auth_block_view($delta = '') {
-
   if (!_simplesaml_auth_autoload()) {
     // Exit without executing.
     return;
   }
 
+  $block = array();
   switch ($delta) {
     case 0:
       $block = array(
         'subject' => t('simpleSAMLphp login'),
-        'content' => _simplesamlphp_auth_generate_block_text()
+        'content' => _simplesamlphp_auth_generate_block_text(),
       );
       break;
   }
-
   return $block;
 }
 
@@ -335,9 +336,8 @@ function simplesamlphp_auth_block_info() {
     array(
       'info' => t('simpleSAMLphp authentication'),
       'cache' => DRUPAL_NO_CACHE,
-    )
+    ),
   );
-
   return $block;
 }
 
@@ -346,28 +346,26 @@ function simplesamlphp_auth_block_info() {
  ****************************************************************************/
 
 /**
- * Checks to see if authentication via SimpleSAMLphp should be activated
+ * Checks if authentication via SimpleSAMLphp should be activated.
  *
- * @param bool bShowInactiveMsg
+ * @param bool $show_inactive_msg
  *   Whether to display the "module not activated" message
  *
  * @return bool
- *   TRUE is simplesamlphp_auth is enabled.
+ *   TRUE if simplesamlphp_auth is enabled.
  */
-function _simplesamlphp_auth_isEnabled($bShowInactiveMsg = FALSE) {
-  GLOBAL $user;
+function _simplesamlphp_auth_isEnabled($show_inactive_msg = FALSE) {
+  global $user;
 
   $failure = NULL;
-  $isActivated = variable_get('simplesamlphp_auth_activate');
+  $is_activated = variable_get('simplesamlphp_auth_activate');
   $basedir = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
 
-  if ($isActivated) {
+  if ($is_activated) {
     // Make sure we know where SimpleSAMLphp is.
     if (!file_exists($basedir)) {
       $failure = t('SimpleSAMLphp could not be found at %basedir . The simplesamlphp_auth module cannot function until the path to the local SimpleSAMLphp instance is configured.', array('%basedir' => $basedir));
-
       watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
-
     }
 
   }
@@ -381,14 +379,12 @@ function _simplesamlphp_auth_isEnabled($bShowInactiveMsg = FALSE) {
   }
   else {
 
-    // communicate but don't be too annoying
-    if ($bShowInactiveMsg && (1 == $user->uid || user_access('access administration pages')) && (preg_match('/admin\/people/', request_uri()) || preg_match('/admin\/modules/', request_uri()) || preg_match('/admin\/config/', request_uri()))) {
+    // Communicate but don't be too annoying.
+    if ($show_inactive_msg && (1 == $user->uid || user_access('access administration pages')) && (preg_match('/admin\/people/', request_uri()) || preg_match('/admin\/modules/', request_uri()) || preg_match('/admin\/config/', request_uri()))) {
       drupal_set_message($failure);
     }
   }
-
   return FALSE;
-
 }
 
 /**
@@ -422,7 +418,7 @@ function _simplesamlphp_auth_get_authname() {
 /**
  * Gets the default name attribute from the SAML assertion.
  *
- * @return
+ * @return string
  *   The name attribute.
  */
 function _simplesamlphp_auth_get_default_name($account) {
@@ -453,7 +449,7 @@ function _simplesamlphp_auth_get_default_name($account) {
 /**
  * Gets the mail attribute.
  *
- * @return
+ * @return string
  *   The mail attribute.
  */
 function _simplesamlphp_auth_get_mail() {
@@ -515,25 +511,25 @@ function _simplesamlphp_auth_generate_block_text() {
  *
  * The rules work as follows:
  * = does an exact match on an attribute and will iterate over array values if
- *     the array is multivalued.
+ * the array is multivalued.
  * @= matches the domain portion of an email address. It assumes the attribute
- *     is a string, and will not iterate over an array (but take the first value).
- * ~= does a partial string match on the attribute, and does iterate over multiple
- *     values, returning true if any of the values match.
+ * is a string, and will not iterate over an array (but take the first value).
+ * ~= does a partial string match on the attribute, and does iterate over
+ * multiple values, returning true if any of the values match.
  *
- * @param $roleruleevaluation
+ * @param array $roleruleevaluation
  *   An array containing the role rule to evaluate.
- * @param $attributes
+ * @param array $attributes
  *   An array containing the identity attributes.
  *
- * @return
+ * @return array
  *   An array containing role value and the attribute, or FALSE.
  */
 function _simplesamlphp_auth_evaulaterolerule($roleruleevaluation, $attributes) {
   _simplesaml_auth_debug(t('Evaluate rule (key=%key,operator=%op,value=%val)', array(
     '%key' => $roleruleevaluation[0],
     '%op' => $roleruleevaluation[1],
-    '%val' => $roleruleevaluation[2]
+    '%val' => $roleruleevaluation[2],
   )));
 
   if (!array_key_exists($roleruleevaluation[0], $attributes)) {
@@ -542,16 +538,17 @@ function _simplesamlphp_auth_evaulaterolerule($roleruleevaluation, $attributes) 
   $attribute = $attributes[$roleruleevaluation[0]];
 
   switch ($roleruleevaluation[1]) {
-    case '=' :
+    case '=':
       return in_array($roleruleevaluation[2], $attribute);
 
-    case '@=' :
+    case '@=':
       $dc = explode('@', $attribute[0]);
       if (count($dc) != 2) {
         return FALSE;
       }
 
-      return ($dc[1] == $roleruleevaluation[2]);
+      return $dc[1] == $roleruleevaluation[2];
+
     case '~=':
       foreach ($attribute as $subattr) {
         $pos = strpos($subattr, $roleruleevaluation[2]);
@@ -568,10 +565,10 @@ function _simplesamlphp_auth_evaulaterolerule($roleruleevaluation, $attributes) 
 /**
  * Performs role population.
  *
- * @param $rolemap
+ * @param array $rolemap
  *   A string containing the role map.
  *
- * @return
+ * @return array
  *   An array containing user's roles.
  */
 function _simplesamlphp_auth_rolepopulation($rolemap) {
@@ -589,7 +586,7 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
 
     $rolerules = explode('|', $rolemap);
 
-    foreach ($rolerules AS $rolerule) {
+    foreach ($rolerules as $rolerule) {
       _simplesaml_auth_debug(t('Evaluate role rule: %rolerule', array('%rolerule' => $rolerule)));
 
       $roleruledecompose = explode(':', $rolerule);
@@ -598,7 +595,7 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
       $roleruleevaluations = explode(';', $roleruledecompose[1]);
 
       $addnew = TRUE;
-      foreach ($roleruleevaluations AS $roleruleevaluation) {
+      foreach ($roleruleevaluations as $roleruleevaluation) {
 
         _simplesaml_auth_debug(t('Evaluate role evaulation: %roleruleeval', array('%roleruleeval' => $roleruleevaluation)));
 
@@ -621,7 +618,7 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
 }
 
 /**
- * See if the user has an authmap record for simplesamlphp_auth
+ * See if the user has an authmap record for simplesamlphp_auth.
  */
 function _simplesaml_auth_user_has_authmap($authname) {
   $authmaps = user_get_authmaps($authname);
@@ -637,14 +634,14 @@ function _simplesaml_auth_user_has_authmap($authname) {
 }
 
 /**
- * This helper function is used by developers to debug the form API workflow in this module.
+ * Debugs for developers the form API workflow in this module.
  */
 function _simplesaml_auth_debug($message) {
   watchdog('simplesamlphp', $message, NULL, WATCHDOG_DEBUG);
 }
 
 /**
- * Helper function for logging out a user that is has a active session in Drupal but not with simpleSAML.
+ * Logs out a user who has an active Drupal session but not with simpleSAML.
  */
 function _simplesamlphp_auth_destroy_drupal_session() {
   module_load_include('pages.inc', 'user');
