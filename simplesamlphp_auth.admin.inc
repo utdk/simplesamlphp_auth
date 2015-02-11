@@ -147,5 +147,24 @@ function simplesamlphp_auth_settings() {
     '#description' => t('Example: @base_url', array('@base_url' => $base_url)),
   );
 
+  $form['#submit'][] = 'simplesamlphp_auth_settings_submit';
+
   return system_settings_form($form);
+}
+
+/**
+ * Additional submission handler for simplesamlphp_auth_settings().
+ *
+ * If there is a change in the login path, trigger a menu rebuild.
+ *
+ * @see simplesamlphp_auth_settings()
+ * @see system_settings_form_submit()
+ */
+function simplesamlphp_auth_settings_submit($form, &$form_state) {
+  $old_login_path = variable_get('simplesamlphp_auth_login_path', 'saml_login');
+  $new_login_path = $form_state['values']['simplesamlphp_auth_login_path'];
+
+  if ($new_login_path != $old_login_path) {
+    variable_set('menu_rebuild_needed', TRUE);
+  }
 }
