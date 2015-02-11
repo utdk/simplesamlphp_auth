@@ -33,15 +33,15 @@ function simplesamlphp_auth_settings() {
   );
   $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_installdir'] = array(
     '#type' => 'textfield',
-    '#title' => t('Installation directory (default: /var/simplesamlphp)'),
-    '#default_value' => variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp'),
+    '#title' => t('Installation directory (default: /usr/share/simplesamlphp)'),
+    '#default_value' => variable_get('simplesamlphp_auth_installdir', '/usr/share/simplesamlphp'),
     '#description' => t('The base directory of simpleSAMLphp. Absolute path with no trailing slash.'),
   );
   $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_authsource'] = array(
     '#type' => 'textfield',
     '#title' => t('Authenticaton source for this SP (default: default-sp)'),
     '#default_value' => variable_get('simplesamlphp_auth_authsource', 'default-sp'),
-    '#description' => t('The name of the source to use from /var/simplesamlphp/config/authsources.php'),
+    '#description' => t('The name of the source to use from /usr/share/simplesamlphp/config/authsources.php'),
   );
   $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_login_path'] = array(
     '#type' => 'textfield',
