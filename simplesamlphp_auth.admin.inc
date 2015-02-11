@@ -49,12 +49,6 @@ function simplesamlphp_auth_settings() {
     '#default_value' => variable_get('simplesamlphp_auth_login_path', 'saml_login'),
     '#description' => t('Path for logging into SAML - Do not include proceeding slash.'),
   );
-  $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_forcehttps'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Force https for login links'),
-    '#default_value' => variable_get('simplesamlphp_auth_forcehttps', TRUE),
-    '#description' => t('Should be enabled on production sites.'),
-  );
 
   $form['simplesamlphp_auth_grp_user'] = array(
     '#type' => 'fieldset',

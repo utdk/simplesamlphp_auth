@@ -38,7 +38,6 @@ function simplesamlphp_auth_uninstall() {
   variable_del('simplesamlphp_auth_authsource');
   variable_del('simplesamlphp_auth_rolepopulation');
   variable_del('simplesamlphp_auth_roleevaleverytime');
-  variable_del('simplesamlphp_auth_forcehttps');
   variable_del('simplesamlphp_auth_registerusers');
   variable_del('simplesamlphp_auth_allowsetdrupalpwd');
   variable_del('simplesamlphp_auth_allowdefaultlogin');

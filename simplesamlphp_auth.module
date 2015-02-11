@@ -472,18 +472,6 @@ function _simplesamlphp_auth_get_mail() {
 }
 
 /**
- * Forces HTTPS connections.
- */
-function _simplesamlphp_auth_forcehttps_rewrite($url) {
-  if (variable_get('simplesamlphp_auth_forcehttps', TRUE)) {
-    $url = str_replace('http://', 'https://', $url);
-    _simplesaml_auth_debug('forcehttps rewrite: ' . $url);
-  }
-
-  return $url;
-}
-
-/**
  * Generates the text for the log in block.
  */
 function _simplesamlphp_auth_generate_block_text() {
