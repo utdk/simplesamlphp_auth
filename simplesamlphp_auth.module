@@ -167,7 +167,7 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
     if ($_simplesamlphp_auth_as->isAuthenticated() && _simplesamlphp_auth_get_authname() == $account->init) {
       // Get name from default attributes.
       try {
-        _simplesaml_auth_debug(t('Registering user [%acctname]', array('%acctname' => $account->name)));
+        watchdog('simplesamlphp_auth', 'Registering user [%acctname]', array('%acctname' => $account->name), WATCHDOG_DEBUG);
         $account->name = _simplesamlphp_auth_get_default_name($account->uid);
       }
       catch (Exception $e) {
@@ -405,7 +405,7 @@ function _simplesamlphp_auth_get_authname() {
 
   // Check if valid local session exists.
   if (isset($_simplesamlphp_auth_saml_attributes)) {
-    _simplesaml_auth_debug(t('_simplesamlphp_auth_get_authname: Valid local SAML session exists'));
+    watchdog('simplesamlphp_auth', '_simplesamlphp_auth_get_authname: Valid local SAML session exists', NULL, WATCHDOG_DEBUG);
     if (isset($_simplesamlphp_auth_saml_attributes[variable_get('simplesamlphp_auth_unique_id', 'eduPersonPrincipalName')])) {
       $authname = $_simplesamlphp_auth_saml_attributes[variable_get('simplesamlphp_auth_unique_id', 'eduPersonPrincipalName')][0];
     }
@@ -517,11 +517,11 @@ function _simplesamlphp_auth_generate_block_text() {
  *   An array containing role value and the attribute, or FALSE.
  */
 function _simplesamlphp_auth_evaulaterolerule($roleruleevaluation, $attributes) {
-  _simplesaml_auth_debug(t('Evaluate rule (key=%key,operator=%op,value=%val)', array(
+  watchdog('simplesamlphp_auth', 'Evaluate rule (key=%key,operator=%op,value=%val)', array(
     '%key' => $roleruleevaluation[0],
     '%op' => $roleruleevaluation[1],
     '%val' => $roleruleevaluation[2],
-  )));
+  ), WATCHDOG_DEBUG);
 
   if (!array_key_exists($roleruleevaluation[0], $attributes)) {
     return FALSE;
@@ -567,18 +567,18 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
   global $_simplesamlphp_auth_saml_attributes;
   $roles = array();
 
-  _simplesaml_auth_debug(t('Rolemap: %rolemap', array('%rolemap' => $rolemap)));
+  watchdog('simplesamlphp_auth', 'Rolemap: %rolemap', array('%rolemap' => $rolemap), WATCHDOG_DEBUG);
 
   // Check if valid local session exists..
   if (!empty($rolemap) && $_simplesamlphp_auth_as->isAuthenticated()) {
     $attributes = $_simplesamlphp_auth_saml_attributes;
 
-    _simplesaml_auth_debug(t('Evaluate rolemap: %rolemap', array('%rolemap' => $rolemap)));
+    watchdog('simplesamlphp_auth', 'Evaluate rolemap: %rolemap', array('%rolemap' => $rolemap), WATCHDOG_DEBUG);
 
     $rolerules = explode('|', $rolemap);
 
     foreach ($rolerules as $rolerule) {
-      _simplesaml_auth_debug(t('Evaluate role rule: %rolerule', array('%rolerule' => $rolerule)));
+      watchdog('simplesamlphp_auth', 'Evaluate role rule: %rolerule', array('%rolerule' => $rolerule), WATCHDOG_DEBUG);
 
       $roleruledecompose = explode(':', $rolerule);
 
@@ -588,7 +588,7 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
       $addnew = TRUE;
       foreach ($roleruleevaluations as $roleruleevaluation) {
 
-        _simplesaml_auth_debug(t('Evaluate role evaulation: %roleruleeval', array('%roleruleeval' => $roleruleevaluation)));
+        watchdog('simplesamlphp_auth', 'Evaluate role evaulation: %roleruleeval', array('%roleruleeval' => $roleruleevaluation), WATCHDOG_DEBUG);
 
         $roleruleevaluationdc = explode(',', $roleruleevaluation);
         if (!_simplesamlphp_auth_evaulaterolerule($roleruleevaluationdc, $attributes)) {
@@ -597,7 +597,7 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
       }
       if ($addnew) {
         $roles[$roleid] = $roleid;
-        _simplesaml_auth_debug(t('Add new role: %roleid', array('%roleid' => $roleid)));
+        watchdog('simplesamlphp_auth', 'Add new role: %roleid', array('%roleid' => $roleid), WATCHDOG_DEBUG);
       }
 
     }
@@ -622,13 +622,6 @@ function _simplesaml_auth_user_has_authmap($authname) {
 
   return $return;
 
-}
-
-/**
- * Debugs for developers the form API workflow in this module.
- */
-function _simplesaml_auth_debug($message) {
-  watchdog('simplesamlphp', $message, NULL, WATCHDOG_DEBUG);
 }
 
 /**

@@ -18,15 +18,15 @@ function _simplesaml_auth_login_register() {
     // Get unique identifier from saml attributes.
     $authname = _simplesamlphp_auth_get_authname();
 
-    _simplesaml_auth_debug(t('Authname is [%authname] userid is [%uid]', array(
+    watchdog('simplesamlphp_auth', 'Authname is [%authname] userid is [%uid]', array(
       '%authname' => $authname,
       '%uid' => $user->uid,
-    )));
+    ), WATCHDOG_DEBUG);
 
     if (!empty($authname)) {
       // User is logged in with SAML authentication and we got the unique
       // identifier, so try to log into Drupal.
-      _simplesaml_auth_debug(t('Loading Drupal user [%authname]', array('%authname' => $authname)));
+      watchdog('simplesamlphp_auth', 'Loading Drupal user [%authname]', array('%authname' => $authname), WATCHDOG_DEBUG);
 
       // Retrieve user mapping and attempt to log the user in.
       $ext_user = user_external_load($authname);
@@ -63,16 +63,16 @@ function _simplesaml_auth_user_register($authname) {
   if (variable_get('simplesamlphp_auth_registerusers', TRUE)) {
 
     // We are allowed to register new users.
-    _simplesaml_auth_debug(t('Register [%authname]', array('%authname' => $authname)));
+    watchdog('simplesamlphp_auth', 'Register [%authname]', array('%authname' => $authname), WATCHDOG_DEBUG);
 
     // It's possible that a user with this name already exists, but is not
     // permitted to login to Drupal via SAML. If so, log out of SAML and
     // redirect to the front page.
     $account = user_load_by_name($authname);
     if ($account) {
-      _simplesaml_auth_debug(t('User [%authname] could not be registered because that username already exists and is not SAML enabled.', array(
+      watchdog('simplesamlphp_auth', 'User [%authname] could not be registered because that username already exists and is not SAML enabled.', array(
         '%authname' => $authname,
-      )));
+      ), WATCHDOG_DEBUG);
 
       drupal_set_message(t('We are sorry, your user account is not SAML enabled.'));
       $_simplesamlphp_auth_as->logout(base_path());
@@ -83,10 +83,10 @@ function _simplesaml_auth_user_register($authname) {
     // Register the new user.
     user_external_login_register($authname, 'simplesamlphp_auth');
 
-    _simplesaml_auth_debug(t('Registered [%authname] with uid @uid', array(
+    watchdog('simplesamlphp_auth', 'Registered [%authname] with uid @uid', array(
       '%authname' => $authname,
       '@uid' => $user->uid,
-    )));
+    ), WATCHDOG_DEBUG);
 
     if (!empty($user->uid)) {
       // Populate roles based on configuration setting.
@@ -120,7 +120,7 @@ function _simplesaml_auth_user_register($authname) {
  *   The user account object to update.
  */
 function _simplesaml_auth_user_update($account) {
-  _simplesaml_auth_debug(t('Updating username [%acctname]', array('%acctname' => $account->name)));
+  watchdog('simplesamlphp_auth', 'Updating username [%acctname]', array('%acctname' => $account->name), WATCHDOG_DEBUG);
 
   db_update('users')
     ->fields(array('name' => $account->name))
@@ -136,7 +136,7 @@ function _simplesaml_auth_user_update($account) {
     watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
   }
 
-  _simplesaml_auth_debug(t('Updating mail [%mailaddr]', array('%mailaddr' => $mail_address)));
+  watchdog('simplesamlphp_auth', 'Updating mail [%mailaddr]', array('%mailaddr' => $mail_address), WATCHDOG_DEBUG);
 
   if (!empty($mail_address)) {
     db_update('users')
@@ -161,7 +161,7 @@ function _simplesaml_auth_user_login($ext_user) {
   // See if we're supposed to re-evaluate role assignments.
   if (variable_get('simplesamlphp_auth_roleevaleverytime', 0)) {
     // Populate roles based on configuration setting.
-    _simplesaml_auth_debug(t('User already registered [%authname] updating roles.', array('%authname' => $ext_user->name)));
+    watchdog('simplesamlphp_auth', 'User already registered [%authname] updating roles.', array('%authname' => $ext_user->name), WATCHDOG_DEBUG);
     $roles = _simplesamlphp_auth_rolepopulation(variable_get('simplesamlphp_auth_rolepopulation', ''));
     $userinfo = array('roles' => $roles);
 
