@@ -87,6 +87,11 @@ function simplesamlphp_auth_settings() {
     '#default_value' => variable_get('simplesamlphp_auth_roleevaleverytime', 0),
     '#description' => t('NOTE: This means users could loose any roles that have been assigned manually in Drupal.'),
   );
+  $form['simplesamlphp_auth_grp_user']['simplesamlphp_auth_autoenablesaml'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Automatically enable SAML authentication for existing users upon successful login'),
+    '#default_value' => variable_get('simplesamlphp_auth_autoenablesaml', 0),
+  );
 
   $form['simplesamlphp_auth_grp_reg'] = array(
     '#type' => 'fieldset',

@@ -33,7 +33,15 @@ function _simplesaml_auth_login_register() {
 
       // If we did not find a Drupal user, register a new one.
       if (!$ext_user) {
-        $ext_user = _simplesaml_auth_user_register($authname);
+        // Check if a local drupal account exists (to auto-enable SAML).
+        $local_user = user_load_by_name($authname);
+        if ($local_user && variable_get('simplesamlphp_auth_autoenablesaml', FALSE)) {
+          user_set_authmaps($local_user, array('authname_simplesamlphp_auth' => $authname));
+          $ext_user = $local_user;
+        }
+        else {
+          $ext_user = _simplesaml_auth_user_register($authname);
+        }
       }
 
       // Log the user in.
