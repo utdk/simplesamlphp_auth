@@ -296,7 +296,7 @@ function simplesaml_auth_user_profile_form_submit(&$form, $form_state) {
           'module' => 'simplesamlphp_auth',
         ))
         ->fields(array(
-          'authname' => $values['mail'],
+          'authname' => $values['name'],
         ))
         ->execute();
     }
