@@ -112,17 +112,22 @@ function simplesamlphp_auth_settings() {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowsetdrupalpwd'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Allow SAML users to set Drupal passwords.'),
-    '#default_value' => variable_get('simplesamlphp_auth_allowsetdrupalpwd', FALSE),
-    '#description' => t('Check this box if you want to let people set passwords for their local Drupal accounts. This will allow users to log in using either SAML or a local Drupal account. Disabling this removes the password change fields from the user profile form.<br/>NOTE: In order for them to login using their local Drupal password you must allow local logins with the settings below.'),
-  );
   $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultlogin'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow authentication with local Drupal accounts'),
     '#default_value' => variable_get('simplesamlphp_auth_allowdefaultlogin', TRUE),
     '#description' => t('Check this box if you want to let people log in with local Drupal accounts (without using simpleSAMLphp). If you want to restrict this privilege to certain users you can enter the Drupal user IDs in the field below.'),
+  );
+  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowsetdrupalpwd'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow SAML users to set Drupal passwords.'),
+    '#default_value' => variable_get('simplesamlphp_auth_allowsetdrupalpwd', FALSE),
+    '#description' => t('Check this box if you want to let people set passwords for their local Drupal accounts. This will allow users to log in using either SAML or a local Drupal account. Disabling this removes the password change fields from the user profile form.<br/>NOTE: In order for them to login using their local Drupal password you must allow local logins with the settings below.'),
+    '#states' => array(
+      'enabled' => array(
+        ':input[name="simplesamlphp_auth_allowdefaultlogin"]' => array('checked' => TRUE),
+      ),
+    ),
   );
   $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultloginroles'] = array(
     '#type' => 'select',
