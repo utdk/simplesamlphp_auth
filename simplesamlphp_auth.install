@@ -43,6 +43,7 @@ function simplesamlphp_auth_uninstall() {
   variable_del('simplesamlphp_auth_allowdefaultlogin');
   variable_del('simplesamlphp_auth_allowdefaultloginroles');
   variable_del('simplesamlphp_auth_allowdefaultloginusers');
+  variable_del('simplesamlphp_auth_login_link_display_name');
   variable_del('simplesamlphp_auth_logoutgotourl');
   variable_del('simplesamlphp_auth_autoenablesaml');
 }

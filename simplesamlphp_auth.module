@@ -241,7 +241,8 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
   }
 
   $login_path = variable_get('simplesamlphp_auth_login_path', 'saml_login');
-  $link = l(t('Federated Log In'), $login_path);
+  $login_name = variable_get('simplesamlphp_auth_login_link_display_name', t('Federated Log In'));
+  $link = l($login_name, $login_path);
 
   // Add SAML login link to user login form.
   if ($form_id == 'user_login_block' || $form_id == 'user_account_form') {
@@ -491,7 +492,8 @@ function _simplesamlphp_auth_generate_block_text() {
   }
   else {
     $login_path = variable_get('simplesamlphp_auth_login_path', 'saml_login');
-    $block_content .= '<p>' . l(t('Federated Log In'), $login_path) . '</p>';
+    $login_name = variable_get('simplesamlphp_auth_login_link_display_name', t('Federated Log In'));
+    $block_content .= '<p>' . l($login_name, $login_path) . '</p>';
   }
 
   return $block_content;

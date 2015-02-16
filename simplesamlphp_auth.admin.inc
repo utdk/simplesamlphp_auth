@@ -43,6 +43,12 @@ function simplesamlphp_auth_settings() {
     '#default_value' => variable_get('simplesamlphp_auth_authsource', 'default-sp'),
     '#description' => t('The name of the source to use from /usr/share/simplesamlphp/config/authsources.php'),
   );
+  $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_login_link_display_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Federated Log In Link Display Name'),
+    '#default_value' => variable_get('simplesamlphp_auth_login_link_display_name', 'Federated Log In'),
+    '#description' => t('Text to display as the link to the external federated login page. Default is "Federated Log In" and is passed through the core translation layer.'),
+  );
   $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_login_path'] = array(
     '#type' => 'textfield',
     '#title' => t('Login path'),
