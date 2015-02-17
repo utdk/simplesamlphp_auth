@@ -29,3 +29,24 @@ function hook_simplesamlphp_auth_user_roles_alter(&$roles) {
     }
   }
 }
+
+/**
+ * Allows other modules to decide whether user with the given set of
+ * attributes is allowed to log in via SSO or not.
+ *
+ * Each implementation should take care of displaying errors, there is no
+ * message implementation at hook invocation. Implementations should return
+ * a boolean indicating the success of the access check. Access will be denied
+ * if any implementations return FALSE.
+ *
+ * @param $attributes
+ * @return bool
+ */
+function hook_simplesamlphp_auth_allow_login($attributes) {
+  if (in_array('student', $attributes)) {
+    return FALSE;
+  }
+  else {
+    return TRUE;
+  }
+}

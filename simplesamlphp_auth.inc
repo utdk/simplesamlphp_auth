@@ -12,8 +12,10 @@ function _simplesaml_auth_login_register() {
   global $user;
   global $_simplesamlphp_auth_as;
 
-  // User is logged in - SimpleSAMLphp (but not Drupal).
-  if ($_simplesamlphp_auth_as->isAuthenticated()) {
+  // Check if the user is logged in via SAML (but not Drupal) and is also allowed
+  // to log in by other contrib modules. Please note that no error messaging is done in
+  // this hook invocation - each contrib module should do its own messaging.
+  if ($_simplesamlphp_auth_as->isAuthenticated() && _simplesamlphp_auth_allow_user_by_attribute()) {
 
     // Get unique identifier from saml attributes.
     $authname = _simplesamlphp_auth_get_authname();
@@ -51,6 +53,19 @@ function _simplesaml_auth_login_register() {
   }
 }
 
+/**
+ * Asks all modules if current federated user is allowed to login.
+ * Returns FALSE if at least one module returns FALSE
+ */
+function _simplesamlphp_auth_allow_user_by_attribute() {
+  $attributes = simplesamlphp_auth_get_attributes();
+  foreach (module_implements('simplesamlphp_auth_allow_login') as $module) {
+    if (module_invoke($module, 'simplesamlphp_auth_allow_login', $attributes) === FALSE) {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
 
 /**
  * Creates a new Drupal account for a SAML authenticated user.
