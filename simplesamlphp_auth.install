@@ -69,10 +69,29 @@ function simplesamlphp_auth_requirements($phase) {
     if (!file_exists($basedir . '/lib/_autoload.php')) {
       $requirements['simplesamlphp_auth'] = array(
         'severity'    => REQUIREMENT_ERROR,
-        'title'       => 'SimpleSAMLphp auth',
-        'value'       => $t('SimpleSAMLphp authentication is missing the required SimpleSAMLphp library'),
-        'description' => $t('Please download and install the !simplesamlphp library.', array('!simplesamlphp' => l($t('SimpeSAMLphp'), 'https://simplesamlphp.org/download'))),
+        'title'       => 'SimpleSAMLphp authentication',
+        'value'       => $t('SimpleSAMLphp authentication is missing the required SimpleSAMLphp library.'),
+        'description' => $t('Please download and install the !simplesamlphp library.', array('!simplesamlphp' => l($t('SimpleSAMLphp'), 'https://simplesamlphp.org/download'))),
       );
+    }
+    // SimpleSAMLphp is installed.  Check the version.
+    else {
+      $_simplesamlphp_auth_saml_config = SimpleSAML_Configuration::getInstance();
+      $_simplesamlphp_auth_saml_version = $_simplesamlphp_auth_saml_config->getVersion();
+      if (!empty($_simplesamlphp_auth_saml_version)) {
+        $ver = explode('.', $_simplesamlphp_auth_saml_version);
+        $requirements['simplesamlphp_auth_version'] = array(
+          'title' => $t('SimpleSAMLphp authentication'),
+          'value' => $_simplesamlphp_auth_saml_version,
+        );
+        if ($ver[0] < 1 || ($ver[0] == 1 && $ver[1] < 6)) {
+          $requirements['simplesamlphp_auth_version']['description'] = $t('Your version of SimpleSAMLphp is too old. The minimum version is 1.6.');
+          $requirements['simplesamlphp_auth_version']['severity'] = REQUIREMENT_ERROR;
+        }
+        else {
+          $requirements['simplesamlphp_auth_version']['severity'] = REQUIREMENT_OK;
+        }
+      }
     }
   }
 
