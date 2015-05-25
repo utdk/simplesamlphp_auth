@@ -592,7 +592,7 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
 
         watchdog('simplesamlphp_auth', 'Evaluate role evaulation: %roleruleeval', array('%roleruleeval' => $roleruleevaluation), WATCHDOG_DEBUG);
 
-        $roleruleevaluationdc = explode(',', $roleruleevaluation);
+        $roleruleevaluationdc = str_getcsv($roleruleevaluation);
         if (!_simplesamlphp_auth_evaulaterolerule($roleruleevaluationdc, $attributes)) {
           $addnew = FALSE;
         }
