@@ -50,3 +50,23 @@ function hook_simplesamlphp_auth_allow_login($attributes) {
     return TRUE;
   }
 }
+
+/**
+ * Allows other modules to perform an additional authentication step prior
+ * to logging in given the set of attributes and user object.
+ *
+ * Each implementation should take care of displaying errors or redirecting
+ * to appropriate error pages, there is no message implementation at hook
+ * invocation.
+ *
+ * @param $attributes
+ * @param $ext_user
+ *  The user object for the current user
+ */
+function hook_simplesamlphp_auth_pre_login($attributes, $ext_user) {
+  // Disallow students from logging in with a specific role.
+  if ($ext_user['roles'] == '3' && (in_array('student', $attributes))) {
+    drupal_goto('some-error-page-path');
+    exit();
+  }
+}

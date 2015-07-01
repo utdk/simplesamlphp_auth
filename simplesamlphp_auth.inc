@@ -46,6 +46,12 @@ function _simplesaml_auth_login_register() {
         }
       }
 
+      // Provides opportunity to perform additional prelogin authentication.
+      $attributes = simplesamlphp_auth_get_attributes();
+      foreach (module_implements('simplesamlphp_auth_pre_login') as $module) {
+        module_invoke($module, 'simplesamlphp_auth_pre_login', $attributes, $ext_user);
+      }
+
       // Log the user in.
       _simplesaml_auth_user_login($ext_user);
 
