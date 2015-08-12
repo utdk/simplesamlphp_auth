@@ -55,8 +55,8 @@ function simplesamlphp_auth_install() {
   user_role_revoke_permissions(DRUPAL_AUTHENTICATED_RID, array('change own password'));
 
   // Disable the open registration to the site and store the original setting.
-  $user_settings = \Drupal::config('user.settings');
-  $config = \Drupal::config('simplesamlphp_auth.settings');
+  $user_settings = \Drupal::configFactory()->getEditable('user.settings');
+  $config = \Drupal::configFactory()->getEditable('simplesamlphp_auth.settings');
   $config->set('user_register_original', $user_settings->get('register'));
   $user_settings->set('register', 0);
   $user_settings->save();
@@ -69,7 +69,7 @@ function simplesamlphp_auth_install() {
 function simplesamlphp_auth_uninstall() {
 
   // Restore the original user registration directive.
-  $user_settings = \Drupal::config('user.settings');
+  $user_settings = \Drupal::configFactory()->getEditable('user.settings');
   $config = \Drupal::config('simplesamlphp_auth.settings');
   $user_settings->set('register', $config->get('user_register_original'));
   $user_settings->save();
