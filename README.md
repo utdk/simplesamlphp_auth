@@ -25,6 +25,9 @@ identity attribute values.
    If you are on a shared host or a machine that you cannot install memcache on
    then consider using the sql handler (store.type => 'sql').
 
+2) You must have installed Composer Manager and allowed it to download the
+   simplesamlphp libraries.
+
 
 -- INSTALLATION --
 
@@ -44,6 +47,19 @@ like any other Drupal module.
 The configuration of the module is fairly straight forward. You will need to
 know the names of the attributes that your SP will be making available to the
 module in order to map them into Drupal.
+
+An additional step is required to allow access to SimpleSAMLphp paths within the
+.htaccess for the Drupal 8 version of this module. Add in the lines below at the
+appropriate place within the Drupal 8 .htaccess or the configuration will cause
+permission denied errors.
+
+  # Copy and adapt this rule to directly execute PHP files in contributed or
+  # custom modules or to run another PHP application in the same directory.
+  RewriteCond %{REQUEST_URI} !/core/modules/statistics/statistics.php$
++ # Allow access to simplesaml paths
++ RewriteCond %{REQUEST_URI} !^/simplesaml
+  # Deny access to any other PHP files that do not match the rules above.
+  RewriteRule "^.+/.*\.php$" - [F]
 
 
 -- TROUBLESHOOTING --

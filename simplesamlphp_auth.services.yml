@@ -1,0 +1,12 @@
+services:
+  simplesamlphp_auth.manager:
+    class: Drupal\simplesamlphp_auth\SimplesamlphpAuthManager
+    arguments: ['@config.factory', '@database', '@logger.channel.simplesamlphp_auth']
+  simplesamlphp_auth_event_subscriber:
+    class: Drupal\simplesamlphp_auth\EventSubscriber\SimplesamlSubscriber
+    arguments: ['@simplesamlphp_auth.manager', '@current_user', '@config.factory']
+    tags:
+      - {name: event_subscriber}
+  logger.channel.simplesamlphp_auth:
+    parent: logger.channel_base
+    arguments: ['simplesamlphp_auth']

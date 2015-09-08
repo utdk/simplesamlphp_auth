@@ -1,0 +1,3 @@
+administer simplesamlphp authentication:
+  title: 'Administer SimpleSAMLphp Authentication'
+  restrict access: TRUE
