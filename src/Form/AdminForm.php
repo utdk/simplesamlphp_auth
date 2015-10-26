@@ -135,7 +135,7 @@ class AdminForm extends ConfigFormBase {
     $form['authentication']['allow_default_login_roles'] = array(
       '#type' => 'select',
       '#size' => 3,
-      '#options' => array_map('\Drupal\Component\Utility\String::checkPlain', user_role_names(TRUE)),
+      '#options' => array_map('\Drupal\Component\Utility\Html::escape', user_role_names(TRUE)),
       '#multiple' => TRUE,
       '#title' => $this->t('Roles to be allowed to log in locally'),
       '#default_value' => $config->get('allow.default_login_roles'),
@@ -161,7 +161,7 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->config('simplesamlphp_auth.settings')
+    $this->configFactory()->getEditable('simplesamlphp_auth.settings')
       ->set('activate', $form_state->getValue('activate'))
       ->set('auth_source', $form_state->getValue('auth_source'))
       ->set('force_https', $form_state->getValue('force_https'))

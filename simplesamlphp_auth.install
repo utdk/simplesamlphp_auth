@@ -4,6 +4,7 @@
  * @file
  * the install file for the simplesamlphp_auth module
  */
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Implements hook_schema().
@@ -52,7 +53,7 @@ function simplesamlphp_auth_schema() {
  */
 function simplesamlphp_auth_install() {
 
-  user_role_revoke_permissions(DRUPAL_AUTHENTICATED_RID, array('change own password'));
+  user_role_revoke_permissions(AccountInterface::AUTHENTICATED_ROLE, array('change own password'));
 
   // Disable the open registration to the site and store the original setting.
   $user_settings = \Drupal::configFactory()->getEditable('user.settings');

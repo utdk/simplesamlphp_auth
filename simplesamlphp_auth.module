@@ -30,7 +30,6 @@
 
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\simplesamlphp_auth\SimplesamlphpAuthManager;
 
 /**
  * Implements hook_help().
@@ -105,7 +104,7 @@ function simplesamlphp_auth_user_logout($account) {
  *  Implements hook_ENTITY_TYPE_delete().
  */
 function simplesamlphp_auth_user_delete(Drupal\Core\Entity\EntityInterface $entity) {
-  db_delete('simplesamlphp_auth_authmap')
+  \Drupal::database()->delete('simplesamlphp_auth_authmap')
     ->condition('uid', $entity->id())
     ->execute();
 }
@@ -127,7 +126,12 @@ function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $for
   // them to know their Drupal password. This will allow them to change their
   // e-mail address, and set a Drupal password if they want to (and are allowed).
   $account = $form_state->getFormObject()->getEntity();
-  $saml_enabled = db_query("SELECT authname FROM {simplesamlphp_auth_authmap} WHERE authname = :authname", array(':authname' => $account->getInitialEmail()))->fetchField();
+
+  $saml_enabled = Drupal::database()->select('simplesamlphp_auth_authmap', 'sa')
+    ->fields('sa', array('authname'))
+    ->condition('sa.authname', $account->getInitialEmail())
+    ->fetchField();
+
   if ($saml_enabled) {
     $form['simplesamlphp_auth_user_enable']['#default_value'] = TRUE;
     unset($form['account']['current_pass']);
@@ -210,7 +214,7 @@ function simplesamlphp_auth_user_form_submit($form, FormStateInterface $form_sta
   // Enter the user's authname into the simplesamlphp_auth_authmap table.
   if ($form_state->getValue('simplesamlphp_auth_user_enable')) {
     $account = $form_state->getFormObject()->getEntity();
-    db_merge('simplesamlphp_auth_authmap')
+    Drupal::database()->merge('simplesamlphp_auth_authmap')
       ->key(array(
         'uid' => $form_state->getValue('uid'),
       ))
@@ -221,7 +225,7 @@ function simplesamlphp_auth_user_form_submit($form, FormStateInterface $form_sta
   }
   // Remove this username from the simplesamlphp_auth_authmap table.
   else {
-    db_delete('simplesamlphp_auth_authmap')
+    Drupal::database()->delete('simplesamlphp_auth_authmap')
       ->condition('uid', $form_state->getValue('uid'))
       ->execute();
   }

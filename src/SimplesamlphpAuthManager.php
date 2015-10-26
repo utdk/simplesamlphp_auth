@@ -4,6 +4,7 @@ namespace Drupal\simplesamlphp_auth;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\user\UserInterface;
 use Psr\Log\LoggerInterface;
 use SimpleSAML_Auth_Simple;
@@ -25,6 +26,13 @@ class SimplesamlphpAuthManager {
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $config;
+
+  /**
+   * The entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
 
   /**
    * A logger instance.
@@ -52,10 +60,11 @@ class SimplesamlphpAuthManager {
    * @param Connection $connection
    * @param LoggerInterface $logger
    */
-  public function __construct(ConfigFactoryInterface $config_factory, Connection $connection, LoggerInterface $logger) {
+  public function __construct(ConfigFactoryInterface $config_factory, Connection $connection, EntityManagerInterface $entityManager, LoggerInterface $logger) {
     $this->connection = $connection;
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
     $this->logger = $logger;
+    $this->entityManager = $entityManager;
   }
 
   /**
@@ -103,7 +112,7 @@ class SimplesamlphpAuthManager {
       ->fetchField();
 
     if ($uid) {
-      return entity_load('user', $uid);
+      return $this->entityManager->getStorage('user')->load($uid);
     }
     else {
       return $this->externalRegister($authname);
@@ -134,7 +143,7 @@ class SimplesamlphpAuthManager {
     // It's possible that a user with their username set to this authname
     // already exists in the Drupal database, but is not permitted to login to
     // Drupal via SAML. If so, log out of SAML and redirect to the front page.
-    if (user_load_by_name($name)) {
+    if ($this->entityManager->getStorage('user')->loadByProperties(array('name' => $name))) {
       drupal_set_message(t('We are sorry, your user account is not SAML enabled.'));
       $this->instance->logout(base_path());
 
@@ -142,13 +151,15 @@ class SimplesamlphpAuthManager {
     }
 
     // Create the new user.
-    $account = entity_create('user', array(
-      'name' => $name,
-      'pass' => user_password(),
-      'init' => $name,
-      'status' => 1,
-      'access' => REQUEST_TIME
-    ));
+    $account = $this->entityManager->getStorage('user')->create(
+      array(
+        'name' => $name,
+        'pass' => user_password(),
+        'init' => $name,
+        'status' => 1,
+        'access' => REQUEST_TIME
+      )
+    );
     $account->enforceIsNew();
     $account->save();
     $this->logger->notice('Registering user [%name]', array('%name' => $name));
@@ -176,7 +187,7 @@ class SimplesamlphpAuthManager {
     }
 
     // Finalizing the login, calls hook_user_login.
-    $this->logger->notice('Logging in user [%name]', array('%name' => $account->getUsername()));
+    $this->logger->notice('Logging in user [%name]', array('%name' => $account->getAccountName()));
     user_login_finalize($account);
 
   }
@@ -203,7 +214,7 @@ class SimplesamlphpAuthManager {
           if ($this->evalRoleRule($role_eval_part)) {
             $this->logger->notice('Adding role %role to user %name', array(
               '%role' => $role_id,
-              '%name' => $account->getUsername(),
+              '%name' => $account->getAccountName(),
             ));
             $account->addRole($role_id);
           }
