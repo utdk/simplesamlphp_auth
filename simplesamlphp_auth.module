@@ -130,7 +130,7 @@ function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $for
   $saml_enabled = Drupal::database()->select('simplesamlphp_auth_authmap', 'sa')
     ->fields('sa', array('authname'))
     ->condition('sa.authname', $account->getInitialEmail())
-    ->fetchField();
+    ->execute()->fetchField();
 
   if ($saml_enabled) {
     $form['simplesamlphp_auth_user_enable']['#default_value'] = TRUE;
