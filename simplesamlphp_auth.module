@@ -127,21 +127,19 @@ function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $for
   // e-mail address, and set a Drupal password if they want to (and are allowed).
   $account = $form_state->getFormObject()->getEntity();
 
-  $saml_enabled = Drupal::database()->select('simplesamlphp_auth_authmap', 'sa')
+  $saml_enabled = \Drupal::database()->select('simplesamlphp_auth_authmap', 'sa')
     ->fields('sa', array('authname'))
     ->condition('sa.authname', $account->getInitialEmail())
     ->execute()->fetchField();
 
   if ($saml_enabled) {
     $form['simplesamlphp_auth_user_enable']['#default_value'] = TRUE;
-    unset($form['account']['current_pass']);
-    unset($form['account']['current_pass_required_values']);
-    $form['#validate'] = array_diff($form['#validate'], array('user_validate_current_pass'));
+    $form['account']['current_pass']['#access'] = FALSE;
 
     // If the user is a simplesamlphp_auth user and is NOT allowed to set their Drupal password, remove the fields from the form.
     $config = \Drupal::config('simplesamlphp_auth.settings');
     if (!$config->get('allow.set_drupal_pwd')) {
-      unset($form['account']['pass']);
+      $form['account']['pass']['#access'] = FALSE;
     }
   }
 }
@@ -173,6 +171,7 @@ function simplesamlphp_auth_user_form_includes(&$form) {
   $form['simplesamlphp_auth_user_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable this user to leverage SAML authentication'),
+    '#access' => \Drupal::currentUser()->hasPermission('administer simpleSAMLphp authentication'),
   );
 
   // We store the authname as the initial email. If we're using SimpleSAML we
@@ -214,7 +213,7 @@ function simplesamlphp_auth_user_form_submit($form, FormStateInterface $form_sta
   // Enter the user's authname into the simplesamlphp_auth_authmap table.
   if ($form_state->getValue('simplesamlphp_auth_user_enable')) {
     $account = $form_state->getFormObject()->getEntity();
-    Drupal::database()->merge('simplesamlphp_auth_authmap')
+    \Drupal::database()->merge('simplesamlphp_auth_authmap')
       ->key(array(
         'uid' => $form_state->getValue('uid'),
       ))
@@ -225,7 +224,7 @@ function simplesamlphp_auth_user_form_submit($form, FormStateInterface $form_sta
   }
   // Remove this username from the simplesamlphp_auth_authmap table.
   else {
-    Drupal::database()->delete('simplesamlphp_auth_authmap')
+    \Drupal::database()->delete('simplesamlphp_auth_authmap')
       ->condition('uid', $form_state->getValue('uid'))
       ->execute();
   }
