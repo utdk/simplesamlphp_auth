@@ -43,8 +43,9 @@ class SimplesamlphpAuthBlock extends BlockBase {
         ));
       }
       else {
+        $label = Drupal::config('simplesamlphp_auth.settings')->get('login_link_display_name');
         $content = $this->t('!login', array(
-          '!login' => $this->l('Federated Log In', new Url('simplesamlphp_auth.saml_login'))
+          '!login' => $this->l($label, new Url('simplesamlphp_auth.saml_login'))
         ));
       }
     }

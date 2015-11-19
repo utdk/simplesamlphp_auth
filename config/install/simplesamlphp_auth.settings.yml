@@ -4,6 +4,7 @@ unique_id: 'eduPersonPrincipalName'
 user_name: 'eduPersonPrincipalName'
 auth_source: 'default-sp'
 force_https: true
+login_link_display_name: "Federated login"
 role:
   population:
   eval_every_time: 0
@@ -15,3 +16,5 @@ allow:
   default_login_users:
 logout_goto_url:
 user_register_original:
+langcode: en
+default_langcode: en

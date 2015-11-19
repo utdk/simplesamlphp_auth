@@ -13,6 +13,9 @@ simplesamlphp_auth.settings:
     force_https:
       type: boolean
       label: 'Force https for login links'
+    login_link_display_name:
+      type: label
+      label: 'Federated Log In Link Display Name'
     user_name:
       type: string
       label: 'SimpleSAMLphp attribute to be used as username for the user'
@@ -60,3 +63,9 @@ simplesamlphp_auth.settings:
     user_register_original:
       type: string
       label: 'Original user register status'
+    langcode:
+      type: string
+      label: 'Language code'
+    default_langcode:
+      type: string
+      label: 'Site default language code'

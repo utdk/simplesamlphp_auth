@@ -53,6 +53,12 @@ class AdminForm extends ConfigFormBase {
       '#default_value' => $config->get('force_https'),
       '#description' => $this->t('Should be enabled on production sites.'),
     );
+    $form['basic']['login_link_display_name'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Federated Log In Link Display Name'),
+      '#default_value' => $config->get('login_link_display_name'),
+      '#description' => $this->t('Text to display as the link to the external federated login page.'),
+    );
 
     $form['user_info'] = array(
       '#type' => 'fieldset',
