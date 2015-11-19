@@ -45,10 +45,12 @@ simplesamlphp_auth.settings:
         default_login:
           type: boolean
           label: 'Allow authentication with local Drupal accounts'
-        # @TODO string isn't the correct type here.
         default_login_roles:
-          type: string
+          type: sequence
           label: 'Roles to be allowed to log in locally'
+          sequence:
+              type: string
+              label: 'role'
         default_login_users:
           type: string
           label: 'Users to be allowed to log in locally'

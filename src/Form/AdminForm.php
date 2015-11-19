@@ -133,7 +133,7 @@ class AdminForm extends ConfigFormBase {
       '#description' => $this->t('Check this box if you want to let people log in with local Drupal accounts (without using simpleSAMLphp). If you want to restrict this privilege to certain users you can enter the Drupal user IDs in the field below.'),
     );
     $form['authentication']['allow_default_login_roles'] = array(
-      '#type' => 'select',
+      '#type' => 'checkboxes',
       '#size' => 3,
       '#options' => array_map('\Drupal\Component\Utility\Html::escape', user_role_names(TRUE)),
       '#multiple' => TRUE,
