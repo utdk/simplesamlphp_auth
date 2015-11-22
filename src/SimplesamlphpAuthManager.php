@@ -208,7 +208,7 @@ class SimplesamlphpAuthManager {
     if ($rolemap = $this->config->get('role.population')) {
 
       foreach (explode('|', $rolemap) as $rolerule) {
-        list($role_id, $role_eval) = explode(':', $rolerule);
+        list($role_id, $role_eval) = explode(':', $rolerule, 2);
 
         foreach (explode(';', $role_eval) as $role_eval_part) {
           if ($this->evalRoleRule($role_eval_part)) {
