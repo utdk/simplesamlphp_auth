@@ -5,6 +5,7 @@ namespace Drupal\simplesamlphp_auth;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\user\UserInterface;
 use Psr\Log\LoggerInterface;
 use SimpleSAML_Auth_Simple;
@@ -162,6 +163,7 @@ class SimplesamlphpAuthManager {
     );
     $account->enforceIsNew();
     $account->save();
+    $this->synchronizeUserAttributes($account, TRUE);
     $this->logger->notice('Registering user [%name]', array('%name' => $name));
 
     $this->connection->merge('simplesamlphp_auth_authmap')
@@ -172,6 +174,38 @@ class SimplesamlphpAuthManager {
       ->execute();
 
     return $account;
+  }
+
+  /**
+   * Synchronizes user data if enabled.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param bool $force
+   *   Define whether to force syncing of the user attributes, regardless of
+   *   SimpleSAMLphp settings.
+   */
+  public function synchronizeUserAttributes(AccountInterface $account, $force = FALSE) {
+    $sync_mail = $force || $this->config->get('sync.mail');
+    $sync_user_name = $force || $this->config->get('sync.user_name');
+
+    try {
+      if ($sync_user_name) {
+        $name = $this->getDefaultName();
+        $account->setUsername($name);
+      }
+
+      if ($sync_mail) {
+        $mail = $this->getDefaultEmail();
+        $account->setEmail($mail);
+      }
+    } catch (Exception $e) {
+      drupal_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
+      \Drupal::logger('simplesamlphp_auth')->critical($e->getMessage());
+    }
+
+    if ($sync_mail || $sync_user_name) {
+      $account->save();
+    }
   }
 
   /**

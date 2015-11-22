@@ -69,3 +69,13 @@ simplesamlphp_auth.settings:
     default_langcode:
       type: string
       label: 'Site default language code'
+    sync:
+      type: mapping
+      label: 'Synchronize options'
+      mapping:
+        mail:
+          type: boolean
+          label: 'Synchronize mail on every login'
+        user_name:
+          type: boolean
+          label: 'Synchronize user_name on every login'

@@ -58,22 +58,7 @@ function simplesamlphp_auth_user_login($account) {
 
   // If user registration has a valid session...
   if ($simplesaml->isAuthenticated() && $simplesaml->getAuthname() == $account->getInitialEmail()) {
-    // Get name and mail from default attributes.
-    try {
-      $name = $simplesaml->getDefaultName();
-      $mail = $simplesaml->getDefaultEmail();
-    } catch (Exception $e) {
-      drupal_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
-      \Drupal::logger('simplesamlphp_auth')->critical($e->getMessage());
-    }
-
-    // Update username and email address.
-    // @TODO Make this conditional.
-    // Should this go in the Manager (externalLogin method)
-    $account->setUsername($name);
-    $account->setEmail($mail);
-    $account->save();
-
+    $simplesaml->synchronizeUserAttributes($account);
   }
 }
 

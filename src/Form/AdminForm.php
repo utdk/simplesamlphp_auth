@@ -72,6 +72,13 @@ class AdminForm extends ConfigFormBase {
       '#description' => $this->t('Example: <i>eduPersonPrincipalName</i> or <i>displayName</i><br />If the attribute is multivalued, the first value will be used.'),
       '#required' => TRUE,
     );
+    $form['user_info']['user_name_sync'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Synchronize user name on every login'),
+      '#default_value' => $config->get('sync.user_name'),
+      '#description' => $this->t('Check if user name should be synchronized every time a user logs in.'),
+      '#required' => FALSE,
+    );
     $form['user_info']['unique_id'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('SimpleSAMLphp attribute to be used as unique identifier for the user'),
@@ -84,6 +91,13 @@ class AdminForm extends ConfigFormBase {
       '#title' => $this->t('SimpleSAMLphp attribute to be used as email address for the user'),
       '#default_value' => $config->get('mail_attr'),
       '#description' => $this->t('Example: <i>mail</i><br />If the user attribute is multivalued, the first value will be used.'),
+    );
+    $form['user_info']['mail_attr_sync'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Synchronize email address on every login'),
+      '#default_value' => $config->get('sync.mail'),
+      '#description' => $this->t('Check if email address should be synchronized every time a user logs in.'),
+      '#required' => FALSE,
     );
     $form['user_info']['role_population'] = array(
       '#type' => 'textarea',
@@ -172,8 +186,10 @@ class AdminForm extends ConfigFormBase {
       ->set('auth_source', $form_state->getValue('auth_source'))
       ->set('force_https', $form_state->getValue('force_https'))
       ->set('user_name', $form_state->getValue('user_name'))
+      ->set('sync.user_name', $form_state->getValue('user_name_sync'))
       ->set('unique_id', $form_state->getValue('unique_id'))
       ->set('mail_attr', $form_state->getValue('mail_attr'))
+      ->set('sync.mail', $form_state->getValue('mail_attr_sync'))
       ->set('role.population', $form_state->getValue('role_population'))
       ->set('role.eval_every_time', $form_state->getValue('role_eval_every_time'))
       ->set('register_users', $form_state->getValue('register_users'))

@@ -18,3 +18,6 @@ logout_goto_url:
 user_register_original:
 langcode: en
 default_langcode: en
+sync:
+  mail: true
+  user_name: true
