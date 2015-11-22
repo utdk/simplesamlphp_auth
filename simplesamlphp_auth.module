@@ -171,7 +171,7 @@ function simplesamlphp_auth_user_form_includes(&$form) {
   $form['simplesamlphp_auth_user_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable this user to leverage SAML authentication'),
-    '#access' => \Drupal::currentUser()->hasPermission('administer simpleSAMLphp authentication'),
+    '#access' => \Drupal::currentUser()->hasPermission('change saml authentication setting'),
   );
 
   // We store the authname as the initial email. If we're using SimpleSAML we
