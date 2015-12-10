@@ -1,25 +1,27 @@
 <?php
 
-namespace Drupal\simplesamlphp_auth;
+/**
+ * @file
+ * Contains \Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth.
+ */
+
+namespace Drupal\simplesamlphp_auth\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\user\UserInterface;
+use Drupal\Core\Session\AccountInterface;
 use Psr\Log\LoggerInterface;
-use SimpleSAML_Auth_Simple;
-use SimpleSAML_Configuration;
 
-
-class SimplesamlphpAuthManager {
+class SimplesamlphpDrupalAuth {
 
   /**
-   * The connection object used for this data.
+   * SimpleSAMLphp Authentication helper
    *
-   * @var \Drupal\Core\Database\Connection $connection
+   * @var SimplesamlphpAuthManager
    */
-  protected $connection;
+  protected $simplesaml;
 
   /**
    * The Drupal configuration factory.
@@ -27,6 +29,13 @@ class SimplesamlphpAuthManager {
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $config;
+
+  /**
+   * The connection object used for this data.
+   *
+   * @var \Drupal\Core\Database\Connection $connection
+   */
+  protected $connection;
 
   /**
    * The entity manager.
@@ -43,81 +52,62 @@ class SimplesamlphpAuthManager {
   protected $logger;
 
   /**
-   * A SimpleSAML configuration instance.
-   *
-   * @var \SimpleSAML_Configuration
-   */
-  protected $simplesamlConfig;
-
-  /**
-   * A SimpleSAML instance.
-   *
-   * @var \SimpleSAML_Auth_Simple
-   */
-  public $instance;
-
-  /**
+   * @param SimplesamlphpAuthManager $simplesaml_auth
    * @param ConfigFactoryInterface $config_factory
    * @param Connection $connection
+   * @param EntityManagerInterface $entityManager
    * @param LoggerInterface $logger
    */
-  public function __construct(ConfigFactoryInterface $config_factory, Connection $connection, EntityManagerInterface $entityManager, LoggerInterface $logger) {
-    $this->connection = $connection;
+  public function __construct(SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory, Connection $connection, EntityManagerInterface $entityManager, LoggerInterface $logger) {
+    $this->simplesaml_auth = $simplesaml_auth;
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
-    $this->logger = $logger;
+    $this->connection = $connection;
     $this->entityManager = $entityManager;
+    $this->logger = $logger;
   }
 
   /**
-   * Loads the SimpleSAML instance and configuration.
-   *
-   * @throws \Exception
-   */
-  public function load() {
-    $auth_source = $this->config->get('auth_source');
-    $this->instance = new SimpleSAML_Auth_Simple($auth_source);
-    $this->simplesamlConfig = \SimpleSAML_Configuration::getInstance();
-  }
-
-  /**
-   * Forwards the user to the IdP for authentication.
-   */
-  public function externalAuthenticate() {
-    $this->instance->requireAuth();
-  }
-
-  /**
-   * @return string
-   *   The storage type.
-   */
-  public function getStorage() {
-    return $this->simplesamlConfig->getValue('store.type');
-  }
-
-  /**
-   * @return bool
-   *   If the user is authenticated by the IdP.
-   */
-  public function isAuthenticated() {
-    return $this->instance->isAuthenticated();
-  }
-
-  /**
-   * Loads or registers the user based on the authname provided.
+   * Loads or registers a Drupal user based on the authname provided.
    *
    * @param $authname
    * @return \Drupal\Core\Entity\EntityInterface|null
    */
   public function externalLoad($authname) {
-    $uid = $this->connection->query("SELECT uid FROM {simplesamlphp_auth_authmap} WHERE authname = :authname", array(':authname' => $authname))
-      ->fetchField();
-
+    $uid = $this->getUserIdforAuthname($authname);
     if ($uid) {
       return $this->entityManager->getStorage('user')->load($uid);
     }
     else {
       return $this->externalRegister($authname);
     }
+  }
+
+  /**
+   * Finalize logging in the external user.
+   *
+   * @param UserInterface $account
+   *
+   * @codeCoverageIgnore
+   */
+  protected function externalLoginFinalize($account) {
+    user_login_finalize($account);
+  }
+
+  /**
+   * Logs in users following successful authentication from the IdP.
+   *
+   * @param UserInterface $account
+   */
+  public function externalLogin(UserInterface $account) {
+
+    // Determine if roles should be evaluated upon login.
+    if ($this->config->get('role.eval_every_time')) {
+      $this->roleMatchAdd($account);
+    }
+
+    // Finalizing the login, calls hook_user_login.
+    $this->logger->notice('Logging in user [%name]', array('%name' => $account->getAccountName()));
+    $this->externalLoginFinalize($account);
   }
 
   /**
@@ -136,7 +126,7 @@ class SimplesamlphpAuthManager {
       // We are not allowed to register new users on the site through simpleSAML.
       // We let the user know about this and redirect to the user/login page.
       drupal_set_message(t("We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you."));
-      $this->instance->logout(base_path());
+      $this->simplesaml_auth->logout(base_path());
 
       return FALSE;
     }
@@ -146,32 +136,27 @@ class SimplesamlphpAuthManager {
     // Drupal via SAML. If so, log out of SAML and redirect to the front page.
     if ($this->entityManager->getStorage('user')->loadByProperties(array('name' => $name))) {
       drupal_set_message(t('We are sorry, your user account is not SAML enabled.'));
-      $this->instance->logout(base_path());
+      $this->simplesaml_auth->logout(base_path());
 
       return FALSE;
     }
 
     // Create the new user.
-    $account = $this->entityManager->getStorage('user')->create(
+    $entity_storage = $this->entityManager->getStorage('user');
+    $account = $entity_storage->create(
       array(
         'name' => $name,
-        'pass' => user_password(),
         'init' => $name,
         'status' => 1,
-        'access' => REQUEST_TIME
+        'access' => (int) $_SERVER['REQUEST_TIME'],
       )
     );
+
     $account->enforceIsNew();
     $account->save();
     $this->synchronizeUserAttributes($account, TRUE);
+    $this->saveAuthmap($name, $account->id());
     $this->logger->notice('Registering user [%name]', array('%name' => $name));
-
-    $this->connection->merge('simplesamlphp_auth_authmap')
-      ->keys(array(
-        'uid' => $account->id(),
-      ))
-      ->fields(array('authname' => $name))
-      ->execute();
 
     return $account;
   }
@@ -190,12 +175,12 @@ class SimplesamlphpAuthManager {
 
     try {
       if ($sync_user_name) {
-        $name = $this->getDefaultName();
+        $name = $this->simplesaml_auth->getDefaultName();
         $account->setUsername($name);
       }
 
       if ($sync_mail) {
-        $mail = $this->getDefaultEmail();
+        $mail = $this->simplesaml_auth->getDefaultEmail();
         $account->setEmail($mail);
       }
     } catch (Exception $e) {
@@ -209,21 +194,38 @@ class SimplesamlphpAuthManager {
   }
 
   /**
-   * Logs in users following successful authentication from the IdP.
+   * Get a Drupal uid for a given SimpleSAMLphp authname.
    *
-   * @param UserInterface $account
+   * @todo: refactor into its own service.
+   *
+   * @param $authname
+   * @return int|bool
    */
-  public function externalLogin(UserInterface $account) {
-
-    // Determine if roles should be evaluated upon login.
-    if ($this->config->get('role.eval_every_time')) {
-      $this->roleMatchAdd($account);
+  protected function getUserIdForAuthname($authname) {
+    $uid = $this->connection->query("SELECT uid FROM {simplesamlphp_auth_authmap} WHERE authname = :authname", array(':authname' => $authname))
+      ->fetchField();
+    if ($uid) {
+      return $uid;
     }
+    return FALSE;
+  }
 
-    // Finalizing the login, calls hook_user_login.
-    $this->logger->notice('Logging in user [%name]', array('%name' => $account->getAccountName()));
-    user_login_finalize($account);
-
+  /**
+   * Save an authmap record for a given SimpleSAMLphp authname and
+   * corresponding Drupal uid
+   *
+   * @todo: refactor into its own service.
+   *
+   * @param string $name
+   * @param int $id
+   */
+  protected function saveAuthmap($name, $id) {
+    $this->connection->merge('simplesamlphp_auth_authmap')
+      ->keys(array(
+        'uid' => $id,
+      ))
+      ->fields(array('authname' => $name))
+      ->execute();
   }
 
   /**
@@ -232,7 +234,29 @@ class SimplesamlphpAuthManager {
    * @param UserInterface $account
    */
   public function roleMatchAdd(UserInterface $account) {
+    // Get matching roles based on retrieved SimpleSAMLphp attributes
+    $matching_roles = $this->getMatchingRoles();
 
+    if ($matching_roles) {
+      foreach ($matching_roles as $role_id) {
+        $this->logger->notice('Adding role %role to user %name', array(
+          '%role' => $role_id,
+          '%name' => $account->getAccountName(),
+        ));
+        $account->addRole($role_id);
+      }
+      $account->save();
+    }
+  }
+
+  /**
+   * Get matching user roles to assign to user, based on retrieved
+   * SimpleSAMLphp attributes.
+   * 
+   * @return array
+   */
+  public function getMatchingRoles() {
+    $roles = array();
     // Obtain the role map stored. The role map is a concatenated string of
     // rules which, when SimpleSAML attributes on the user match, will add
     // roles to the user.
@@ -246,16 +270,12 @@ class SimplesamlphpAuthManager {
 
         foreach (explode(';', $role_eval) as $role_eval_part) {
           if ($this->evalRoleRule($role_eval_part)) {
-            $this->logger->notice('Adding role %role to user %name', array(
-              '%role' => $role_id,
-              '%name' => $account->getAccountName(),
-            ));
-            $account->addRole($role_id);
+            $roles[] = $role_id;
           }
         }
       }
-      $account->save();
     }
+    return $roles;
   }
 
   /**
@@ -267,7 +287,7 @@ class SimplesamlphpAuthManager {
   protected function evalRoleRule($role_eval_part) {
     list($key, $op, $value) = explode(',', $role_eval_part);
 
-    $attributes = $this->getAttributes();
+    $attributes = $this->simplesaml_auth->getAttributes();
     if (!array_key_exists($key, $attributes)) {
       return FALSE;
     }
@@ -290,77 +310,6 @@ class SimplesamlphpAuthManager {
           return strpos($subattr, $value) !== FALSE;
         });
     }
-  }
-
-  /**
-   * Gets the unique id of the user from the IdP.
-   *
-   * @return string
-   *   The authname.
-   */
-  public function getAuthname() {
-    return $this->getAttribute($this->config->get('unique_id'));
-  }
-
-  /**
-   * Gets the name attribute.
-   *
-   * @return string
-   *   The name attribute.
-   */
-  public function getDefaultName() {
-    return $this->getAttribute($this->config->get('user_name'));
-  }
-
-  /**
-   * Gets the mail attribute.
-   *
-   * @return string
-   *   The mail attribute.
-   */
-  public function getDefaultEmail() {
-    return $this->getAttribute($this->config->get('mail_attr'));
-  }
-
-  /**
-   * Gets all SimpleSAML attributes.
-   *
-   * @return mixed
-   */
-  protected function getAttributes() {
-    return $this->instance->getAttributes();
-  }
-
-  /**
-   * @param $attribute
-   * @return bool
-   * @throws \Exception
-   */
-  protected function getAttribute($attribute) {
-    $attributes = $this->getAttributes();
-
-    if (isset($attributes)) {
-      if (empty($attributes[$attribute][0])) {
-        throw new \Exception(t('Error in simplesamlphp_auth.module: no valid %attribute attribute set.',
-          array(
-            '%attribute' => $attribute,
-          )
-        ));
-      }
-
-      return $attributes[$attribute][0];
-    }
-
-    return FALSE;
-  }
-
-  /**
-   * Checks if SimpleSAMLphp_auth is enabled.
-   *
-   * @return bool
-   */
-  public function isActivated() {
-    return $this->config->get('activate');
   }
 
 }

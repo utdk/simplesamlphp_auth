@@ -4,7 +4,7 @@ namespace Drupal\simplesamlphp_auth\EventSubscriber;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\simplesamlphp_auth\SimplesamlphpAuthManager;
+use Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;

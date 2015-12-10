@@ -50,6 +50,7 @@ function simplesamlphp_auth_help($route_name) {
 function simplesamlphp_auth_user_login($account) {
 
   $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
+  $simplesaml_drupalauth = \Drupal::service('simplesamlphp_auth.drupalauth');
   $simplesaml->load();
 
   if (!$simplesaml->isActivated()) {
@@ -58,7 +59,7 @@ function simplesamlphp_auth_user_login($account) {
 
   // If user registration has a valid session...
   if ($simplesaml->isAuthenticated() && $simplesaml->getAuthname() == $account->getInitialEmail()) {
-    $simplesaml->synchronizeUserAttributes($account);
+    $simplesaml_drupalauth->synchronizeUserAttributes($account);
   }
 }
 
@@ -78,10 +79,10 @@ function simplesamlphp_auth_user_logout($account) {
   session_destroy();
 
   if ($logout_url) {
-    $simplesaml->instance->logout($logout_url);
+    $simplesaml->logout($logout_url);
   }
   else {
-    $simplesaml->instance->logout();
+    $simplesaml->logout();
   }
 }
 
