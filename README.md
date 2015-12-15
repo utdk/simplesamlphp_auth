@@ -25,8 +25,8 @@ identity attribute values.
    If you are on a shared host or a machine that you cannot install memcache on
    then consider using the sql handler (store.type => 'sql').
 
-2) You must have installed Composer Manager and allowed it to download the
-   simplesamlphp libraries.
+2) You must have installed Composer Manager (https://www.drupal.org/project/composer_manager) and allowed it to
+   download the simplesamlphp libraries. See README.txt in the composer_manager module for installation instructions.
 
 
 -- INSTALLATION --
@@ -36,10 +36,11 @@ like any other Drupal module.
 
 1) Download the module
 2) Uncompress it
-3) Move it to the appropriate modules directory (usually, sites/all/modules)
+3) Move it to the appropriate modules directory (usually, /modules)
 4) Go to the Drupal module administration page for your site
 5) Enable the module
-6) Configure the module (see below)
+6) Run the "composer drupal-update" command (see Prerequisites above)
+7) Configure the module (see below)
 
 
 -- CONFIGURATION --

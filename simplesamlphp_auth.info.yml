@@ -5,4 +5,3 @@ core: 8.x
 configure: simplesamlphp_auth.admin_settings
 dependencies:
  - user
- - composer_manager
