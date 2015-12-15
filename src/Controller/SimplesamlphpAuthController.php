@@ -159,12 +159,8 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
           // identifier, so try to log into Drupal.
           // Check to see whether the external user exists in Drupal. If they
           // do not exist, create them.
-          $account = $this->simplesaml_drupalauth->externalLoad($authname);
-
-          // Log the user in.
-          if ($account instanceof UserInterface) {
-            $this->simplesaml_drupalauth->externalLogin($account);
-          }
+          // Also log in the user.
+          $this->simplesaml_drupalauth->externalLoginRegister($authname);
         }
       }
 
@@ -185,7 +181,6 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
     }
 
     return $this->redirect('user.login');
-
   }
 
 }

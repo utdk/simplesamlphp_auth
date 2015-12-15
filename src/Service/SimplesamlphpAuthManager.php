@@ -8,19 +8,11 @@
 namespace Drupal\simplesamlphp_auth\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Database\Connection;
 use SimpleSAML_Auth_Simple;
 use SimpleSAML_Configuration;
 
 
 class SimplesamlphpAuthManager {
-
-  /**
-   * The connection object used for this data.
-   *
-   * @var \Drupal\Core\Database\Connection $connection
-   */
-  protected $connection;
 
   /**
    * The Drupal configuration factory.
@@ -45,10 +37,8 @@ class SimplesamlphpAuthManager {
 
   /**
    * @param ConfigFactoryInterface $config_factory
-   * @param Connection $connection
    */
-  public function __construct(ConfigFactoryInterface $config_factory, Connection $connection) {
-    $this->connection = $connection;
+  public function __construct(ConfigFactoryInterface $config_factory) {
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
   }
 

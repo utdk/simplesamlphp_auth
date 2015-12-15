@@ -8,11 +8,11 @@
 namespace Drupal\simplesamlphp_auth\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Session\AccountInterface;
 use Psr\Log\LoggerInterface;
+use Drupal\externalauth\ExternalAuthInterface;
 
 class SimplesamlphpDrupalAuth {
 
@@ -31,13 +31,6 @@ class SimplesamlphpDrupalAuth {
   protected $config;
 
   /**
-   * The connection object used for this data.
-   *
-   * @var \Drupal\Core\Database\Connection $connection
-   */
-  protected $connection;
-
-  /**
    * The entity manager.
    *
    * @var \Drupal\Core\Entity\EntityManagerInterface
@@ -52,72 +45,55 @@ class SimplesamlphpDrupalAuth {
   protected $logger;
 
   /**
+   * The External Authentication service.
+   *
+   * @var \Drupal\externalauth\ExternalAuth
+   */
+  protected $externalauth;
+
+  /**
    * @param SimplesamlphpAuthManager $simplesaml_auth
    * @param ConfigFactoryInterface $config_factory
-   * @param Connection $connection
    * @param EntityManagerInterface $entityManager
    * @param LoggerInterface $logger
+   * @param ExternalAuthInterface $externalauth
    */
-  public function __construct(SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory, Connection $connection, EntityManagerInterface $entityManager, LoggerInterface $logger) {
+  public function __construct(SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory, EntityManagerInterface $entityManager, LoggerInterface $logger, ExternalAuthInterface $externalauth) {
     $this->simplesaml_auth = $simplesaml_auth;
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
-    $this->connection = $connection;
     $this->entityManager = $entityManager;
     $this->logger = $logger;
+    $this->externalauth = $externalauth;
   }
 
   /**
-   * Loads or registers a Drupal user based on the authname provided.
+   * Logs in and optionally registers a Drupal user based on the authname provided.
    *
    * @param $authname
    * @return \Drupal\Core\Entity\EntityInterface|null
    */
-  public function externalLoad($authname) {
-    $uid = $this->getUserIdforAuthname($authname);
-    if ($uid) {
-      return $this->entityManager->getStorage('user')->load($uid);
+  public function externalLoginRegister($authname) {
+    $account = $this->externalauth->login($authname, 'simplesamlphp_auth');
+    if (!$account) {
+      $account = $this->externalRegister($authname);
     }
-    else {
-      return $this->externalRegister($authname);
-    }
-  }
-
-  /**
-   * Finalize logging in the external user.
-   *
-   * @param UserInterface $account
-   *
-   * @codeCoverageIgnore
-   */
-  protected function externalLoginFinalize($account) {
-    user_login_finalize($account);
-  }
-
-  /**
-   * Logs in users following successful authentication from the IdP.
-   *
-   * @param UserInterface $account
-   */
-  public function externalLogin(UserInterface $account) {
 
     // Determine if roles should be evaluated upon login.
     if ($this->config->get('role.eval_every_time')) {
       $this->roleMatchAdd($account);
     }
 
-    // Finalizing the login, calls hook_user_login.
-    $this->logger->notice('Logging in user [%name]', array('%name' => $account->getAccountName()));
-    $this->externalLoginFinalize($account);
+    return $account;
   }
 
   /**
    * Registers a user locally as one authenticated by the SimpleSAML IdP.
    *
-   * @param $name
+   * @param $authname
    * @return \Drupal\Core\Entity\EntityInterface
    * @throws \Exception
    */
-  public function externalRegister($name) {
+  public function externalRegister($authname) {
 
     // First we check the admin settings for simpleSAMLphp and find out if we
     // are allowed to register users.
@@ -134,7 +110,7 @@ class SimplesamlphpDrupalAuth {
     // It's possible that a user with their username set to this authname
     // already exists in the Drupal database, but is not permitted to login to
     // Drupal via SAML. If so, log out of SAML and redirect to the front page.
-    if ($this->entityManager->getStorage('user')->loadByProperties(array('name' => $name))) {
+    if ($this->entityManager->getStorage('user')->loadByProperties(array('name' => $authname))) {
       drupal_set_message(t('We are sorry, your user account is not SAML enabled.'));
       $this->simplesaml_auth->logout(base_path());
 
@@ -142,23 +118,9 @@ class SimplesamlphpDrupalAuth {
     }
 
     // Create the new user.
-    $entity_storage = $this->entityManager->getStorage('user');
-    $account = $entity_storage->create(
-      array(
-        'name' => $name,
-        'init' => $name,
-        'status' => 1,
-        'access' => (int) $_SERVER['REQUEST_TIME'],
-      )
-    );
-
-    $account->enforceIsNew();
-    $account->save();
+    $account = $this->externalauth->register($authname, 'simplesamlphp_auth');
     $this->synchronizeUserAttributes($account, TRUE);
-    $this->saveAuthmap($name, $account->id());
-    $this->logger->notice('Registering user [%name]', array('%name' => $name));
-
-    return $account;
+    return $this->externalauth->userLoginFinalize($account);
   }
 
   /**
@@ -194,41 +156,6 @@ class SimplesamlphpDrupalAuth {
   }
 
   /**
-   * Get a Drupal uid for a given SimpleSAMLphp authname.
-   *
-   * @todo: refactor into its own service.
-   *
-   * @param $authname
-   * @return int|bool
-   */
-  protected function getUserIdForAuthname($authname) {
-    $uid = $this->connection->query("SELECT uid FROM {simplesamlphp_auth_authmap} WHERE authname = :authname", array(':authname' => $authname))
-      ->fetchField();
-    if ($uid) {
-      return $uid;
-    }
-    return FALSE;
-  }
-
-  /**
-   * Save an authmap record for a given SimpleSAMLphp authname and
-   * corresponding Drupal uid
-   *
-   * @todo: refactor into its own service.
-   *
-   * @param string $name
-   * @param int $id
-   */
-  protected function saveAuthmap($name, $id) {
-    $this->connection->merge('simplesamlphp_auth_authmap')
-      ->keys(array(
-        'uid' => $id,
-      ))
-      ->fields(array('authname' => $name))
-      ->execute();
-  }
-
-  /**
    * Adds roles to user accounts.
    *
    * @param UserInterface $account
@@ -252,7 +179,7 @@ class SimplesamlphpDrupalAuth {
   /**
    * Get matching user roles to assign to user, based on retrieved
    * SimpleSAMLphp attributes.
-   * 
+   *
    * @return array
    */
   public function getMatchingRoles() {

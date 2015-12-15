@@ -58,7 +58,7 @@ function simplesamlphp_auth_user_login($account) {
   }
 
   // If user registration has a valid session...
-  if ($simplesaml->isAuthenticated() && $simplesaml->getAuthname() == $account->getInitialEmail()) {
+  if ($simplesaml->isAuthenticated() && $simplesaml->getAuthname() == 'simplesamlphp_auth_' . $account->getInitialEmail()) {
     $simplesaml_drupalauth->synchronizeUserAttributes($account);
   }
 }
@@ -87,15 +87,6 @@ function simplesamlphp_auth_user_logout($account) {
 }
 
 /**
- *  Implements hook_ENTITY_TYPE_delete().
- */
-function simplesamlphp_auth_user_delete(Drupal\Core\Entity\EntityInterface $entity) {
-  \Drupal::database()->delete('simplesamlphp_auth_authmap')
-    ->condition('uid', $entity->id())
-    ->execute();
-}
-
-/**
  *  Implements hook_form_FORM_ID_alter().
  *
  * Alters the user register form to include a checkbox signifying the user
@@ -107,16 +98,13 @@ function simplesamlphp_auth_user_delete(Drupal\Core\Entity\EntityInterface $enti
  */
 function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   simplesamlphp_auth_user_form_includes($form);
+  $authmap = \Drupal::service('externalauth.authmap');
 
   // If the user has a simplesamlphp_auth authmap record, then don't require
   // them to know their Drupal password. This will allow them to change their
   // e-mail address, and set a Drupal password if they want to (and are allowed).
   $account = $form_state->getFormObject()->getEntity();
-
-  $saml_enabled = \Drupal::database()->select('simplesamlphp_auth_authmap', 'sa')
-    ->fields('sa', array('authname'))
-    ->condition('sa.authname', $account->getInitialEmail())
-    ->execute()->fetchField();
+  $saml_enabled = $authmap->get($account->id(), 'simplesamlphp_auth');
 
   if ($saml_enabled) {
     $form['simplesamlphp_auth_user_enable']['#default_value'] = TRUE;
@@ -195,23 +183,15 @@ function simplesamlphp_auth_form_user_login_form_alter(&$form, FormStateInterfac
  * @see simplesamlphp_auth_form_user_form_alter()
  */
 function simplesamlphp_auth_user_form_submit($form, FormStateInterface $form_state) {
+  $authmap = \Drupal::service('externalauth.authmap');
 
   // Enter the user's authname into the simplesamlphp_auth_authmap table.
   if ($form_state->getValue('simplesamlphp_auth_user_enable')) {
     $account = $form_state->getFormObject()->getEntity();
-    \Drupal::database()->merge('simplesamlphp_auth_authmap')
-      ->key(array(
-        'uid' => $form_state->getValue('uid'),
-      ))
-      ->fields(array(
-        'authname' => $account->getInitialEmail(),
-      ))
-      ->execute();
+    $authmap->save($account, 'simplesamlphp_auth', $account->getInitialEmail());
   }
   // Remove this username from the simplesamlphp_auth_authmap table.
   else {
-    \Drupal::database()->delete('simplesamlphp_auth_authmap')
-      ->condition('uid', $form_state->getValue('uid'))
-      ->execute();
+    $authmap->delete($form_state->getValue('uid'));
   }
 }
