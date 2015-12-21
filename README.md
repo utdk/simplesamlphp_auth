@@ -28,6 +28,9 @@ identity attribute values.
 2) You must have installed Composer Manager (https://www.drupal.org/project/composer_manager) and allowed it to
    download the simplesamlphp libraries. See README.txt in the composer_manager module for installation instructions.
 
+3) You must have installed the ExternalAuth module (https://www.drupal.org/project/externalauth). See README.txt in the
+   externalauth module for installation instructions.
+
 
 -- INSTALLATION --
 
