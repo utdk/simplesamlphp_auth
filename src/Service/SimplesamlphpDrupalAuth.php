@@ -21,7 +21,7 @@ class SimplesamlphpDrupalAuth {
    *
    * @var SimplesamlphpAuthManager
    */
-  protected $simplesaml;
+  protected $simplesaml_auth;
 
   /**
    * The Drupal configuration factory.
@@ -60,6 +60,7 @@ class SimplesamlphpDrupalAuth {
    */
   public function __construct(SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory, EntityManagerInterface $entityManager, LoggerInterface $logger, ExternalAuthInterface $externalauth) {
     $this->simplesaml_auth = $simplesaml_auth;
+    $this->simplesaml_auth->load();
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
     $this->entityManager = $entityManager;
     $this->logger = $logger;
@@ -147,7 +148,7 @@ class SimplesamlphpDrupalAuth {
       }
     } catch (Exception $e) {
       drupal_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
-      \Drupal::logger('simplesamlphp_auth')->critical($e->getMessage());
+      $this->logger->critical($e->getMessage());
     }
 
     if ($sync_mail || $sync_user_name) {
@@ -197,11 +198,14 @@ class SimplesamlphpDrupalAuth {
 
         foreach (explode(';', $role_eval) as $role_eval_part) {
           if ($this->evalRoleRule($role_eval_part)) {
-            $roles[] = $role_id;
+            $roles[$role_id] = $role_id;
           }
         }
       }
     }
+
+    $attributes = $this->simplesaml_auth->getAttributes();
+    \Drupal::modulehandler()->alter('simplesamlphp_auth_user_roles', $roles, $attributes);
     return $roles;
   }
 

@@ -139,6 +139,20 @@ class SimplesamlphpAuthManager {
   }
 
   /**
+   * Asks all modules if current federated user is allowed to login.
+   * Returns FALSE if at least one module returns FALSE
+   */
+  public function allowUserByAttribute() {
+    $attributes = $this->getAttributes();
+    foreach (\Drupal::moduleHandler()->getImplementations('simplesamlphp_auth_allow_login') as $module) {
+      if (\Drupal::moduleHandler()->invoke($module, 'simplesamlphp_auth_allow_login', [$attributes]) === FALSE) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
    * Checks if SimpleSAMLphp_auth is enabled.
    *
    * @return bool

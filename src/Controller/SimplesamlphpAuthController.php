@@ -151,6 +151,12 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
       // User is logged in to the SimpleSAMLphp IdP, but not to Drupal.
       if ($this->simplesaml->isAuthenticated()) {
 
+        if (!$this->simplesaml->allowUserByAttribute()) {
+          return [
+            '#markup' => $this->t('You are not allowed to login via this service.'),
+          ];
+        }
+
         // Get unique identifier from saml attributes.
         $authname = $this->simplesaml->getAuthname();
 
