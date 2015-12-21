@@ -33,7 +33,6 @@ class SimplesamlphpAuthBlock extends BlockBase {
     $activated = \Drupal::config('simplesamlphp_auth.settings')->get('activate');
 
     $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
-    $simplesaml->load();
 
     if ($activated) {
       if ($simplesaml->isAuthenticated()) {

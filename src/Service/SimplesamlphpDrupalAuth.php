@@ -60,7 +60,6 @@ class SimplesamlphpDrupalAuth {
    */
   public function __construct(SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory, EntityManagerInterface $entityManager, LoggerInterface $logger, ExternalAuthInterface $externalauth) {
     $this->simplesaml_auth = $simplesaml_auth;
-    $this->simplesaml_auth->load();
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
     $this->entityManager = $entityManager;
     $this->logger = $logger;

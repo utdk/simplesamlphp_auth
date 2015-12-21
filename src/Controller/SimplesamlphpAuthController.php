@@ -116,7 +116,6 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
    *   A redirection to either a designated page or the user login page.
    */
   public function authenticate() {
-    $this->simplesaml->load();
     global $base_url;
 
     // Ensure the module has been turned on before continuing with the request.

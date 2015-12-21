@@ -10,6 +10,7 @@ namespace Drupal\simplesamlphp_auth\Service;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use SimpleSAML_Auth_Simple;
 use SimpleSAML_Configuration;
+use Drupal\simplesamlphp_auth\Exception\SimplesamlphpAttributeException;
 
 
 class SimplesamlphpAuthManager {
@@ -33,24 +34,36 @@ class SimplesamlphpAuthManager {
    *
    * @var \SimpleSAML_Auth_Simple
    */
-  public $instance;
+  protected $instance;
+
+  /**
+   * Attributes for federated user.
+   *
+   * @var array
+   */
+  protected $attributes;
 
   /**
    * @param ConfigFactoryInterface $config_factory
+   * @param SimpleSAML_Auth_Simple $instance
+   * @param SimpleSAML_Configuration $config
    */
-  public function __construct(ConfigFactoryInterface $config_factory) {
+  public function __construct(ConfigFactoryInterface $config_factory, SimpleSAML_Auth_Simple $instance = NULL, SimpleSAML_Configuration $config = NULL) {
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
-  }
+    if (!$instance) {
+      $auth_source = $this->config->get('auth_source');
+      $this->instance = new SimpleSAML_Auth_Simple($auth_source);
+    }
+    else {
+      $this->instance = $instance;
+    }
 
-  /**
-   * Loads the SimpleSAML instance and configuration.
-   *
-   * @throws \Exception
-   */
-  public function load() {
-    $auth_source = $this->config->get('auth_source');
-    $this->instance = new SimpleSAML_Auth_Simple($auth_source);
-    $this->simplesamlConfig = \SimpleSAML_Configuration::getInstance();
+    if (!$config) {
+      $this->simplesamlConfig = \SimpleSAML_Configuration::getInstance();
+    }
+    else {
+      $this->simplesamlConfig = $config;
+    }
   }
 
   /**
@@ -109,33 +122,30 @@ class SimplesamlphpAuthManager {
   /**
    * Gets all SimpleSAML attributes.
    *
-   * @return mixed
+   * @return array
    */
   public function getAttributes() {
-    return $this->instance->getAttributes();
+    if (!$this->attributes) {
+      $this->attributes = $this->instance->getAttributes();
+    }
+    return $this->attributes;
   }
 
   /**
    * @param $attribute
-   * @return bool
-   * @throws \Exception
+   * @return mixed|bool
+   * @throws SimplesamlphpAttributeException
    */
-  protected function getAttribute($attribute) {
+  public function getAttribute($attribute) {
     $attributes = $this->getAttributes();
 
     if (isset($attributes)) {
-      if (empty($attributes[$attribute][0])) {
-        throw new \Exception(t('Error in simplesamlphp_auth.module: no valid %attribute attribute set.',
-          array(
-            '%attribute' => $attribute,
-          )
-        ));
+      if (!empty($attributes[$attribute][0])) {
+        return $attributes[$attribute][0];
       }
-
-      return $attributes[$attribute][0];
     }
 
-    return FALSE;
+    throw new SimplesamlphpAttributeException(sprintf('Error in simplesamlphp_auth.module: no valid "%s" attribute set.', $attribute));
   }
 
   /**
@@ -158,7 +168,10 @@ class SimplesamlphpAuthManager {
    * @return bool
    */
   public function isActivated() {
-    return $this->config->get('activate');
+    if ($this->config->get('activate') == 1) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**

@@ -52,7 +52,6 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $this->simplesaml->load();
     if ($this->simplesaml->isAuthenticated()) {
       return;
     }
