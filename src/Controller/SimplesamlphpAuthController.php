@@ -181,6 +181,8 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
     }
 
     if (isset($redirect)) {
+      // Avoid caching of redirect response object.
+      \Drupal::service('page_cache_kill_switch')->trigger();
       $response = new RedirectResponse($redirect, RedirectResponse::HTTP_FOUND);
       return $response;
     }
