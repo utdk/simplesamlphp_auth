@@ -47,12 +47,6 @@ class AdminForm extends ConfigFormBase {
       '#default_value' => $config->get('auth_source'),
       '#description' => $this->t('The name of the source to use (Usually in authsources.php).'),
     );
-    $form['basic']['force_https'] = array(
-      '#type' => 'checkbox',
-      '#title' => $this->t('Force https for login links'),
-      '#default_value' => $config->get('force_https'),
-      '#description' => $this->t('Should be enabled on production sites.'),
-    );
     $form['basic']['login_link_display_name'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Federated Log In Link Display Name'),
@@ -184,7 +178,6 @@ class AdminForm extends ConfigFormBase {
     $this->configFactory()->getEditable('simplesamlphp_auth.settings')
       ->set('activate', $form_state->getValue('activate'))
       ->set('auth_source', $form_state->getValue('auth_source'))
-      ->set('force_https', $form_state->getValue('force_https'))
       ->set('user_name', $form_state->getValue('user_name'))
       ->set('sync.user_name', $form_state->getValue('user_name_sync'))
       ->set('unique_id', $form_state->getValue('unique_id'))

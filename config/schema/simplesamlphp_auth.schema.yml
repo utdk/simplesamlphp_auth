@@ -10,9 +10,6 @@ simplesamlphp_auth.settings:
     auth_source:
       type: string
       label: 'Authentication source for this SP'
-    force_https:
-      type: boolean
-      label: 'Force https for login links'
     login_link_display_name:
       type: label
       label: 'Federated Log In Link Display Name'

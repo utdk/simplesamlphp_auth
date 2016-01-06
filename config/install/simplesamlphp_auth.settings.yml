@@ -3,7 +3,6 @@ mail_attr: 'mail'
 unique_id: 'eduPersonPrincipalName'
 user_name: 'eduPersonPrincipalName'
 auth_source: 'default-sp'
-force_https: true
 login_link_display_name: "Federated login"
 role:
   population:
