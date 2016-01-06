@@ -191,7 +191,7 @@ class SimplesamlphpAuthManager {
   protected function checkLibrary() {
     if (!class_exists('SimpleSAML_Configuration')) {
       $dir = Settings::get('simplesamlphp_dir');
-      require_once $dir . '/lib/_autoload.php';
+      include_once $dir . '/lib/_autoload.php';
     }
   }
 }
