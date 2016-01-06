@@ -23,10 +23,6 @@ http://www.php.net/manual/en/memcache.installation.php
 If you are on a shared host or a machine that you cannot install memcache on then consider using the sql handler 
 (store.type => 'sql').
 
-<<<<<<< HEAD
-2) You must have installed Composer Manager (https://www.drupal.org/project/composer_manager) and allowed it to
-   download the simplesamlphp libraries. See README.txt in the composer_manager module for installation instructions.
-=======
 Make sure your SimpleSAMLphp installation has a correctly configured "config" and "metadata" folder, and an appropriate
 vhost configuration. See http://www.simplesamlphp.org for more information.
    
@@ -44,7 +40,6 @@ The Drupal simplesamlphp_auth module will need to connect to a working SimpleSAM
 ways - depending on your setup:
 
 ## INSTALLATION WITH COMPOSER MANAGER
->>>>>>> e494da6... #2632324 - add alternative way to link SimpleSAMLphp instance through settings.php, rather than using the Composer-loaded library
 
 Make sure you have the composer_manager module installed according to its README.txt.
 
@@ -62,7 +57,8 @@ another location where they are saved.
 
 ## INSTALLATION WITHOUT COMPOSER
 
-1. Make sure you have a working SimpleSAMLphp installation.
+1. Make sure you have a working SimpleSAMLphp installation. It needs to be a standalone installation, which has a 
+"vendor" folder in the root of the project.
 2. Download the simplesamlphp_auth module
 3. Uncompress it
 4. Move it to the appropriate modules directory (usually, /modules)
