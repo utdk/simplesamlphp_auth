@@ -11,7 +11,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use SimpleSAML_Auth_Simple;
 use SimpleSAML_Configuration;
 use Drupal\simplesamlphp_auth\Exception\SimplesamlphpAttributeException;
-
+use Drupal\Core\Site\Settings;
 
 class SimplesamlphpAuthManager {
 
@@ -49,6 +49,7 @@ class SimplesamlphpAuthManager {
    * @param SimpleSAML_Configuration $config
    */
   public function __construct(ConfigFactoryInterface $config_factory, SimpleSAML_Auth_Simple $instance = NULL, SimpleSAML_Configuration $config = NULL) {
+    $this->checkLibrary();
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
     if (!$instance) {
       $auth_source = $this->config->get('auth_source');
@@ -183,4 +184,14 @@ class SimplesamlphpAuthManager {
     $this->instance->logout($redirect_path);
   }
 
+  /**
+   * Check if the SimpleSAMLphp library can be found.
+   * Fallback for when the library was not found via Composer.
+   */
+  protected function checkLibrary() {
+    if (!class_exists('SimpleSAML_Configuration')) {
+      $dir = Settings::get('simplesamlphp_dir');
+      require_once $dir . '/lib/_autoload.php';
+    }
+  }
 }

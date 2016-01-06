@@ -5,6 +5,7 @@
  * the install file for the simplesamlphp_auth module
  */
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Site\Settings;
 
 /**
  * Implements hook_install().
@@ -41,6 +42,7 @@ function simplesamlphp_auth_requirements($phase) {
   $requirements = array();
 
   if ($phase == 'install') {
+    simplesamlphp_auth_check_library();
     if (!class_exists('SimpleSAML_Configuration')) {
       $requirements['simplesamlphp_library'] = [
         'description' => t('SimpleSAMLphp module requires the simplesamlphp library. See README file for installation instructions.'),
@@ -62,4 +64,15 @@ function simplesamlphp_auth_requirements($phase) {
   }
 
   return $requirements;
+}
+
+/**
+ * Check if the SimpleSAMLphp library can be found.
+ * Fallback for when the library was not found via Composer.
+ */
+function simplesamlphp_auth_check_library() {
+  if (!class_exists('SimpleSAML_Configuration')) {
+    $dir = Settings::get('simplesamlphp_dir');
+    require_once $dir . '/lib/_autoload.php';
+  }
 }
