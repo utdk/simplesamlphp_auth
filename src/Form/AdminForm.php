@@ -43,7 +43,7 @@ class AdminForm extends ConfigFormBase {
     );
     $form['basic']['auth_source'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Authenticaton source for this SP'),
+      '#title' => $this->t('Authentication source for this SP'),
       '#default_value' => $config->get('auth_source'),
       '#description' => $this->t('The name of the source to use (Usually in authsources.php).'),
     );
