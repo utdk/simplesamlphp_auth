@@ -178,6 +178,7 @@ class AdminForm extends ConfigFormBase {
     $this->configFactory()->getEditable('simplesamlphp_auth.settings')
       ->set('activate', $form_state->getValue('activate'))
       ->set('auth_source', $form_state->getValue('auth_source'))
+      ->set('login_link_display_name', $form_state->getValue('login_link_display_name'))
       ->set('user_name', $form_state->getValue('user_name'))
       ->set('sync.user_name', $form_state->getValue('user_name_sync'))
       ->set('unique_id', $form_state->getValue('unique_id'))
