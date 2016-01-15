@@ -11,3 +11,5 @@ simplesamlphp_auth.saml_login:
     _controller: '\Drupal\simplesamlphp_auth\Controller\SimplesamlphpAuthController::authenticate'
   requirements:
     _access: 'TRUE'
+  options:
+     no_cache: TRUE
