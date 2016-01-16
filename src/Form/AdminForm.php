@@ -114,6 +114,12 @@ class AdminForm extends ConfigFormBase {
       '#default_value' => $config->get('role.eval_every_time'),
       '#description' => $this->t('NOTE: This means users could lose any roles that have been assigned manually in Drupal.'),
     );
+    $form['user_info']['autoenablesaml'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Automatically enable SAML authentication for existing users upon successful login'),
+      '#default_value' => $config->get('autoenablesaml'),
+      '#description' => $this->t('Upon federated login, check if a local, pre-existing Drupal user is present with a username equal to the SAML authname. If so, enable SAML authentication for this existing user.<br />WARNING: make sure there is an actual link between the SAML authname and pre-existing Drupal user names, otherwise the Drupal user could be taken over by someone else authenticating with a SAML authname that happens to be the same.<br />NOTE: When enabled, the pre-existing user can be modified (e.g. get other username, email address, roles, ... based on SAML attributes).'),
+    );
 
     $form['user_provisioning'] = array(
       '#type' => 'details',
@@ -192,6 +198,7 @@ class AdminForm extends ConfigFormBase {
       ->set('allow.default_login_roles', $form_state->getValue('allow_default_login_roles'))
       ->set('allow.default_login_users', $form_state->getValue('allow_default_login_users'))
       ->set('logout_goto_url', $form_state->getValue('logout_goto_url'))
+      ->set('autoenablesaml', $form_state->getValue('autoenablesaml'))
       ->save();
 
     parent::submitForm($form, $form_state);

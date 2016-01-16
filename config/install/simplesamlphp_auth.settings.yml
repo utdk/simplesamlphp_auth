@@ -20,3 +20,4 @@ default_langcode: en
 sync:
   mail: true
   user_name: true
+autoenablesaml: false

@@ -94,6 +94,7 @@ class SimplesamlphpDrupalAuth {
    * @throws \Exception
    */
   public function externalRegister($authname) {
+    $account = FALSE;
 
     // First we check the admin settings for simpleSAMLphp and find out if we
     // are allowed to register users.
@@ -108,17 +109,29 @@ class SimplesamlphpDrupalAuth {
     }
 
     // It's possible that a user with their username set to this authname
-    // already exists in the Drupal database, but is not permitted to login to
-    // Drupal via SAML. If so, log out of SAML and redirect to the front page.
-    if ($this->entityManager->getStorage('user')->loadByProperties(array('name' => $authname))) {
-      drupal_set_message(t('We are sorry, your user account is not SAML enabled.'));
-      $this->simplesaml_auth->logout(base_path());
-
-      return FALSE;
+    // already exists in the Drupal database.
+    $existing_user = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $authname));
+    $existing_user = $existing_user ? reset($existing_user) : FALSE;
+    if ($existing_user) {
+      // If auto-enable SAML is activated, link this user to SAML.
+      if ($this->config->get('autoenablesaml')) {
+        $this->externalauth->linkExistingAccount($authname, 'simplesamlphp_auth', $local_user);
+        $account = $local_user;
+      }
+      else {
+        // User is not permitted to login to Drupal via SAML.
+        // Log out of SAML and redirect to the front page.
+        drupal_set_message(t('We are sorry, your user account is not SAML enabled.'));
+        $this->simplesaml_auth->logout(base_path());
+        return FALSE;
+      }
     }
 
-    // Create the new user.
-    $account = $this->externalauth->register($authname, 'simplesamlphp_auth');
+    if (!$account) {
+      // Create the new user.
+      $account = $this->externalauth->register($authname, 'simplesamlphp_auth');
+    }
+
     $this->synchronizeUserAttributes($account, TRUE);
     return $this->externalauth->userLoginFinalize($account);
   }
