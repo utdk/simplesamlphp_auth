@@ -40,7 +40,7 @@ function hook_simplesamlphp_auth_user_roles_alter(&$roles, $attributes) {
  * a boolean indicating the success of the access check. Access will be denied
  * if any implementations return FALSE.
  *
- * @param $attributes
+ * @param array $attributes
  * @return bool
  */
 function hook_simplesamlphp_auth_allow_login($attributes) {
@@ -50,4 +50,40 @@ function hook_simplesamlphp_auth_allow_login($attributes) {
   else {
     return TRUE;
   }
+}
+
+/**
+ * Allows other modules to change the authname that is being stored when
+ * a pre-existing Drupal user account gets SAML-enabled.
+ * This is done by clicking the checkbox "Enable this user to leverage SAML
+ * authentication" upon user registration or the user edit form (given enough
+ * permissions).
+ *
+ * For example, this allows you to pre-register Drupal accounts and store the
+ * entered email address (rather than the default username) as the authname.
+ * The SAML user with that email address as authname will then be able to login
+ * as that Drupal user.
+ *
+ * @param string $authname
+ * @param \Drupal\user\UserInterface $account
+ */
+function hook_simplesamphp_auth_account_authname_alter(&$authname, $account) {
+  $authname = $account->mail;
+}
+
+
+/**
+ * @param array $attributes
+ * @return \Drupal\user\UserInterface | bool
+ */
+function hook_simplesamlphp_auth_existing_user($attributes) {
+  $saml_mail = $attributes['mail'];
+  $existing_users = \Drupal::service('entity.manager')->getStorage('user')->loadByProperties(array('mail' => $saml_mail));
+  if ($existing_users) {
+    $existing_user = is_array($existing_users) ? reset($existing_users) : FALSE;
+    if ($existing_user) {
+      return $existing_user;
+    }
+  }
+  return FALSE;
 }

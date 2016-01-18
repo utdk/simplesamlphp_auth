@@ -118,7 +118,7 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Automatically enable SAML authentication for existing users upon successful login'),
       '#default_value' => $config->get('autoenablesaml'),
-      '#description' => $this->t('Upon federated login, check if a local, pre-existing Drupal user is present with a username equal to the SAML authname. If so, enable SAML authentication for this existing user.<br />WARNING: make sure there is an actual link between the SAML authname and pre-existing Drupal user names, otherwise the Drupal user could be taken over by someone else authenticating with a SAML authname that happens to be the same.<br />NOTE: When enabled, the pre-existing user can be modified (e.g. get other username, email address, roles, ... based on SAML attributes).'),
+      '#description' => $this->t('Upon federated login, check if a local, pre-existing Drupal user is present that can be linked to the SAML authname (by default Drupal username is checked). If so, enable SAML authentication for this existing user.<br />WARNING: make sure there is an actual link between the SAML authname and pre-existing Drupal usernames, otherwise the Drupal user could be taken over by someone else authenticating with a SAML authname that happens to be the same.<br />NOTE: When enabled, the pre-existing user can be modified (e.g. get other username, email address, roles, ... based on SAML attributes).'),
     );
 
     $form['user_provisioning'] = array(

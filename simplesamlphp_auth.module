@@ -138,12 +138,14 @@ function simplesamlphp_auth_form_user_register_form_alter(&$form, FormStateInter
  *
  * @see simplesamlphp_auth_form_user_form_alter()
  * @see simplesamlphp_auth_form_user_register_form_alter()
+ * @see simplesamlphp_auth_user_form_submit()
  */
 function simplesamlphp_auth_user_form_includes(&$form) {
   $form['simplesamlphp_auth_user_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable this user to leverage SAML authentication'),
     '#access' => \Drupal::currentUser()->hasPermission('change saml authentication setting'),
+    '#description' => t("WARNING: if unchecked, this will become a local Drupal user, which might be denied access based on the SimpleSAMLphp settings for authenticating local Drupal accounts.<br />Don't use this setting for access control, which should be configured in your IdP instead.<br />NOTE: if the configuration option 'Automatically enable SAML authentication for existing users upon successful login' is activated, this Drupal account can become linked with SAML (again) when the user succesfully authenticates to the IdP."),
   );
 
   // We store the authname as the initial email. If we're using SimpleSAML we
@@ -157,7 +159,6 @@ function simplesamlphp_auth_user_form_includes(&$form) {
  *  Implements hook_form_FORM_ID_alter().
  */
 function simplesamlphp_auth_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-
   // Return without executing if the functionality is not enabled.
   if (!\Drupal::config('simplesamlphp_auth.settings')->get('activate')) {
     return;
@@ -182,11 +183,17 @@ function simplesamlphp_auth_form_user_login_form_alter(&$form, FormStateInterfac
  */
 function simplesamlphp_auth_user_form_submit($form, FormStateInterface $form_state) {
   $authmap = \Drupal::service('externalauth.authmap');
+  $externalauth = \Drupal::service('externalauth.externalauth');
 
-  // Enter the user's authname into the simplesamlphp_auth_authmap table.
+  // Add an authmap entry for this account, so it can leverage SAML authentication.
   if ($form_state->getValue('simplesamlphp_auth_user_enable')) {
     $account = $form_state->getFormObject()->getEntity();
-    $authmap->save($account, 'simplesamlphp_auth', $account->getInitialEmail());
+    // Link an authmap entry to this account, if not yet existing.
+    // By default, we use the username as authname.
+    // This can be altered if needed. See simplesamlphp_auth.api.php for details.
+    $authname = $account->getAccountName();
+    \Drupal::modulehandler()->alter('simplesamlphp_auth_account_authname', $authname, $account);
+    $externalauth->linkExistingAccount($authname, 'simplesamlphp_auth', $account);
   }
   // Remove this username from the simplesamlphp_auth_authmap table.
   else {

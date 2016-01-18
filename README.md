@@ -73,6 +73,8 @@ another location where they are saved.
 
 # CONFIGURATION
 
+## Basic configuration
+
 The configuration of the module is fairly straight forward. You will need to know the names of the attributes that your 
 SP will be making available to the module in order to map them into Drupal.
 
@@ -88,7 +90,35 @@ cause permission denied errors.
   # Deny access to any other PHP files that do not match the rules above.
   RewriteRule "^.+/.*\.php$" - [F]
 
+## Linking authenticated users to Drupal users
+  
+  - If you don't have pre-existing Drupal users, you should make sure the checkbox "Register users" is enabled.
+  When a user is correctly authenticated via the IdP, a Drupal user will automatically be created linked to the SAML 
+  authname. Upon following successful SAML authentications, the created Drupal user will be loaded and logged in. 
+  
+  - If you have pre-existing Drupal users, you can link them with SAML accounts upon successful SAML authentication.
+  You can do so by enabling the option "Automatically enable SAML authentication for existing users upon successful login".
+  If a user successfully authenticates via SAML, the provided SAML authname is checked against available Drupal usernames. 
+  If a match is found, the pre-existing Drupal user is linked to the authenticated SAML identity.
+  You can also match existing users on different Drupal fields and SAML attributes. See 
+  hook_simplesamlphp_auth_existing_user in simplesamlphp_auth.api.php for details.
+  
+  - Alternatively, you can link specific Drupal users to SAML accounts by checking the checkbox "Enable this user to 
+  leverage SAML authentication" upon user registration or user editing. In that case the Drupal username (by default)
+  will be added to the authmap table. This allows a SAML authenticated user with an authname identical to the one in the 
+  authmap table to be logged in as that Drupal user. If the stored authname to match on shouldn't be the Drupal username 
+  in your use case, you can implement hook_simplesamphp_auth_account_authname_alter() - see simplesamlphp_auth.api.php.
+  
+  - If you wish to limit which users can authenticate with Drupal, you can:
+    - allow only access to SAML users within specific roles - see hook_simplesamlphp_auth_allow_login in 
+    simplesamlphp_auth.api.php
+    - disable the "Register users" option, enable the option "Automatically enable SAML authentication for existing 
+    users upon successful login" and register Drupal accounts for the users you wish to allow. Make sure their username 
+    matches the SAML authname attribute, or link them based on another field (see paragraphs above).
 
 # TROUBLESHOOTING
 
-The most common reason for things not working is the SP session storage type is still set to phpsession.
+* Installation fails:
+  - The most common reason for things not working is the SP session storage type is still set to phpsession.
+  - If that's set up correctly, make sure your Drupal installation can connect to a working SimpleSAMLphp instance. 
+  See "INSTALLATION" above.

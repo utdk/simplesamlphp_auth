@@ -126,6 +126,21 @@ class SimplesamlphpDrupalAuth {
         return FALSE;
       }
     }
+    else {
+      // If auto-enable SAML is activated, take more action to find an existing user.
+      if ($this->config->get('autoenablesaml')) {
+        // Allow other modules to decide if there is an existing Drupal user,
+        // based on the supplied SAML atttributes.
+        $attributes = $this->simplesaml_auth->getAttributes();
+        foreach (\Drupal::moduleHandler()->getImplementations('simplesamlphp_auth_existing_user') as $module) {
+          $return_value = \Drupal::moduleHandler()->invoke($module, 'simplesamlphp_auth_existing_user', [$attributes]);
+          if ($return_value instanceof UserInterface) {
+            $account = $return_value;
+            $this->externalauth->linkExistingAccount($authname, 'simplesamlphp_auth', $account);
+          }
+        }
+      }
+    }
 
     if (!$account) {
       // Create the new user.
