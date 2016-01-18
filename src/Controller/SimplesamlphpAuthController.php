@@ -15,7 +15,6 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager;
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth;
-use Drupal\user\UserInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -28,14 +27,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SimplesamlphpAuthController extends ControllerBase implements ContainerInjectionInterface {
 
   /**
-   * The SimpleSaml Authentication helper service
+   * The SimpleSaml Authentication helper service.
    *
    * @var \Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager
    */
   public $simplesaml;
 
   /**
-   * The SimpleSaml Drupal Authentication service
+   * The SimpleSaml Drupal Authentication service.
    *
    * @var \Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth
    */
@@ -142,7 +141,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
     if ($this->account->isAnonymous()) {
 
       if (isset($redirect)) {
-        // Set the cookie so we can deliver the user to the place they started
+        // Set the cookie so we can deliver the user to the place they started.
         // @TODO probably a more symfony way of doing this
         setrawcookie('simplesamlphp_auth_returnto', $redirect, time() + 60 * 60);
       }
@@ -176,7 +175,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
     if ($request->cookies->has('simplesamlphp_auth_returnto')) {
       $redirect = $request->cookies->get('simplesamlphp_auth_returnto');
 
-      // unset the cookie
+      // Unset the cookie.
       setrawcookie('simplesamlphp_auth_returnto', '');
     }
 

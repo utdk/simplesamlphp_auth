@@ -103,10 +103,9 @@ class AdminForm extends ConfigFormBase {
       // requires the portion after a '@' in the $attribute to match theuninett.no
       // $value and a '~=' allows the value to match any part of any
       // element in the $attribute array.
-
       // The full role map string, when mapped to the variables below, presents
       // itself thus:
-      // $role_id:$key,$op,$value;$key,$op,$value;$key,$op,$value|$role_id:$key,$op,$value... etc
+      // $role_id:$key,$op,$value;$key,$op,$value;$key,$op,$value|$role_id:$key,$op,$value... etc.
     );
     $form['user_info']['role_eval_every_time'] = array(
       '#type' => 'checkbox',
@@ -131,7 +130,7 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Register users'),
       '#default_value' => $config->get('register_users'),
-      '#description' => $this->t('Determines wether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you\'ve done some custom work to provision Drupal accounts with the necessary simplesamlphp_auth_authmap entries you will want this checked.<br /><br />NOTE: If unchecked each user must already have been provisioned a Drupal account with an appropriate entry in the simplesamlphp_auth_authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Drupal account will not create the necessary entry in the simplesamlphp_auth_authmap table.'),
+      '#description' => $this->t('Determines whether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you\'ve done some custom work to provision Drupal accounts with the necessary authmap entries you will want this checked.<br /><br />NOTE: If unchecked each user must already have been provisioned a Drupal account correctly linked to the SAML authname attribute (e.g. by creating Drupal users with "Enable this user to leverage SAML authentication" checked). Otherwise they will receive a notice and be denied access.'),
     );
 
     $form['authentication'] = array(
@@ -205,7 +204,7 @@ class AdminForm extends ConfigFormBase {
 
   }
 
-    /**
+  /**
    * Gets the configuration names that will be editable.
    *
    * @return array
@@ -214,7 +213,8 @@ class AdminForm extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'simplesamlphp_auth.settings'
+      'simplesamlphp_auth.settings',
     ];
   }
+
 }

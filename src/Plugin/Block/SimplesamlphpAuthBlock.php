@@ -8,8 +8,6 @@
 namespace Drupal\simplesamlphp_auth\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\LinkGeneratorTrait;
 use Drupal\Core\Url;
 
@@ -44,7 +42,7 @@ class SimplesamlphpAuthBlock extends BlockBase {
       else {
         $label = Drupal::config('simplesamlphp_auth.settings')->get('login_link_display_name');
         $content = $this->t('!login', array(
-          '!login' => $this->l($label, new Url('simplesamlphp_auth.saml_login'))
+          '!login' => $this->l($label, new Url('simplesamlphp_auth.saml_login')),
         ));
       }
     }
@@ -57,4 +55,5 @@ class SimplesamlphpAuthBlock extends BlockBase {
       '#markup' => $content,
     );
   }
+
 }

@@ -14,10 +14,13 @@ use Drupal\Core\Session\AccountInterface;
 use Psr\Log\LoggerInterface;
 use Drupal\externalauth\ExternalAuthInterface;
 
+/**
+ * Service to link SimpleSAMLphp authentication with Drupal users.
+ */
 class SimplesamlphpDrupalAuth {
 
   /**
-   * SimpleSAMLphp Authentication helper
+   * SimpleSAMLphp Authentication helper.
    *
    * @var SimplesamlphpAuthManager
    */
@@ -70,6 +73,7 @@ class SimplesamlphpDrupalAuth {
    * Logs in and optionally registers a Drupal user based on the authname provided.
    *
    * @param $authname
+   *
    * @return \Drupal\Core\Entity\EntityInterface|null
    */
   public function externalLoginRegister($authname) {
@@ -90,7 +94,9 @@ class SimplesamlphpDrupalAuth {
    * Registers a user locally as one authenticated by the SimpleSAML IdP.
    *
    * @param $authname
+   *
    * @return \Drupal\Core\Entity\EntityInterface
+   *
    * @throws \Exception
    */
   public function externalRegister($authname) {
@@ -173,7 +179,8 @@ class SimplesamlphpDrupalAuth {
         $mail = $this->simplesaml_auth->getDefaultEmail();
         $account->setEmail($mail);
       }
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       drupal_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
       $this->logger->critical($e->getMessage());
     }
@@ -189,7 +196,7 @@ class SimplesamlphpDrupalAuth {
    * @param UserInterface $account
    */
   public function roleMatchAdd(UserInterface $account) {
-    // Get matching roles based on retrieved SimpleSAMLphp attributes
+    // Get matching roles based on retrieved SimpleSAMLphp attributes.
     $matching_roles = $this->getMatchingRoles();
 
     if ($matching_roles) {
@@ -217,7 +224,7 @@ class SimplesamlphpDrupalAuth {
     // roles to the user.
     // The full role map string, when mapped to the variables below, presents
     // itself thus:
-    // $role_id:$key,$op,$value;$key,$op,$value;$key,$op,$value|$role_id:$key,$op,$value... etc
+    // $role_id:$key,$op,$value;$key,$op,$value;$key,$op,$value|$role_id:$key,$op,$value... etc.
     if ($rolemap = $this->config->get('role.population')) {
 
       foreach (explode('|', $rolemap) as $rolerule) {
@@ -240,6 +247,7 @@ class SimplesamlphpDrupalAuth {
    * Determines whether a role should be added to an account.
    *
    * @param $role_eval_part
+   *
    * @return bool
    */
   protected function evalRoleRule($role_eval_part) {

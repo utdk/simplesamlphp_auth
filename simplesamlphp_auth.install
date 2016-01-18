@@ -2,7 +2,7 @@
 
 /**
  * @file
- * the install file for the simplesamlphp_auth module
+ * The install file for the simplesamlphp_auth module.
  */
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\Settings;
@@ -59,7 +59,7 @@ function simplesamlphp_auth_requirements($phase) {
         'title'       => 'simpleSAMLphp_auth',
         'value'       => t('SimpleSAMLphp authentication is NOT activated'),
         'description' => t('It can be activated on the <a href="@config_page">configuration page</a>.', array('@config_page' => \Drupal::url('simplesamlphp_auth.admin_settings'))),
-       );
+      );
     }
   }
 

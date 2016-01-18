@@ -13,6 +13,9 @@ use SimpleSAML_Configuration;
 use Drupal\simplesamlphp_auth\Exception\SimplesamlphpAttributeException;
 use Drupal\Core\Site\Settings;
 
+/**
+ * Service to interact with the SimpleSAMLPHP authentication library.
+ */
 class SimplesamlphpAuthManager {
 
   /**
@@ -151,7 +154,7 @@ class SimplesamlphpAuthManager {
 
   /**
    * Asks all modules if current federated user is allowed to login.
-   * Returns FALSE if at least one module returns FALSE
+   * Returns FALSE if at least one module returns FALSE.
    */
   public function allowUserByAttribute() {
     $attributes = $this->getAttributes();
@@ -194,4 +197,5 @@ class SimplesamlphpAuthManager {
       include_once $dir . '/lib/_autoload.php';
     }
   }
+
 }

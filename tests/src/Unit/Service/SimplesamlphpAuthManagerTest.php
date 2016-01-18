@@ -8,8 +8,6 @@
 namespace Drupal\Tests\simplesamlphp_auth\Unit\Service;
 
 use Drupal\Tests\UnitTestCase;
-use SimpleSAML_Auth_Simple;
-use SimpleSAML_Configuration;
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -18,6 +16,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
  * SimplesamlphpAuthManager unit tests.
  *
  * @ingroup simplesamlphp_auth
+ *
  * @group simplesamlphp_auth
  *
  * @coversDefaultClass \Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager
@@ -51,7 +50,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   protected function setUp() {
     parent::setUp();
 
-    // Set up default test configuration Mock object
+    // Set up default test configuration Mock object.
     $this->config_factory = $this->getConfigFactoryStub(array(
       'simplesamlphp_auth.settings' => array(
         'auth_source' => 'default-sp',
@@ -171,7 +170,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
       'uid' => ['ext_user_123'],
       'name' => ['External User'],
       'mail' => ['ext_user_123@example.com'],
-      'roles' => [['employee', 'webmaster']]
+      'roles' => [['employee', 'webmaster']],
     );
 
     // Set expectations for instance.
@@ -221,7 +220,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
       'uid' => ['ext_user_123'],
       'name' => ['External User'],
       'mail' => ['ext_user_123@example.com'],
-      'roles' => [['employee', 'webmaster']]
+      'roles' => [['employee', 'webmaster']],
     );
 
     // Set expectations for instance.
@@ -238,7 +237,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
     $container->set('module_handler', $module_handler);
     \Drupal::setContainer($container);
 
-    // Test allowUserByAttribute method
+    // Test allowUserByAttribute method.
     $simplesaml = new SimplesamlphpAuthManager(
       $this->config_factory,
       $this->instance,
@@ -270,4 +269,5 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
 
     $simplesaml->logout($redirect_path);
   }
+
 }

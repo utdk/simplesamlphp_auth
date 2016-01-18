@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\simplesamlphp_auth\EventSubscriber\SimplesamlSubscriber.
+ */
+
 namespace Drupal\simplesamlphp_auth\EventSubscriber;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -10,6 +15,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Event subscriber subscribing to KernelEvents::REQUEST.
+ */
 class SimplesamlSubscriber implements EventSubscriberInterface {
 
   /**

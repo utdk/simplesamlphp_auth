@@ -15,7 +15,7 @@
  *   The roles that have been selected for the current user
  *   by the role evaluation process.
  * @param array $attributes
- *   The SimpleSAMLphp attributes for this user
+ *   The SimpleSAMLphp attributes for this user.
  */
 function hook_simplesamlphp_auth_user_roles_alter(&$roles, $attributes) {
   if (isset($attributes['roles'])) {
@@ -41,6 +41,7 @@ function hook_simplesamlphp_auth_user_roles_alter(&$roles, $attributes) {
  * if any implementations return FALSE.
  *
  * @param array $attributes
+ *   The SimpleSAMLphp attributes for this user.
  * @return bool
  */
 function hook_simplesamlphp_auth_allow_login($attributes) {
