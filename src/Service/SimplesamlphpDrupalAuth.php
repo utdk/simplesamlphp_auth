@@ -115,8 +115,8 @@ class SimplesamlphpDrupalAuth {
     if ($existing_user) {
       // If auto-enable SAML is activated, link this user to SAML.
       if ($this->config->get('autoenablesaml')) {
-        $this->externalauth->linkExistingAccount($authname, 'simplesamlphp_auth', $local_user);
-        $account = $local_user;
+        $this->externalauth->linkExistingAccount($authname, 'simplesamlphp_auth', $existing_user);
+        $account = $existing_user;
       }
       else {
         // User is not permitted to login to Drupal via SAML.
