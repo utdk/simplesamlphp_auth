@@ -11,6 +11,8 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserInterface;
 use Drupal\externalauth\ExternalAuthInterface;
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * SimplesamlphpDrupalAuth unit tests.
@@ -87,6 +89,13 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
 
     // Create a Mock User object to test against.
     $this->entity_account = $this->getMock('Drupal\user\UserInterface');
+
+    $container = new ContainerBuilder();
+    $module_handler = $this->getMock(ModuleHandlerInterface::class);
+    $module_handler->expects($this->any())
+      ->method('alter');
+    $container->set('module_handler', $module_handler);
+    \Drupal::setContainer($container);
   }
 
   /**
@@ -163,7 +172,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
 
     // Mock the getAttributes() method on SimplesamlphpAuthManager.
     $attributes = array('eduPersonAffiliation' => array('student'));
-    $simplesaml->expects($this->once())
+    $simplesaml->expects($this->any())
       ->method('getAttributes')
       ->will($this->returnValue($attributes));
 
@@ -337,13 +346,13 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       array(
         'admin:userName,=,externalAdmin|test:something,=,something',
         array('userName' => array('externalAdmin')),
-        array('admin')
+        array('admin' => 'admin')
       ),
       // test matching of attribute portion
       array(
         'employee:mail,@=,company.com',
         array('mail' => array('joe@company.com')),
-        array('employee')
+        array('employee' => 'employee')
       ),
       // test non-matching of attribute portion
       array(
@@ -355,19 +364,19 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       array(
         'employee:affiliate,~=,xyz',
         array('affiliate' => array('abcd', 'wxyz')),
-        array('employee')
+        array('employee' => 'employee')
       ),
       // test multiple roles
       array(
         'admin:userName,=,externalAdmin|employee:mail,@=,company.com',
         array('userName' => array('externalAdmin'), 'mail' => array('externalAdmin@company.com')),
-        array('admin', 'employee')
+        array('admin' => 'admin', 'employee' => 'employee')
       ),
       // test special characters (colon) in attribute
       array(
         'admin:domain,=,http://admindomain.com',
         array('domain' => array('http://admindomain.com', 'http://drupal.org')),
-        array('admin')
+        array('admin' => 'admin')
       ),
     );
   }
