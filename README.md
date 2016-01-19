@@ -90,7 +90,7 @@ cause permission denied errors.
   # Deny access to any other PHP files that do not match the rules above.
   RewriteRule "^.+/.*\.php$" - [F]
 
-## Linking authenticated users to Drupal users
+## Linking SAML-authenticated users to Drupal users
   
   - If you don't have pre-existing Drupal users, you should make sure the checkbox "Register users" is enabled.
   When a user is correctly authenticated via the IdP, a Drupal user will automatically be created linked to the SAML 
@@ -122,3 +122,18 @@ cause permission denied errors.
   - The most common reason for things not working is the SP session storage type is still set to phpsession.
   - If that's set up correctly, make sure your Drupal installation can connect to a working SimpleSAMLphp instance. 
   See "INSTALLATION" above.
+  
+* Usernames are not correctly synchronized or result in errors:
+  - Drupal usernames need to be unique. This is enforced in code and on database level. Based on your settings, it's
+  possible that this is not enforced in the SimpleSAMLphp attributes that are received, or that a pre-existing Drupal
+  user already exists with the same username. Here's how you can fix this problem:
+    - It is recommended to set the SimpleSAMLphp Auth setting "SimpleSAMLphp attribute to be used as username for the 
+    user" to a SAML attribute that is unique, preferably the same as "SimpleSAMLphp attribute to be used as unique 
+    identifier for the user". This might make the Drupal username less human-readable, and might not be how you want to 
+    visually represent the user on your website. You can fix this by altering how the account's name is displayed by
+    using hook_user_format_name_alter().
+    - In case of pre-existing users with the same username, you should verify if the pre-existing Drupal user and SAML-
+    authenticated users are one and the same person. If so, make sure you have enabled the setting "Automatically 
+    enable SAML authentication for existing users upon successful login". This will make sure the existing Drupal user
+    will be linked to the SAML-autenticated user, and not result in errors. Though you should make sure that this action
+    is valid, and won't result in SAML-authenticated users taking over accounts of other pre-existing Drupal users.
