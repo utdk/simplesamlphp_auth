@@ -82,9 +82,11 @@ class SimplesamlphpDrupalAuth {
       $account = $this->externalRegister($authname);
     }
 
-    // Determine if roles should be evaluated upon login.
-    if ($this->config->get('role.eval_every_time')) {
-      $this->roleMatchAdd($account);
+    if ($account) {
+      // Determine if roles should be evaluated upon login.
+      if ($this->config->get('role.eval_every_time')) {
+        $this->roleMatchAdd($account);
+      }
     }
 
     return $account;
@@ -150,11 +152,19 @@ class SimplesamlphpDrupalAuth {
 
     if (!$account) {
       // Create the new user.
-      $account = $this->externalauth->register($authname, 'simplesamlphp_auth');
+      try {
+        $account = $this->externalauth->register($authname, 'simplesamlphp_auth');
+      }
+      catch (\Exception $ex) {
+        watchdog_exception('simplesamlphp_auth', $ex);
+        drupal_set_message(t('Error registering user: An account with this username already exists.'), 'error');
+      }
     }
 
-    $this->synchronizeUserAttributes($account, TRUE);
-    return $this->externalauth->userLoginFinalize($account);
+    if ($account) {
+      $this->synchronizeUserAttributes($account, TRUE);
+      return $this->externalauth->userLoginFinalize($account);
+    }
   }
 
   /**
@@ -169,20 +179,33 @@ class SimplesamlphpDrupalAuth {
     $sync_mail = $force || $this->config->get('sync.mail');
     $sync_user_name = $force || $this->config->get('sync.user_name');
 
-    try {
-      if ($sync_user_name) {
-        $name = $this->simplesaml_auth->getDefaultName();
-        $account->setUsername($name);
+    if ($sync_user_name) {
+      $name = $this->simplesaml_auth->getDefaultName();
+      if ($name) {
+        $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $name));
+        if ($account = reset($account_search)) {
+          $this->logger->critical("Error on synchronizing name attribute: an account with the username %username already exists.", ['%username' => $name]);
+          drupal_set_message(t('Error synchronizing username: an account with this username already exists.'), 'error');
+        }
+        else {
+          $account->setUsername($name);
+        }
       }
-
-      if ($sync_mail) {
-        $mail = $this->simplesaml_auth->getDefaultEmail();
-        $account->setEmail($mail);
+      else {
+        $this->logger->critical("Error on synchronizing name attribute: no username available for Drupal user %id.", ['%id' => $account->id()]);
+        drupal_set_message(t('Error synchronizing username: no username is provided by SAML.'), 'error');
       }
     }
-    catch (Exception $e) {
-      drupal_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
-      $this->logger->critical($e->getMessage());
+
+    if ($sync_mail) {
+      $mail = $this->simplesaml_auth->getDefaultEmail();
+      if ($mail) {
+        $account->setEmail($mail);
+      }
+      else {
+        $this->logger->critical("Error on synchronizing mail attribute: no email address available for Drupal user %id.", ['%id' => $account->id()]);
+        drupal_set_message(t('Error synchronizing mail: no email address is provided by SAML.'), 'error');
+      }
     }
 
     if ($sync_mail || $sync_user_name) {
