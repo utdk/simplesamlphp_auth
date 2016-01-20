@@ -212,7 +212,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Expect the entity storage to return no existing user.
     $entity_storage->expects($this->any())
       ->method('loadByProperties')
-      ->will($this->returnValue(FALSE));
+      ->will($this->returnValue(array()));
 
     $this->entityManager->expects($this->any())
       ->method('getStorage')
@@ -340,6 +340,17 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     $simplesaml->expects($this->once())
       ->method('getDefaultEmail')
       ->will($this->returnValue("test@example.com"));
+
+    // Mock the User storage layer.
+    $entity_storage = $this->getMock('Drupal\Core\Entity\EntityStorageInterface');
+    // Expect the entity storage to return no existing user.
+    $entity_storage->expects($this->any())
+      ->method('loadByProperties')
+      ->will($this->returnValue(array()));
+
+    $this->entityManager->expects($this->any())
+      ->method('getStorage')
+      ->will($this->returnValue($entity_storage));
 
     // Get a Mock User object to test the user attribute syncing.
     $this->entity_account->expects($this->once())
