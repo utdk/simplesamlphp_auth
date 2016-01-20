@@ -76,3 +76,10 @@ function simplesamlphp_auth_check_library() {
     include_once $dir . '/lib/_autoload.php';
   }
 }
+
+/**
+ * Rebuild simplesamlphp_auth_event_subscriber service.
+ */
+function simplesamlphp_auth_update_8001() {
+  \Drupal::service('simplesamlphp_auth_event_subscriber')->rebuild();
+}

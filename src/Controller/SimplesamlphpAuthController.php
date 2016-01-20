@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 
 
 /**
@@ -76,14 +77,24 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
   protected $logger;
 
   /**
+   * A configuration object.
+   *
+   * @var \Drupal\Core\Config\ImmutableConfig
+   */
+  protected $config;
+
+  /**
    * @param SimplesamlphpAuthManager $simplesaml
    * @param SimplesamlphpDrupalAuth $simplesaml_drupalauth
    * @param UrlGeneratorInterface $url_generator
    * @param RequestStack $requestStack
    * @param AccountInterface $account
    * @param PathValidatorInterface $pathValidator
+   * @param LoggerInterface $logger
+   * @param ConfigFactoryInterface $config_factory
+   *
    */
-  public function __construct(SimplesamlphpAuthManager $simplesaml, SimplesamlphpDrupalAuth $simplesaml_drupalauth, UrlGeneratorInterface $url_generator, RequestStack $requestStack, AccountInterface $account, PathValidatorInterface $pathValidator, LoggerInterface $logger) {
+  public function __construct(SimplesamlphpAuthManager $simplesaml, SimplesamlphpDrupalAuth $simplesaml_drupalauth, UrlGeneratorInterface $url_generator, RequestStack $requestStack, AccountInterface $account, PathValidatorInterface $pathValidator, LoggerInterface $logger, ConfigFactoryInterface $config_factory) {
     $this->simplesaml = $simplesaml;
     $this->simplesaml_drupalauth = $simplesaml_drupalauth;
     $this->urlGenerator = $url_generator;
@@ -91,6 +102,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
     $this->account = $account;
     $this->pathValidator = $pathValidator;
     $this->logger = $logger;
+    $this->config = $config_factory->get('simplesamlphp_auth.settings');
   }
 
   /**
@@ -104,7 +116,8 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
       $container->get('request_stack'),
       $container->get('current_user'),
       $container->get('path.validator'),
-      $container->get('logger.factory')->get('simplesamlphp_auth')
+      $container->get('logger.factory')->get('simplesamlphp_auth'),
+      $container->get('config.factory')
     );
   }
 
@@ -159,6 +172,11 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
         $authname = $this->simplesaml->getAuthname();
 
         if (!empty($authname)) {
+          if ($this->config->get('debug')) {
+            $this->logger->debug('Trying to login SAML-authenticated user with authname %authname', array(
+              '%authname' => $authname,
+            ));
+          }
           // User is logged in with SAML authentication and we got the unique
           // identifier, so try to log into Drupal.
           // Check to see whether the external user exists in Drupal. If they

@@ -19,9 +19,9 @@ use Drupal\Core\Site\Settings;
 class SimplesamlphpAuthManager {
 
   /**
-   * The Drupal configuration factory.
+   * A configuration object.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var \Drupal\Core\Config\ImmutableConfig
    */
   protected $config;
 

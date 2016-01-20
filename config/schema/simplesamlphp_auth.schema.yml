@@ -4,6 +4,12 @@ simplesamlphp_auth.settings:
   type: mapping
   label: 'SimpleSAMLphp Auth Settings'
   mapping:
+    langcode:
+      type: string
+      label: 'Language code'
+    default_langcode:
+      type: string
+      label: 'Site default language code'
     activate:
       type: boolean
       label: 'Activate authentication via SimpleSAMLphp'
@@ -60,12 +66,6 @@ simplesamlphp_auth.settings:
     user_register_original:
       type: string
       label: 'Original user register status'
-    langcode:
-      type: string
-      label: 'Language code'
-    default_langcode:
-      type: string
-      label: 'Site default language code'
     sync:
       type: mapping
       label: 'Synchronize options'
@@ -79,3 +79,6 @@ simplesamlphp_auth.settings:
     autoenablesaml:
       type: boolean
       label: 'Automatically enable SAML authentication for existing users upon successful login'
+    debug:
+      type: boolean
+      label: 'Expand the level of Drupal logging to include debugging information'

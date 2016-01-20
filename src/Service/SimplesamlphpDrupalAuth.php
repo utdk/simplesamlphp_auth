@@ -27,9 +27,9 @@ class SimplesamlphpDrupalAuth {
   protected $simplesaml_auth;
 
   /**
-   * The Drupal configuration factory.
+   * A configuration object.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var \Drupal\Core\Config\ImmutableConfig
    */
   protected $config;
 
@@ -123,10 +123,21 @@ class SimplesamlphpDrupalAuth {
     if ($existing_user) {
       // If auto-enable SAML is activated, link this user to SAML.
       if ($this->config->get('autoenablesaml')) {
+        if ($this->config->get('debug')) {
+          $this->logger->debug('Linking authname %authname to existing Drupal user with ID %id because "Automatically enable SAML authentication for existing users upon successful login" setting is activated.', array(
+            '%authname' => $authname,
+            '%id' => $existing_user->id(),
+          ));
+        }
         $this->externalauth->linkExistingAccount($authname, 'simplesamlphp_auth', $existing_user);
         $account = $existing_user;
       }
       else {
+        if ($this->config->get('debug')) {
+          $this->logger->debug('A local Drupal user with username %authname already exists. Aborting the creation of a SAML-enabled Drupal user.', array(
+            '%authname' => $authname,
+          ));
+        }
         // User is not permitted to login to Drupal via SAML.
         // Log out of SAML and redirect to the front page.
         drupal_set_message(t('We are sorry, your user account is not SAML enabled.'));
@@ -144,6 +155,12 @@ class SimplesamlphpDrupalAuth {
           $return_value = \Drupal::moduleHandler()->invoke($module, 'simplesamlphp_auth_existing_user', [$attributes]);
           if ($return_value instanceof UserInterface) {
             $account = $return_value;
+            if ($this->config->get('debug')) {
+              $this->logger->debug('Linking authname %authname to existing Drupal user with ID %id because "Automatically enable SAML authentication for existing users upon successful login" setting is activated.', array(
+                '%authname' => $authname,
+                '%id' => $account->id(),
+              ));
+            }
             $this->externalauth->linkExistingAccount($authname, 'simplesamlphp_auth', $account);
           }
         }
@@ -225,10 +242,12 @@ class SimplesamlphpDrupalAuth {
 
     if ($matching_roles) {
       foreach ($matching_roles as $role_id) {
-        $this->logger->notice('Adding role %role to user %name', array(
-          '%role' => $role_id,
-          '%name' => $account->getAccountName(),
-        ));
+        if ($this->config->get('debug')) {
+          $this->logger->debug('Adding role %role to user %name', array(
+            '%role' => $role_id,
+            '%name' => $account->getAccountName(),
+          ));
+        }
         $account->addRole($role_id);
       }
       $account->save();
@@ -276,8 +295,16 @@ class SimplesamlphpDrupalAuth {
    */
   protected function evalRoleRule($role_eval_part) {
     list($key, $op, $value) = explode(',', $role_eval_part);
-
     $attributes = $this->simplesaml_auth->getAttributes();
+
+    if ($this->config->get('debug')) {
+      $this->logger->debug('Evaluate rule (key=%key,operator=%op,value=%val', array(
+        '%key' => $key,
+        '%op' => $op,
+        '%val' => $value,
+      ));
+    }
+
     if (!array_key_exists($key, $attributes)) {
       return FALSE;
     }

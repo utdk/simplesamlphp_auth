@@ -1,3 +1,5 @@
+langcode: en
+default_langcode: en
 activate: false
 mail_attr: 'mail'
 unique_id: 'eduPersonPrincipalName'
@@ -15,9 +17,8 @@ allow:
   default_login_users:
 logout_goto_url:
 user_register_original:
-langcode: en
-default_langcode: en
 sync:
   mail: true
   user_name: true
 autoenablesaml: false
+debug: false

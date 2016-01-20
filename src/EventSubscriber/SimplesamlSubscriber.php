@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Event subscriber subscribing to KernelEvents::REQUEST.
@@ -31,19 +32,31 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
   protected $account;
 
   /**
-   * @var ConfigFactoryInterface
+   * A configuration object.
+   *
+   * @var \Drupal\Core\Config\ImmutableConfig
    */
-  protected $configFactory;
+  protected $config;
+
+  /**
+   * A logger instance.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
 
   /**
    * @param SimplesamlphpAuthManager $simplesaml
    * @param AccountInterface $account
    * @param ConfigFactoryInterface $config_factory
+   * @param LoggerInterface $logger
    */
-  public function __construct(SimplesamlphpAuthManager $simplesaml, AccountInterface $account, ConfigFactoryInterface $config_factory) {
+  public function __construct(SimplesamlphpAuthManager $simplesaml, AccountInterface $account, ConfigFactoryInterface $config_factory, LoggerInterface $logger) {
     $this->simplesaml = $simplesaml;
     $this->account = $account;
-    $this->configFactory = $config_factory;
+    $this->config = $config_factory->get('simplesamlphp_auth.settings');
+    $this->logger = $logger;
   }
 
   /**
@@ -64,22 +77,23 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $config = $this->configFactory->get('simplesamlphp_auth.settings');
 
-    if ($config->get('allow.default_login')) {
+    if ($this->config->get('allow.default_login')) {
 
-      $allowed_uids = explode(',', $config->get('allow.default_login_users'));
+      $allowed_uids = explode(',', $this->config->get('allow.default_login_users'));
       if (in_array($this->account->id(), $allowed_uids)) {
         return;
       }
 
-      $allowed_roles = $config->get('allow.default_login_roles');
+      $allowed_roles = $this->config->get('allow.default_login_roles');
       if (array_intersect($this->account->getRoles(), $allowed_roles)) {
         return;
       }
     }
 
-    \Drupal::logger('simplesamlphp_auth')->notice('User %name not authorized to log in using local account.', array('%name' => $this->account->getAccountName()));
+    if ($this->config->get('debug')) {
+      $this->logger->debug('User %name not authorized to log in using local account.', array('%name' => $this->account->getAccountName()));
+    }
     user_logout();
 
     $response = new RedirectResponse('/', RedirectResponse::HTTP_FOUND);

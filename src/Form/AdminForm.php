@@ -54,6 +54,19 @@ class AdminForm extends ConfigFormBase {
       '#description' => $this->t('Text to display as the link to the external federated login page.'),
     );
 
+
+    $form['debugging'] = array(
+      '#type' => 'fieldset',
+      '#title' => $this->t('Debugging'),
+      '#collapsible' => FALSE,
+    );
+    $form['debugging']['debug'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Turn on debugging messages'),
+      '#default_value' => $config->get('debug'),
+      '#description' => $this->t('Expand the level of Drupal logging to include debugging information.'),
+    );
+
     $form['user_info'] = array(
       '#type' => 'fieldset',
       '#title' => $this->t('User info and syncing'),
@@ -198,6 +211,7 @@ class AdminForm extends ConfigFormBase {
       ->set('allow.default_login_users', $form_state->getValue('allow_default_login_users'))
       ->set('logout_goto_url', $form_state->getValue('logout_goto_url'))
       ->set('autoenablesaml', $form_state->getValue('autoenablesaml'))
+      ->set('debug', $form_state->getValue('debug'))
       ->save();
 
     parent::submitForm($form, $form_state);
