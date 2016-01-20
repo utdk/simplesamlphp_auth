@@ -71,6 +71,22 @@ another location where they are saved.
 7. Enable the module
 8. Configure the module (see below)
 
+# UPGRADING
+
+The Drupal 8 version of this module provides a tested upgrade path from Drupal 6.x-2.x, Drupal 7.x-2.x and 
+Drupal 7.x-3.x branches, through the Migrate API in Drupal 8. Other branches might have a working upgrade path, but are
+untested.
+
+In order to upgrade the SimpleSAMLphp settings from your Drupal 6 or Drupal 7 website, follow these instructions:
+  - Install and enable the simplesamlphp_auth module as described above.
+  - Activate the Migrate and Migrate Drupal core modules and perform your upgrade migration. 
+  See https://www.drupal.org/upgrade/migrate for more information about this process.
+  - Some settings did not exist in earlier versions of this module. They will remain in the default state after 
+  migration.
+  - The setting "Activate authentication via SimpleSAMLphp" will always be migrated as deactivated, to avoid being 
+  locked out of your website after migration. Please check the migrated configuration thoroughly, and after validation
+  of the settings, activate authentication via SimpleSAMLphp manually.
+
 # CONFIGURATION
 
 ## Basic configuration
