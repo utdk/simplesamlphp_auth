@@ -126,6 +126,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->entityManager,
         $this->logger,
         $this->externalauth,
+        $this->entityAccount
       ))
       ->getMock();
 
@@ -193,6 +194,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->entityManager,
         $this->logger,
         $this->externalauth,
+        $this->entityAccount
       ))
       ->getMock();
 
@@ -243,6 +245,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->entityManager,
         $this->logger,
         $externalauth,
+        $this->entityAccount
       ))
       ->getMock();
 
@@ -310,6 +313,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->entityManager,
         $this->logger,
         $externalauth,
+        $this->entityAccount
       ))
       ->getMock();
 
@@ -367,7 +371,8 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       $this->configFactory,
       $this->entityManager,
       $this->logger,
-      $this->externalauth
+      $this->externalauth,
+      $this->entityAccount
     );
 
     $simplesaml_drupalauth->synchronizeUserAttributes($this->entityAccount, TRUE);
@@ -407,7 +412,8 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       $config_factory,
       $this->entityManager,
       $this->logger,
-      $this->externalauth
+      $this->externalauth,
+      $this->entityAccount
     );
 
     $matching_roles = $simplesaml_drupalauth->getMatchingRoles();

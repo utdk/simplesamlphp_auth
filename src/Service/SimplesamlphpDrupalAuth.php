@@ -203,7 +203,7 @@ class SimplesamlphpDrupalAuth {
 
     if ($account) {
       $this->synchronizeUserAttributes($account, TRUE);
-      return $this->externalauth->userLoginFinalize($account);
+      return $this->externalauth->userLoginFinalize($account, $authname, 'simplesamlphp_auth');
     }
   }
 
