@@ -55,6 +55,13 @@ class SimplesamlphpDrupalAuth {
   protected $externalauth;
 
   /**
+   * The currently logged in user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
    * {@inheritdoc}
    *
    * @param SimplesamlphpAuthManager $simplesaml_auth
@@ -67,13 +74,16 @@ class SimplesamlphpDrupalAuth {
    *   A logger instance.
    * @param ExternalAuthInterface $externalauth
    *   The ExternalAuth service.
+   * @param AccountInterface $account
+   *   The currently logged in user.
    */
-  public function __construct(SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager, LoggerInterface $logger, ExternalAuthInterface $externalauth) {
+  public function __construct(SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager, LoggerInterface $logger, ExternalAuthInterface $externalauth, AccountInterface $account) {
     $this->simplesamlAuth = $simplesaml_auth;
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
     $this->entityManager = $entity_manager;
     $this->logger = $logger;
     $this->externalauth = $externalauth;
+    $this->currentUser = $account;
   }
 
   /**
@@ -213,13 +223,17 @@ class SimplesamlphpDrupalAuth {
     if ($sync_user_name) {
       $name = $this->simplesamlAuth->getDefaultName();
       if ($name) {
+        $existing = FALSE;
         $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $name));
         if ($existing_account = reset($account_search)) {
-          $account = $existing_account;
-          $this->logger->critical("Error on synchronizing name attribute: an account with the username %username already exists.", ['%username' => $name]);
-          drupal_set_message(t('Error synchronizing username: an account with this username already exists.'), 'error');
+          if ($this->currentUser->id() != $existing_account->id()) {
+            $existing = TRUE;
+            $this->logger->critical("Error on synchronizing name attribute: an account with the username %username already exists.", ['%username' => $name]);
+            drupal_set_message(t('Error synchronizing username: an account with this username already exists.'), 'error');
+          }
         }
-        else {
+
+        if (!$existing) {
           $account->setUsername($name);
         }
       }

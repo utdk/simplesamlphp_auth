@@ -46,24 +46,6 @@ function simplesamlphp_auth_help($route_name) {
 }
 
 /**
- * Implements hook_user_login().
- */
-function simplesamlphp_auth_user_login($account) {
-
-  $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
-  $simplesaml_drupalauth = \Drupal::service('simplesamlphp_auth.drupalauth');
-
-  if (!$simplesaml->isActivated()) {
-    return;
-  }
-
-  // If user registration has a valid session...
-  if ($simplesaml->isAuthenticated() && $simplesaml->getAuthname() == 'simplesamlphp_auth_' . $account->getInitialEmail()) {
-    $simplesaml_drupalauth->synchronizeUserAttributes($account);
-  }
-}
-
-/**
  * Implements hook_user_logout().
  */
 function simplesamlphp_auth_user_logout($account) {

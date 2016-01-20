@@ -111,3 +111,27 @@ function hook_simplesamlphp_auth_existing_user($attributes) {
   }
   return FALSE;
 }
+
+/**
+ * Hook to alter a Drupal user account after SAML authentication.
+ *
+ * Allows other modules to change fields or properties on the Drupal account
+ * after a user logged in through SimpleSAMLphp. This can be used to add
+ * map additional SAML attributes to Drupal user profile fields.
+ *
+ * @param \Drupal\user\UserInterface $account
+ *   The Drupal account that can be altered.
+ * @param array $attributes
+ *   The SimpleSAMLphp attributes for this user.
+ *
+ * @return \Drupal\user\UserInterface|bool
+ *   The altered Drupal account or FALSE if nothing was changed.
+ */
+function hook_simplesamlphp_auth_user_attributes(\Drupal\user\UserInterface $account, $attributes) {
+  $saml_first_name = $attributes['first_name'];
+  if ($saml_first_name) {
+    $account->set('field_first_name', $saml_first_name);
+    return $account;
+  }
+  return FALSE;
+}
