@@ -183,7 +183,8 @@ class SimplesamlphpDrupalAuth {
       $name = $this->simplesaml_auth->getDefaultName();
       if ($name) {
         $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $name));
-        if ($account = reset($account_search)) {
+        if ($existing_account = reset($account_search)) {
+          $account = $existing_account;
           $this->logger->critical("Error on synchronizing name attribute: an account with the username %username already exists.", ['%username' => $name]);
           drupal_set_message(t('Error synchronizing username: an account with this username already exists.'), 'error');
         }
