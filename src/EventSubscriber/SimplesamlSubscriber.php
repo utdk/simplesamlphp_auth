@@ -22,12 +22,16 @@ use Psr\Log\LoggerInterface;
 class SimplesamlSubscriber implements EventSubscriberInterface {
 
   /**
-   * @var SimplesamlphpAuthManager
+   * The SimpleSAML Authentication helper service.
+   *
+   * @var \Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager
    */
   protected $simplesaml;
 
   /**
-   * @var AccountInterface
+   * The current account.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
    */
   protected $account;
 
@@ -47,10 +51,16 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
 
 
   /**
+   * {@inheritdoc}
+   *
    * @param SimplesamlphpAuthManager $simplesaml
+   *   The SimpleSAML Authentication helper service.
    * @param AccountInterface $account
+   *   The current account.
    * @param ConfigFactoryInterface $config_factory
+   *   The configuration factory.
    * @param LoggerInterface $logger
+   *   A logger instance.
    */
   public function __construct(SimplesamlphpAuthManager $simplesaml, AccountInterface $account, ConfigFactoryInterface $config_factory, LoggerInterface $logger) {
     $this->simplesaml = $simplesaml;
@@ -63,6 +73,7 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
    * Logs out user if not SAML authenticated and local logins are disabled.
    *
    * @param GetResponseEvent $event
+   *   The subscribed event.
    */
   public function checkAuthStatus(GetResponseEvent $event) {
     if ($this->account->isAnonymous()) {
@@ -76,7 +87,6 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
     if ($this->simplesaml->isAuthenticated()) {
       return;
     }
-
 
     if ($this->config->get('allow.default_login')) {
 
@@ -105,7 +115,7 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  static function getSubscribedEvents() {
+  public static function getSubscribedEvents() {
     $events[KernelEvents::REQUEST][] = array('checkAuthStatus');
     return $events;
   }

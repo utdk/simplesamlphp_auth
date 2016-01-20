@@ -4,6 +4,7 @@
  * @file
  * The install file for the simplesamlphp_auth module.
  */
+
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\Settings;
 
@@ -68,6 +69,7 @@ function simplesamlphp_auth_requirements($phase) {
 
 /**
  * Check if the SimpleSAMLphp library can be found.
+ *
  * Fallback for when the library was not found via Composer.
  */
 function simplesamlphp_auth_check_library() {

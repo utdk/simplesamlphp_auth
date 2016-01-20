@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
 class BasicSettingsForm extends ConfigFormBase {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getFormId() {
     return 'simplesamlphp_auth_basic_settings_form';
@@ -59,7 +59,6 @@ class BasicSettingsForm extends ConfigFormBase {
       '#description' => $this->t('Text to display as the link to the external federated login page.'),
     );
 
-
     $form['debugging'] = array(
       '#type' => 'fieldset',
       '#title' => $this->t('Debugging'),
@@ -72,7 +71,7 @@ class BasicSettingsForm extends ConfigFormBase {
       '#description' => $this->t('Expand the level of Drupal logging to include debugging information.'),
     );
 
-     $form['user_provisioning'] = array(
+    $form['user_provisioning'] = array(
       '#type' => 'fieldset',
       '#title' => $this->t('User Provisioning'),
       '#collapsible' => FALSE,

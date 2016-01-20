@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
 class LocalSettingsForm extends ConfigFormBase {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getFormId() {
     return 'simplesamlphp_auth_local_settings_form';

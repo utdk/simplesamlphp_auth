@@ -28,7 +28,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-  protected $config_factory;
+  protected $configFactory;
 
   /**
    * A mocked SimpleSAML configuration instance.
@@ -51,7 +51,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
     parent::setUp();
 
     // Set up default test configuration Mock object.
-    $this->config_factory = $this->getConfigFactoryStub(array(
+    $this->configFactory = $this->getConfigFactoryStub(array(
       'simplesamlphp_auth.settings' => array(
         'auth_source' => 'default-sp',
         'register_users' => TRUE,
@@ -80,13 +80,15 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
 
 
   /**
+   * Tests isActivated() method.
+   *
    * @covers ::__construct
    * @covers ::isActivated
    */
-  function testIsActivated() {
+  public function testIsActivated() {
     // Test isActivated() method.
     $simplesaml = new SimplesamlphpAuthManager(
-      $this->config_factory,
+      $this->configFactory,
       $this->instance,
       $this->simplesamlConfig
     );
@@ -96,10 +98,12 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests isAuthenticated() method.
+   *
    * @covers ::__construct
    * @covers ::isAuthenticated
    */
-  function testIsAuthenticated() {
+  public function testIsAuthenticated() {
     // Set expectations for instance.
     $this->instance->expects($this->once())
       ->method('isAuthenticated')
@@ -107,7 +111,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
 
     // Test isAuthenticated() method.
     $simplesaml = new SimplesamlphpAuthManager(
-      $this->config_factory,
+      $this->configFactory,
       $this->instance,
       $this->simplesamlConfig
     );
@@ -117,17 +121,19 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests externalAuthenticate() method.
+   *
    * @covers ::__construct
    * @covers ::externalAuthenticate
    */
-  function testExternalAuthenticate() {
+  public function testExternalAuthenticate() {
     // Set expectations for instance.
     $this->instance->expects($this->once())
       ->method('requireAuth');
 
     // Test externalAuthenticate() method.
     $simplesaml = new SimplesamlphpAuthManager(
-      $this->config_factory,
+      $this->configFactory,
       $this->instance,
       $this->simplesamlConfig
     );
@@ -136,10 +142,12 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests getStorage() method.
+   *
    * @covers ::__construct
    * @covers ::getStorage
    */
-  function testGetStorage() {
+  public function testGetStorage() {
     // Set expectations for config.
     $this->simplesamlConfig->expects($this->once())
       ->method('getValue')
@@ -148,7 +156,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
 
     // Test getStorage() method.
     $simplesaml = new SimplesamlphpAuthManager(
-      $this->config_factory,
+      $this->configFactory,
       $this->instance,
       $this->simplesamlConfig
     );
@@ -158,6 +166,8 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests attributes assignment logic.
+   *
    * @covers ::__construct
    * @covers ::getAttributes
    * @covers ::getAttribute
@@ -165,7 +175,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
    * @covers ::getDefaultName
    * @covers ::getDefaultEmail
    */
-  function testAttributes() {
+  public function testAttributes() {
     $data = array(
       'uid' => ['ext_user_123'],
       'name' => ['External User'],
@@ -180,7 +190,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
 
     // Test attribute methods.
     $simplesaml = new SimplesamlphpAuthManager(
-      $this->config_factory,
+      $this->configFactory,
       $this->instance,
       $this->simplesamlConfig
     );
@@ -192,19 +202,23 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests attribute assignment logic throwing exceptions.
+   *
    * @covers ::__construct
    * @covers ::getAttribute
+   *
    * @expectedException \Drupal\simplesamlphp_auth\Exception\SimplesamlphpAttributeException
+   *
    * @expectedExceptionMessage Error in simplesamlphp_auth.module: no valid "name" attribute set.
    */
-  function testAttributesException() {
+  public function testAttributesException() {
     // Set expectations for instance.
     $this->instance->expects($this->any())
       ->method('getAttributes')
       ->will($this->returnValue(array('uid' => ['ext_user_123'])));
 
     $simplesaml = new SimplesamlphpAuthManager(
-      $this->config_factory,
+      $this->configFactory,
       $this->instance,
       $this->simplesamlConfig
     );
@@ -212,10 +226,12 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests allowUserByAttribute() method.
+   *
    * @covers ::__construct
    * @covers ::allowUserByAttribute
    */
-  function testAllowUserByAttribute() {
+  public function testAllowUserByAttribute() {
     $data = array(
       'uid' => ['ext_user_123'],
       'name' => ['External User'],
@@ -239,7 +255,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
 
     // Test allowUserByAttribute method.
     $simplesaml = new SimplesamlphpAuthManager(
-      $this->config_factory,
+      $this->configFactory,
       $this->instance,
       $this->simplesamlConfig
     );
@@ -249,10 +265,12 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests logout() method.
+   *
    * @covers ::__construct
    * @covers ::logout
    */
-  function testLogout() {
+  public function testLogout() {
     $redirect_path = '<front>';
 
     // Set expectations for instance.
@@ -262,7 +280,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
 
     // Test logout() method.
     $simplesaml = new SimplesamlphpAuthManager(
-      $this->config_factory,
+      $this->configFactory,
       $this->instance,
       $this->simplesamlConfig
     );

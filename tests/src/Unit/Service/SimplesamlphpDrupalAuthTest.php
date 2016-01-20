@@ -49,7 +49,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-  protected $config_factory;
+  protected $configFactory;
 
   /**
    * The External Authentication service.
@@ -63,7 +63,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
    *
    * @var \Drupal\user\UserInterface
    */
-  protected $entity_account;
+  protected $entityAccount;
 
   /**
    * {@inheritdoc}
@@ -85,7 +85,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->getMock();
 
     // Set up default test configuration Mock object.
-    $this->config_factory = $this->getConfigFactoryStub(array(
+    $this->configFactory = $this->getConfigFactoryStub(array(
       'simplesamlphp_auth.settings' => array(
         'register_users' => TRUE,
         'activate' => TRUE,
@@ -95,7 +95,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     $this->externalauth = $this->getMock('\Drupal\externalauth\ExternalAuthInterface');
 
     // Create a Mock User object to test against.
-    $this->entity_account = $this->getMock('Drupal\user\UserInterface');
+    $this->entityAccount = $this->getMock('Drupal\user\UserInterface');
 
     $container = new ContainerBuilder();
     $module_handler = $this->getMock(ModuleHandlerInterface::class);
@@ -122,7 +122,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->setMethods(array('externalRegister'))
       ->setConstructorArgs(array(
         $this->simplesaml,
-        $this->config_factory,
+        $this->configFactory,
         $this->entityManager,
         $this->logger,
         $this->externalauth,
@@ -133,7 +133,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // of this specific unit test.
     $simplesaml_drupalauth->expects($this->once())
       ->method('externalRegister')
-      ->will($this->returnValue($this->entity_account));
+      ->will($this->returnValue($this->entityAccount));
 
     // Now that everything is set up, call externalLoad() and expect a User.
     $loaded_account = $simplesaml_drupalauth->externalLoginRegister("testuser");
@@ -161,15 +161,15 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
 
     // Get a Mock User object to test the external login method.
     // Expect the role "student" to be added to the user entity.
-    $this->entity_account->expects($this->once())
+    $this->entityAccount->expects($this->once())
       ->method('addRole')
       ->with($this->equalTo('student'));
-    $this->entity_account->expects($this->once())
+    $this->entityAccount->expects($this->once())
       ->method('save');
 
     $this->externalauth->expects($this->once())
       ->method('login')
-      ->will($this->returnValue($this->entity_account));
+      ->will($this->returnValue($this->entityAccount));
 
     // Create a Mock SimplesamlphpAuthManager object.
     $simplesaml = $this->getMockBuilder('\Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager')
@@ -227,11 +227,11 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Set up expectations for ExternalAuth service.
     $externalauth->expects($this->once())
       ->method('register')
-      ->will($this->returnValue($this->entity_account));
+      ->will($this->returnValue($this->entityAccount));
 
     $externalauth->expects($this->once())
       ->method('userLoginFinalize')
-      ->will($this->returnValue($this->entity_account));
+      ->will($this->returnValue($this->entityAccount));
 
     // Set up a mock for SimplesamlphpDrupalAuth class,
     // mocking synchronizeUserAttributes() method.
@@ -239,7 +239,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->setMethods(array('synchronizeUserAttributes'))
       ->setConstructorArgs(array(
         $this->simplesaml,
-        $this->config_factory,
+        $this->configFactory,
         $this->entityManager,
         $this->logger,
         $externalauth,
@@ -276,7 +276,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Expect the entity storage to return an existing user.
     $entity_storage->expects($this->any())
       ->method('loadByProperties')
-      ->will($this->returnValue(array($this->entity_account)));
+      ->will($this->returnValue(array($this->entityAccount)));
 
     $this->entityManager->expects($this->any())
       ->method('getStorage')
@@ -294,7 +294,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
 
     $externalauth->expects($this->once())
       ->method('userLoginFinalize')
-      ->will($this->returnValue($this->entity_account));
+      ->will($this->returnValue($this->entityAccount));
 
     // Set up expectations for ExternalAuth service.
     $externalauth->expects($this->never())
@@ -353,24 +353,24 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->will($this->returnValue($entity_storage));
 
     // Get a Mock User object to test the user attribute syncing.
-    $this->entity_account->expects($this->once())
+    $this->entityAccount->expects($this->once())
       ->method('setUsername')
       ->with($this->equalTo("Test name"));
-    $this->entity_account->expects($this->once())
+    $this->entityAccount->expects($this->once())
       ->method('setEmail')
       ->with($this->equalTo("test@example.com"));
-    $this->entity_account->expects($this->once())
+    $this->entityAccount->expects($this->once())
       ->method('save');
 
     $simplesaml_drupalauth = new SimplesamlphpDrupalAuth(
       $simplesaml,
-      $this->config_factory,
+      $this->configFactory,
       $this->entityManager,
       $this->logger,
       $this->externalauth
     );
 
-    $simplesaml_drupalauth->synchronizeUserAttributes($this->entity_account, TRUE);
+    $simplesaml_drupalauth->synchronizeUserAttributes($this->entityAccount, TRUE);
   }
 
   /**

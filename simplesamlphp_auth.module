@@ -71,10 +71,11 @@ function simplesamlphp_auth_user_logout($account) {
   $logout_url = \Drupal::config('simplesamlphp_auth.settings')->get('logout_goto_url');
   $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
 
-  // Have to destroy the session here as some configurations of SimpleSAMLphp_auth
-  // can create infinite loops. By removing IdP auth before Drupal auth, checks
-  // for local authentication will trigger before the session is destroyed
-  // naturally. We must therefore destroy the session manually here.
+  // Have to destroy the session here as some configurations of
+  // SimpleSAMLphp_auth can create infinite loops. By removing IdP auth before
+  // Drupal auth, checks for local authentication will trigger before the
+  // session is destroyed naturally. We must therefore destroy the session
+  // manually here.
   session_destroy();
 
   if ($logout_url) {
@@ -101,7 +102,8 @@ function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $for
 
   // If the user has a simplesamlphp_auth authmap record, then don't require
   // them to know their Drupal password. This will allow them to change their
-  // e-mail address, and set a Drupal password if they want to (and are allowed).
+  // e-mail address, and set a Drupal password if they want to
+  // (and are allowed).
   $account = $form_state->getFormObject()->getEntity();
   $saml_enabled = $authmap->get($account->id(), 'simplesamlphp_auth');
 
@@ -109,7 +111,8 @@ function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $for
     $form['simplesamlphp_auth_user_enable']['#default_value'] = TRUE;
     $form['account']['current_pass']['#access'] = FALSE;
 
-    // If the user is a simplesamlphp_auth user and is NOT allowed to set their Drupal password, remove the fields from the form.
+    // If the user is a simplesamlphp_auth user and is NOT allowed to set their
+    // Drupal password, remove the fields from the form.
     $config = \Drupal::config('simplesamlphp_auth.settings');
     if (!$config->get('allow.set_drupal_pwd')) {
       $form['account']['pass']['#access'] = FALSE;
@@ -134,7 +137,8 @@ function simplesamlphp_auth_form_user_register_form_alter(&$form, FormStateInter
 /**
  * Helper function to include the SimpleSAML checkbox on user forms.
  *
- * @param $form
+ * @param array $form
+ *   The user account form.
  *
  * @see simplesamlphp_auth_form_user_form_alter()
  * @see simplesamlphp_auth_form_user_register_form_alter()
@@ -186,12 +190,14 @@ function simplesamlphp_auth_user_form_submit($form, FormStateInterface $form_sta
   $authmap = \Drupal::service('externalauth.authmap');
   $externalauth = \Drupal::service('externalauth.externalauth');
 
-  // Add an authmap entry for this account, so it can leverage SAML authentication.
+  // Add an authmap entry for this account, so it can leverage SAML
+  // authentication.
   if ($form_state->getValue('simplesamlphp_auth_user_enable')) {
     $account = $form_state->getFormObject()->getEntity();
     // Link an authmap entry to this account, if not yet existing.
     // By default, we use the username as authname.
-    // This can be altered if needed. See simplesamlphp_auth.api.php for details.
+    // This can be altered if needed. See simplesamlphp_auth.api.php for
+    // details.
     $authname = $account->getAccountName();
     \Drupal::modulehandler()->alter('simplesamlphp_auth_account_authname', $authname, $account);
     $externalauth->linkExistingAccount($authname, 'simplesamlphp_auth', $account);

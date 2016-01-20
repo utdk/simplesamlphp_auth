@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
 class SyncingSettingsForm extends ConfigFormBase {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getFormId() {
     return 'simplesamlphp_auth_syncing_settings_form';
@@ -81,12 +81,12 @@ class SyncingSettingsForm extends ConfigFormBase {
       '#description' => $this->t('A pipe separated list of rules. Each rule consists of a Drupal role id, a SimpleSAML attribute name, an operation and a value to match. <i>e.g. role_id1:attribute_name,operation,value|role_id2:attribute_name2,operation,value... etc</i><br /><br />Each operation may be either "@", "@=" or "~=". <ul><li>"=" requires the value exactly matches the attribute;</li><li>"@=" requires the portion after a "@" in the attribute to match the value;</li><li>"~=" allows the value to match any part of any element in the attribute array.</li></ul>For instance:<br /><i>staff:eduPersonPrincipalName,@=,uninett.no;affiliation,=,employee|admin:mail,=,andreas@uninett.no</i><br />would ensure any user with an eduPersonPrinciplaName SAML attribute matching .*@uninett.no would be assigned a staff role and the user with the mail attribute exactly matching andreas@uninett.no would assume the admin role.'),
 
       // A '=' requires the $value exactly matches the $attribute, A '@='
-      // requires the portion after a '@' in the $attribute to match theuninett.no
-      // $value and a '~=' allows the value to match any part of any
-      // element in the $attribute array.
+      // requires the portion after a '@' in the $attribute to match
+      // theuninett.no $value and a '~=' allows the value to match any part of
+      // any element in the $attribute array.
       // The full role map string, when mapped to the variables below, presents
       // itself thus:
-      // $role_id:$key,$op,$value;$key,$op,$value;$key,$op,$value|$role_id:$key,$op,$value... etc.
+      // $role_id:$key,$op,$value;$key,$op,$value|$role_id:$key,$op,$value etc.
     );
     $form['user_info']['role_eval_every_time'] = array(
       '#type' => 'checkbox',
@@ -101,7 +101,7 @@ class SyncingSettingsForm extends ConfigFormBase {
       '#description' => $this->t('Upon federated login, check if a local, pre-existing Drupal user is present that can be linked to the SAML authname (by default Drupal username is checked). If so, enable SAML authentication for this existing user.<br />WARNING: make sure there is an actual link between the SAML authname and pre-existing Drupal usernames, otherwise the Drupal user could be taken over by someone else authenticating with a SAML authname that happens to be the same.<br />NOTE: When enabled, the pre-existing user can be modified (e.g. get other username, email address, roles, ... based on SAML attributes).'),
     );
 
-     return parent::buildForm($form, $form_state);
+    return parent::buildForm($form, $form_state);
   }
 
   /**

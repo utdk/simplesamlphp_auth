@@ -47,9 +47,14 @@ class SimplesamlphpAuthManager {
   protected $attributes;
 
   /**
+   * {@inheritdoc}
+   *
    * @param ConfigFactoryInterface $config_factory
+   *   The configuration factory.
    * @param SimpleSAML_Auth_Simple $instance
+   *   SimpleSAML_Auth_Simple instance.
    * @param SimpleSAML_Configuration $config
+   *   SimpleSAML_Configuration instance.
    */
   public function __construct(ConfigFactoryInterface $config_factory, SimpleSAML_Auth_Simple $instance = NULL, SimpleSAML_Configuration $config = NULL) {
     $this->checkLibrary();
@@ -78,6 +83,8 @@ class SimplesamlphpAuthManager {
   }
 
   /**
+   * Get SimpleSAMLphp storage type.
+   *
    * @return string
    *   The storage type.
    */
@@ -86,6 +93,8 @@ class SimplesamlphpAuthManager {
   }
 
   /**
+   * Check whether user is authenticated by the IdP.
+   *
    * @return bool
    *   If the user is authenticated by the IdP.
    */
@@ -127,6 +136,7 @@ class SimplesamlphpAuthManager {
    * Gets all SimpleSAML attributes.
    *
    * @return array
+   *   Array of SimpleSAML attributes.
    */
   public function getAttributes() {
     if (!$this->attributes) {
@@ -136,9 +146,16 @@ class SimplesamlphpAuthManager {
   }
 
   /**
-   * @param $attribute
+   * Get a specific SimpleSAML attribute.
+   *
+   * @param string $attribute
+   *   The name of the attribute.
+   *
    * @return mixed|bool
+   *   The attribute value or FALSE.
+   *
    * @throws SimplesamlphpAttributeException
+   *   Exception when attribute is not set.
    */
   public function getAttribute($attribute) {
     $attributes = $this->getAttributes();
@@ -154,7 +171,9 @@ class SimplesamlphpAuthManager {
 
   /**
    * Asks all modules if current federated user is allowed to login.
-   * Returns FALSE if at least one module returns FALSE.
+   *
+   * @return bool
+   *   Returns FALSE if at least one module returns FALSE.
    */
   public function allowUserByAttribute() {
     $attributes = $this->getAttributes();
@@ -170,6 +189,7 @@ class SimplesamlphpAuthManager {
    * Checks if SimpleSAMLphp_auth is enabled.
    *
    * @return bool
+   *   Whether SimpleSAMLphp authentication is enabled or not.
    */
   public function isActivated() {
     if ($this->config->get('activate') == 1) {
@@ -181,7 +201,8 @@ class SimplesamlphpAuthManager {
   /**
    * Log a user out through the SimpleSAMLphp instance.
    *
-   * @param $redirect_path
+   * @param string $redirect_path
+   *   The path to redirect to after logout.
    */
   public function logout($redirect_path = NULL) {
     if (!$redirect_path) {
@@ -192,6 +213,7 @@ class SimplesamlphpAuthManager {
 
   /**
    * Check if the SimpleSAMLphp library can be found.
+   *
    * Fallback for when the library was not found via Composer.
    */
   protected function checkLibrary() {

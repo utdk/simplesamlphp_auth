@@ -28,18 +28,18 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 class SimplesamlphpAuthController extends ControllerBase implements ContainerInjectionInterface {
 
   /**
-   * The SimpleSaml Authentication helper service.
+   * The SimpleSAML Authentication helper service.
    *
    * @var \Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager
    */
   public $simplesaml;
 
   /**
-   * The SimpleSaml Drupal Authentication service.
+   * The SimpleSAML Drupal Authentication service.
    *
    * @var \Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth
    */
-  public $simplesaml_drupalauth;
+  public $simplesamlDrupalauth;
 
   /**
    * The url generator service.
@@ -84,29 +84,38 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
   protected $config;
 
   /**
-   * @param SimplesamlphpAuthManager $simplesaml
-   * @param SimplesamlphpDrupalAuth $simplesaml_drupalauth
-   * @param UrlGeneratorInterface $url_generator
-   * @param RequestStack $requestStack
-   * @param AccountInterface $account
-   * @param PathValidatorInterface $pathValidator
-   * @param LoggerInterface $logger
-   * @param ConfigFactoryInterface $config_factory
+   * {@inheritdoc}
    *
+   * @param SimplesamlphpAuthManager $simplesaml
+   *   The SimpleSAML Authentication helper service.
+   * @param SimplesamlphpDrupalAuth $simplesaml_drupalauth
+   *   The SimpleSAML Drupal Authentication service.
+   * @param UrlGeneratorInterface $url_generator
+   *   The url generator service.
+   * @param RequestStack $request_stack
+   *   The request stack.
+   * @param AccountInterface $account
+   *   The current account.
+   * @param PathValidatorInterface $path_validator
+   *   The path validator.
+   * @param LoggerInterface $logger
+   *   A logger instance.
+   * @param ConfigFactoryInterface $config_factory
+   *   The configuration factory.
    */
-  public function __construct(SimplesamlphpAuthManager $simplesaml, SimplesamlphpDrupalAuth $simplesaml_drupalauth, UrlGeneratorInterface $url_generator, RequestStack $requestStack, AccountInterface $account, PathValidatorInterface $pathValidator, LoggerInterface $logger, ConfigFactoryInterface $config_factory) {
+  public function __construct(SimplesamlphpAuthManager $simplesaml, SimplesamlphpDrupalAuth $simplesaml_drupalauth, UrlGeneratorInterface $url_generator, RequestStack $request_stack, AccountInterface $account, PathValidatorInterface $path_validator, LoggerInterface $logger, ConfigFactoryInterface $config_factory) {
     $this->simplesaml = $simplesaml;
-    $this->simplesaml_drupalauth = $simplesaml_drupalauth;
+    $this->simplesamlDrupalauth = $simplesaml_drupalauth;
     $this->urlGenerator = $url_generator;
-    $this->requestStack = $requestStack;
+    $this->requestStack = $request_stack;
     $this->account = $account;
-    $this->pathValidator = $pathValidator;
+    $this->pathValidator = $path_validator;
     $this->logger = $logger;
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
@@ -182,7 +191,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
           // Check to see whether the external user exists in Drupal. If they
           // do not exist, create them.
           // Also log in the user.
-          $this->simplesaml_drupalauth->externalLoginRegister($authname);
+          $this->simplesamlDrupalauth->externalLoginRegister($authname);
         }
       }
 
