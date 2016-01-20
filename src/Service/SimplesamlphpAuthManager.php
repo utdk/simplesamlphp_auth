@@ -183,7 +183,10 @@ class SimplesamlphpAuthManager {
    *
    * @param $redirect_path
    */
-  public function logout($redirect_path) {
+  public function logout($redirect_path = NULL) {
+    if (!$redirect_path) {
+      $redirect_path = base_path();
+    }
     $this->instance->logout($redirect_path);
   }
 
