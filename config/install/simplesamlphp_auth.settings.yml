@@ -5,7 +5,7 @@ mail_attr: 'mail'
 unique_id: 'eduPersonPrincipalName'
 user_name: 'eduPersonPrincipalName'
 auth_source: 'default-sp'
-login_link_display_name: "Federated login"
+login_link_display_name: 'Federated login'
 role:
   population:
   eval_every_time: false
@@ -14,7 +14,7 @@ allow:
   set_drupal_pwd: true
   default_login: true
   default_login_roles: []
-  default_login_users:
+  default_login_users: '1'
 logout_goto_url:
 user_register_original:
 sync:

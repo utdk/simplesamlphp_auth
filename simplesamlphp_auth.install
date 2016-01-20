@@ -81,5 +81,12 @@ function simplesamlphp_auth_check_library() {
  * Rebuild simplesamlphp_auth_event_subscriber service.
  */
 function simplesamlphp_auth_update_8001() {
-  \Drupal::service('simplesamlphp_auth_event_subscriber')->rebuild();
+  \Drupal::service('kernel')->invalidateContainer();
+}
+
+/**
+ * Rebuild router for changed admin form.
+ */
+function simplesamlphp_auth_update_8002() {
+  \Drupal::service('router.builder')->rebuild();
 }
