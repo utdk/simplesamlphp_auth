@@ -126,7 +126,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->entityManager,
         $this->logger,
         $this->externalauth,
-        $this->entityAccount
+        $this->entityAccount,
       ))
       ->getMock();
 
@@ -194,7 +194,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->entityManager,
         $this->logger,
         $this->externalauth,
-        $this->entityAccount
+        $this->entityAccount,
       ))
       ->getMock();
 
@@ -245,7 +245,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->entityManager,
         $this->logger,
         $externalauth,
-        $this->entityAccount
+        $this->entityAccount,
       ))
       ->getMock();
 
@@ -313,7 +313,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->entityManager,
         $this->logger,
         $externalauth,
-        $this->entityAccount
+        $this->entityAccount,
       ))
       ->getMock();
 
