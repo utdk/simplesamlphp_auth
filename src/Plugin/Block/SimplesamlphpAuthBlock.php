@@ -81,9 +81,9 @@ class SimplesamlphpAuthBlock extends BlockBase implements ContainerFactoryPlugin
   public function build() {
     if ($this->simplesamlAuth->isActivated()) {
       if ($this->simplesamlAuth->isAuthenticated()) {
-        $content = $this->t('Logged in as %authname<br />:logout', array(
+        $content = $this->t('Logged in as %authname<br /><a href=":logout">Log out</a>', array(
           '%authname' => $this->simplesamlAuth->getAuthname(),
-          ':logout' => $this->l('Log Out', new Url('user.logout')),
+          ':logout' => Url::fromRoute('user.logout')->toString(),
         ));
       }
       else {
@@ -102,6 +102,9 @@ class SimplesamlphpAuthBlock extends BlockBase implements ContainerFactoryPlugin
     return array(
       '#title' => $this->t('SimpleSAMLphp Auth Status'),
       '#markup' => $content,
+      '#cache' => array(
+        'contexts' => array('user'),
+      ),
     );
   }
 
