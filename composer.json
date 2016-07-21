@@ -12,6 +12,6 @@
         }
     ],
     "require": {
-        "simplesamlphp/simplesamlphp": "1.13.2"
+        "simplesamlphp/simplesamlphp": "~1.14.4"
     }
 }
