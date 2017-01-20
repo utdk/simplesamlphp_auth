@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simplesamlphp_auth\Form\BasicSettingsForm.
- */
-
 namespace Drupal\simplesamlphp_auth\Form;
 
 use Drupal\Core\Form\ConfigFormBase;

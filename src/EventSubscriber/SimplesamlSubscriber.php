@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simplesamlphp_auth\EventSubscriber\SimplesamlSubscriber.
- */
-
 namespace Drupal\simplesamlphp_auth\EventSubscriber;
 
 use Drupal\Core\Config\ConfigFactoryInterface;

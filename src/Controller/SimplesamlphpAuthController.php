@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simplesamlphp_auth\Controller\SimplesamlphpAuthController.
- */
-
 namespace Drupal\simplesamlphp_auth\Controller;
 
 use Drupal\Component\Utility\UrlHelper;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simplesamlphp_auth\Plugin\Block\SimplesamlphpAuthBlock.
- */
-
 namespace Drupal\simplesamlphp_auth\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;

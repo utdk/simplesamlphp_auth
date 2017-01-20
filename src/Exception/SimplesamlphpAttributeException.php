@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simplesamlphp_auth\Exception\SimplesamlphpAttributeException.
- */
-
 namespace Drupal\simplesamlphp_auth\Exception;
 
 /**

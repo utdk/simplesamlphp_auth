@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simplesamlphp_auth\Tests\SimplesamlphpAuthTest.
- */
-
 namespace Drupal\simplesamlphp_auth\Tests;
 
 use Drupal\simpletest\WebTestBase;

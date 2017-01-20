@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth.
- */
-
 namespace Drupal\simplesamlphp_auth\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
