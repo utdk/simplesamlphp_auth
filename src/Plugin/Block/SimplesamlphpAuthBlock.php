@@ -3,7 +3,7 @@
 namespace Drupal\simplesamlphp_auth\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Routing\LinkGeneratorTrait;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,8 +19,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
  * )
  */
 class SimplesamlphpAuthBlock extends BlockBase implements ContainerFactoryPluginInterface {
-
-  use LinkGeneratorTrait;
 
   /**
    * SimpleSAMLphp Authentication helper.
@@ -83,11 +81,11 @@ class SimplesamlphpAuthBlock extends BlockBase implements ContainerFactoryPlugin
       }
       else {
         $label = $this->config->get('login_link_display_name');
-        $content = $this->l($label, new Url('simplesamlphp_auth.saml_login', array(), array(
+        $content = Link::createFromRoute($label, 'simplesamlphp_auth.saml_login', array(), array(
           'attributes' => array(
             'class' => array('simplesamlphp-auth-login-link'),
           ),
-        )));
+        ));
       }
     }
     else {

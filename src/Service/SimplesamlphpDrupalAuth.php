@@ -3,7 +3,7 @@
 namespace Drupal\simplesamlphp_auth\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Session\AccountInterface;
 use Psr\Log\LoggerInterface;
@@ -29,11 +29,11 @@ class SimplesamlphpDrupalAuth {
   protected $config;
 
   /**
-   * The entity manager.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * A logger instance.
@@ -63,8 +63,8 @@ class SimplesamlphpDrupalAuth {
    *   The SimpleSAML Authentication helper service.
    * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param EntityManagerInterface $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param LoggerInterface $logger
    *   A logger instance.
    * @param ExternalAuthInterface $externalauth
@@ -72,10 +72,10 @@ class SimplesamlphpDrupalAuth {
    * @param AccountInterface $account
    *   The currently logged in user.
    */
-  public function __construct(SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager, LoggerInterface $logger, ExternalAuthInterface $externalauth, AccountInterface $account) {
+  public function __construct(SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger, ExternalAuthInterface $externalauth, AccountInterface $account) {
     $this->simplesamlAuth = $simplesaml_auth;
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
-    $this->entityManager = $entity_manager;
+    $this->entityTypeManager = $entity_type_manager;
     $this->logger = $logger;
     $this->externalauth = $externalauth;
     $this->currentUser = $account;
@@ -135,7 +135,7 @@ class SimplesamlphpDrupalAuth {
 
     // It's possible that a user with their username set to this authname
     // already exists in the Drupal database.
-    $existing_user = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $authname));
+    $existing_user = $this->entityTypeManager->getStorage('user')->loadByProperties(array('name' => $authname));
     $existing_user = $existing_user ? reset($existing_user) : FALSE;
     if ($existing_user) {
       // If auto-enable SAML is activated, link this user to SAML.
@@ -219,7 +219,7 @@ class SimplesamlphpDrupalAuth {
       $name = $this->simplesamlAuth->getDefaultName();
       if ($name) {
         $existing = FALSE;
-        $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $name));
+        $account_search = $this->entityTypeManager->getStorage('user')->loadByProperties(array('name' => $name));
         if ($existing_account = reset($account_search)) {
           if ($this->currentUser->id() != $existing_account->id()) {
             $existing = TRUE;

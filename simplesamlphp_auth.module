@@ -31,6 +31,7 @@
 
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 
 /**
  * Implements hook_help().
@@ -151,13 +152,12 @@ function simplesamlphp_auth_form_user_login_form_alter(&$form, FormStateInterfac
   }
 
   $label = Drupal::config('simplesamlphp_auth.settings')->get('login_link_display_name');
-
   $form['simplesamlphp_auth_login_link'] = array(
-    '#markup' => \Drupal::l($label, new Url('simplesamlphp_auth.saml_login', array(), array(
+    '#markup' => Link::createFromRoute($label, 'simplesamlphp_auth.saml_login', array(), array(
       'attributes' => array(
         'class' => array('simplesamlphp-auth-login-link'),
       ),
-    ))),
+    )),
   );
 
 }
