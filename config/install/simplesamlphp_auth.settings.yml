@@ -6,6 +6,7 @@ unique_id: 'eduPersonPrincipalName'
 user_name: 'eduPersonPrincipalName'
 auth_source: 'default-sp'
 login_link_display_name: 'Federated login'
+header_no_cache: false
 role:
   population:
   eval_every_time: false

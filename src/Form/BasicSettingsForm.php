@@ -54,6 +54,13 @@ class BasicSettingsForm extends ConfigFormBase {
       '#description' => $this->t('Text to display as the link to the external federated login page.'),
     );
 
+    $form['basic']['header_no_cache'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use Header with: Cache-Control: no-cache'),
+      '#default_value' => $config->get('header_no_cache'),
+      '#description' => $this->t('Use a "Cache-Control: no-cache" header in the HTTP response to avoid the redirection be cached (e.g. when using a reverse-proxy layer).'),
+    );
+
     $form['debugging'] = array(
       '#type' => 'fieldset',
       '#title' => $this->t('Debugging'),
@@ -93,6 +100,7 @@ class BasicSettingsForm extends ConfigFormBase {
     $config->set('login_link_display_name', $form_state->getValue('login_link_display_name'));
     $config->set('debug', $form_state->getValue('debug'));
     $config->set('register_users', $form_state->getValue('register_users'));
+    $config->set('header_no_cache', $form_state->getValue('header_no_cache'));
     $config->save();
   }
 

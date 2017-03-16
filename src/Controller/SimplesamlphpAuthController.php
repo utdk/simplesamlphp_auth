@@ -190,6 +190,10 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
         }
       }
 
+      if (\Drupal::config('simplesamlphp_auth.settings')->get('header_no_cache')) {
+        header('Cache-Control: no-cache');
+      }
+
       $this->simplesaml->externalAuthenticate();
     }
 
