@@ -74,7 +74,8 @@ class SimplesamlphpAuthManager {
    * Forwards the user to the IdP for authentication.
    */
   public function externalAuthenticate() {
-    $this->instance->requireAuth();
+    $uri = \Drupal::request()->getUri();
+    $this->instance->requireAuth(array('ReturnTo' => $uri));
   }
 
   /**
