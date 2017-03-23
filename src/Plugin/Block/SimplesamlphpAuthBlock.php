@@ -3,7 +3,6 @@
 namespace Drupal\simplesamlphp_auth\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -72,33 +71,40 @@ class SimplesamlphpAuthBlock extends BlockBase implements ContainerFactoryPlugin
    * {@inheritdoc}
    */
   public function build() {
+    $content = [
+      '#title' => $this->t('SimpleSAMLphp Auth Status'),
+      '#cache' => [
+        'contexts' => ['user'],
+      ],
+    ];
+
     if ($this->simplesamlAuth->isActivated()) {
+
       if ($this->simplesamlAuth->isAuthenticated()) {
-        $content = $this->t('Logged in as %authname<br /><a href=":logout">Log out</a>', array(
+        $content['#markup'] = $this->t('Logged in as %authname<br /><a href=":logout">Log out</a>', array(
           '%authname' => $this->simplesamlAuth->getAuthname(),
           ':logout' => Url::fromRoute('user.logout')->toString(),
         ));
       }
       else {
         $label = $this->config->get('login_link_display_name');
-        $content = Link::createFromRoute($label, 'simplesamlphp_auth.saml_login', array(), array(
-          'attributes' => array(
-            'class' => array('simplesamlphp-auth-login-link'),
-          ),
-        ));
+        $login_link = [
+          '#title' => $label,
+          '#type' => 'link',
+          '#url' => Url::fromRoute('simplesamlphp_auth.saml_login'),
+          '#attributes' => [
+            'title' => $label,
+            'class' => ['simplesamlphp-auth-login-link'],
+          ],
+        ];
+        $content['link'] = $login_link;
       }
     }
     else {
-      $content = $this->t('Warning: SimpleSAMLphp is not activated.');
+      $content['#markup'] = $this->t('Warning: SimpleSAMLphp is not activated.');
     }
 
-    return array(
-      '#title' => $this->t('SimpleSAMLphp Auth Status'),
-      '#markup' => $content,
-      '#cache' => array(
-        'contexts' => array('user'),
-      ),
-    );
+    return $content;
   }
 
 }
