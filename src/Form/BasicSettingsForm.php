@@ -30,60 +30,60 @@ class BasicSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('simplesamlphp_auth.settings');
 
-    $form['basic'] = array(
+    $form['basic'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Basic settings'),
       '#collapsible' => FALSE,
-    );
-    $form['basic']['activate'] = array(
+    ];
+    $form['basic']['activate'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Activate authentication via SimpleSAMLphp'),
       '#default_value' => $config->get('activate'),
       '#description' => $this->t('Checking this box before configuring the module could lock you out of Drupal.'),
-    );
-    $form['basic']['auth_source'] = array(
+    ];
+    $form['basic']['auth_source'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Authentication source for this SP'),
       '#default_value' => $config->get('auth_source'),
       '#description' => $this->t('The name of the source to use (Usually in authsources.php).'),
-    );
-    $form['basic']['login_link_display_name'] = array(
+    ];
+    $form['basic']['login_link_display_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Federated Log In Link Display Name'),
       '#default_value' => $config->get('login_link_display_name'),
       '#description' => $this->t('Text to display as the link to the external federated login page.'),
-    );
+    ];
 
-    $form['basic']['header_no_cache'] = array(
+    $form['basic']['header_no_cache'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Use Header with: Cache-Control: no-cache'),
       '#default_value' => $config->get('header_no_cache'),
       '#description' => $this->t('Use a "Cache-Control: no-cache" header in the HTTP response to avoid the redirection be cached (e.g. when using a reverse-proxy layer).'),
-    );
+    ];
 
-    $form['debugging'] = array(
+    $form['debugging'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Debugging'),
       '#collapsible' => FALSE,
-    );
-    $form['debugging']['debug'] = array(
+    ];
+    $form['debugging']['debug'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Turn on debugging messages'),
       '#default_value' => $config->get('debug'),
       '#description' => $this->t('Expand the level of Drupal logging to include debugging information.'),
-    );
+    ];
 
-    $form['user_provisioning'] = array(
+    $form['user_provisioning'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('User Provisioning'),
       '#collapsible' => FALSE,
-    );
-    $form['user_provisioning']['register_users'] = array(
+    ];
+    $form['user_provisioning']['register_users'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Register users (i.e., auto-provisioning)'),
       '#default_value' => $config->get('register_users'),
       '#description' => $this->t('Determines whether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you\'ve done some custom work to provision Drupal accounts with the necessary authmap entries you will want this checked.<br /><br />NOTE: If unchecked each user must already have been provisioned a Drupal account correctly linked to the SAML authname attribute (e.g. by creating Drupal users with "Enable this user to leverage SAML authentication" checked). Otherwise they will receive a notice and be denied access.'),
-    );
+    ];
 
     return parent::buildForm($form, $form_state);
   }

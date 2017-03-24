@@ -64,12 +64,12 @@ class SimplesamlphpAuthTestManager extends SimplesamlphpAuthManager {
    * {@inheritdoc}
    */
   public function getAttributes() {
-    return array(
+    return [
       'uid' => [0 => 'saml_user'],
       'displayName' => [0 => 'Test Saml User'],
       'mail' => [0 => 'saml@example.com'],
       'roles' => [0 => ['employee', 'test_role']],
-    );
+    ];
   }
 
   /**

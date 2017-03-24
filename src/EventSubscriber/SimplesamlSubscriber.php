@@ -97,7 +97,7 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
     }
 
     if ($this->config->get('debug')) {
-      $this->logger->debug('User %name not authorized to log in using local account.', array('%name' => $this->account->getAccountName()));
+      $this->logger->debug('User %name not authorized to log in using local account.', ['%name' => $this->account->getAccountName()]);
     }
     user_logout();
 
@@ -111,7 +111,7 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events[KernelEvents::REQUEST][] = array('checkAuthStatus');
+    $events[KernelEvents::REQUEST][] = ['checkAuthStatus'];
     return $events;
   }
 

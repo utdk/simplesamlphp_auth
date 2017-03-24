@@ -51,29 +51,29 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
     parent::setUp();
 
     // Set up default test configuration Mock object.
-    $this->configFactory = $this->getConfigFactoryStub(array(
-      'simplesamlphp_auth.settings' => array(
+    $this->configFactory = $this->getConfigFactoryStub([
+      'simplesamlphp_auth.settings' => [
         'auth_source' => 'default-sp',
         'register_users' => TRUE,
         'activate' => 1,
         'user_name' => 'name',
         'mail_attr' => 'mail',
         'unique_id' => 'uid',
-      ),
-    ));
+      ],
+    ]);
 
     $this->instance = $this->getMockBuilder('\SimpleSAML_Auth_Simple')
-      ->setMethods(array(
+      ->setMethods([
         'isAuthenticated',
         'requireAuth',
         'getAttributes',
         'logout',
-      ))
+      ])
       ->disableOriginalConstructor()
       ->getMock();
 
     $this->simplesamlConfig = $this->getMockBuilder('\SimpleSAML_Configuration')
-      ->setMethods(array('getValue'))
+      ->setMethods(['getValue'])
       ->disableOriginalConstructor()
       ->getMock();
   }
@@ -176,12 +176,12 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
    * @covers ::getDefaultEmail
    */
   public function testAttributes() {
-    $data = array(
+    $data = [
       'uid' => ['ext_user_123'],
       'name' => ['External User'],
       'mail' => ['ext_user_123@example.com'],
       'roles' => [['employee', 'webmaster']],
-    );
+    ];
 
     // Set expectations for instance.
     $this->instance->expects($this->any())
@@ -215,7 +215,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
     // Set expectations for instance.
     $this->instance->expects($this->any())
       ->method('getAttributes')
-      ->will($this->returnValue(array('uid' => ['ext_user_123'])));
+      ->will($this->returnValue(['uid' => ['ext_user_123']]));
 
     $simplesaml = new SimplesamlphpAuthManager(
       $this->configFactory,
@@ -232,12 +232,12 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
    * @covers ::allowUserByAttribute
    */
   public function testAllowUserByAttribute() {
-    $data = array(
+    $data = [
       'uid' => ['ext_user_123'],
       'name' => ['External User'],
       'mail' => ['ext_user_123@example.com'],
       'roles' => [['employee', 'webmaster']],
-    );
+    ];
 
     // Set expectations for instance.
     $this->instance->expects($this->any())
@@ -249,7 +249,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
     $module_handler->expects($this->any())
       ->method('getImplementations')
       ->with($this->equalTo('simplesamlphp_auth_allow_login'))
-      ->will($this->returnValue(array()));
+      ->will($this->returnValue([]));
     $container->set('module_handler', $module_handler);
     \Drupal::setContainer($container);
 

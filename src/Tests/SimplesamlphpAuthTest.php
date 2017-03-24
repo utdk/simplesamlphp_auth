@@ -78,7 +78,7 @@ class SimplesamlphpAuthTest extends WebTestBase {
 
     // Add the SimplesamlphpAuthBlock to the sidebar.
     $this->drupalGet('admin/structure/block/add/simplesamlphp_auth_block/' . $default_theme);
-    $edit = array();
+    $edit = [];
     $edit['region'] = 'sidebar_first';
     $this->drupalPostForm('admin/structure/block/add/simplesamlphp_auth_block/' . $default_theme, $edit, t('Save block'));
 

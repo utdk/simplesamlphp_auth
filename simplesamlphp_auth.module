@@ -128,12 +128,12 @@ function simplesamlphp_auth_form_user_register_form_alter(&$form, FormStateInter
  * @see simplesamlphp_auth_user_form_submit()
  */
 function simplesamlphp_auth_user_form_includes(&$form) {
-  $form['simplesamlphp_auth_user_enable'] = array(
+  $form['simplesamlphp_auth_user_enable'] = [
     '#type' => 'checkbox',
     '#title' => t('Enable this user to leverage SAML authentication'),
     '#access' => \Drupal::currentUser()->hasPermission('change saml authentication setting'),
     '#description' => t("WARNING: if unchecked, this will become a local Drupal user, which might be denied access based on the SimpleSAMLphp settings for authenticating local Drupal accounts.<br />Don't use this setting for access control, which should be configured in your IdP instead.<br />NOTE: if the configuration option 'Automatically enable SAML authentication for existing users upon successful login' is activated, this Drupal account can become linked with SAML (again) when the user succesfully authenticates to the IdP."),
-  );
+  ];
 
   // We store the authname as the initial email. If we're using SimpleSAML we
   // need to enforce an email address.

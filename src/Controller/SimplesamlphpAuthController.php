@@ -177,9 +177,9 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
 
         if (!empty($authname)) {
           if ($this->config->get('debug')) {
-            $this->logger->debug('Trying to login SAML-authenticated user with authname %authname', array(
+            $this->logger->debug('Trying to login SAML-authenticated user with authname %authname', [
               '%authname' => $authname,
-            ));
+            ]);
           }
           // User is logged in with SAML authentication and we got the unique
           // identifier, so try to log into Drupal.

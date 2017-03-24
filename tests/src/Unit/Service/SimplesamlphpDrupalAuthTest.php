@@ -85,12 +85,12 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->getMock();
 
     // Set up default test configuration Mock object.
-    $this->configFactory = $this->getConfigFactoryStub(array(
-      'simplesamlphp_auth.settings' => array(
+    $this->configFactory = $this->getConfigFactoryStub([
+      'simplesamlphp_auth.settings' => [
         'register_users' => TRUE,
         'activate' => TRUE,
-      ),
-    ));
+      ],
+    ]);
 
     $this->externalauth = $this->getMock('\Drupal\externalauth\ExternalAuthInterface');
 
@@ -119,15 +119,15 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Set up a mock for SimplesamlphpDrupalAuth class,
     // mocking externalRegister() method.
     $simplesaml_drupalauth = $this->getMockBuilder('Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth')
-      ->setMethods(array('externalRegister'))
-      ->setConstructorArgs(array(
+      ->setMethods(['externalRegister'])
+      ->setConstructorArgs([
         $this->simplesaml,
         $this->configFactory,
         $this->entityManager,
         $this->logger,
         $this->externalauth,
         $this->entityAccount,
-      ))
+      ])
       ->getMock();
 
     // Mock some methods on SimplesamlphpDrupalAuth, since they are out of scope
@@ -151,14 +151,14 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
    */
   public function testExternalLoginWithRoleMatch() {
     // Set up specific configuration to test external login & role matching.
-    $config_factory = $this->getConfigFactoryStub(array(
-      'simplesamlphp_auth.settings' => array(
+    $config_factory = $this->getConfigFactoryStub([
+      'simplesamlphp_auth.settings' => [
         'register_users' => TRUE,
         'activate' => 1,
         'role.eval_every_time' => 1,
         'role.population' => 'student:eduPersonAffiliation,=,student',
-      ),
-    ));
+      ],
+    ]);
 
     // Get a Mock User object to test the external login method.
     // Expect the role "student" to be added to the user entity.
@@ -175,11 +175,11 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Create a Mock SimplesamlphpAuthManager object.
     $simplesaml = $this->getMockBuilder('\Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager')
       ->disableOriginalConstructor()
-      ->setMethods(array('getAttributes'))
+      ->setMethods(['getAttributes'])
       ->getMock();
 
     // Mock the getAttributes() method on SimplesamlphpAuthManager.
-    $attributes = array('eduPersonAffiliation' => array('student'));
+    $attributes = ['eduPersonAffiliation' => ['student']];
     $simplesaml->expects($this->any())
       ->method('getAttributes')
       ->will($this->returnValue($attributes));
@@ -187,15 +187,15 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Set up a mock for SimplesamlphpDrupalAuth class,
     // mocking getUserIdforAuthname() and externalRegister() methods.
     $simplesaml_drupalauth = $this->getMockBuilder('Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth')
-      ->setMethods(array('externalLoginFinalize'))
-      ->setConstructorArgs(array(
+      ->setMethods(['externalLoginFinalize'])
+      ->setConstructorArgs([
         $simplesaml,
         $config_factory,
         $this->entityManager,
         $this->logger,
         $this->externalauth,
         $this->entityAccount,
-      ))
+      ])
       ->getMock();
 
     // Now that everything is set up, call externalLogin() and expect a User.
@@ -214,7 +214,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Expect the entity storage to return no existing user.
     $entity_storage->expects($this->any())
       ->method('loadByProperties')
-      ->will($this->returnValue(array()));
+      ->will($this->returnValue([]));
 
     $this->entityManager->expects($this->any())
       ->method('getStorage')
@@ -223,7 +223,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Create a Mock ExternalAuth object.
     $externalauth = $this->getMockBuilder('\Drupal\externalauth\ExternalAuth')
       ->disableOriginalConstructor()
-      ->setMethods(array('register', 'userLoginFinalize'))
+      ->setMethods(['register', 'userLoginFinalize'])
       ->getMock();
 
     // Set up expectations for ExternalAuth service.
@@ -238,15 +238,15 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Set up a mock for SimplesamlphpDrupalAuth class,
     // mocking synchronizeUserAttributes() method.
     $simplesaml_drupalauth = $this->getMockBuilder('Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth')
-      ->setMethods(array('synchronizeUserAttributes'))
-      ->setConstructorArgs(array(
+      ->setMethods(['synchronizeUserAttributes'])
+      ->setConstructorArgs([
         $this->simplesaml,
         $this->configFactory,
         $this->entityManager,
         $this->logger,
         $externalauth,
         $this->entityAccount,
-      ))
+      ])
       ->getMock();
 
     // Mock some methods on SimplesamlphpDrupalAuth, since they are out of scope
@@ -266,20 +266,20 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
    * @covers ::__construct
    */
   public function testExternalRegisterWithAutoEnableSaml() {
-    $config_factory = $this->getConfigFactoryStub(array(
-      'simplesamlphp_auth.settings' => array(
+    $config_factory = $this->getConfigFactoryStub([
+      'simplesamlphp_auth.settings' => [
         'register_users' => TRUE,
         'activate' => TRUE,
         'autoenablesaml' => TRUE,
-      ),
-    ));
+      ],
+    ]);
 
     // Mock the User storage layer.
     $entity_storage = $this->getMock('Drupal\Core\Entity\EntityStorageInterface');
     // Expect the entity storage to return an existing user.
     $entity_storage->expects($this->any())
       ->method('loadByProperties')
-      ->will($this->returnValue(array($this->entityAccount)));
+      ->will($this->returnValue([$this->entityAccount]));
 
     $this->entityManager->expects($this->any())
       ->method('getStorage')
@@ -288,7 +288,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Create a Mock ExternalAuth object.
     $externalauth = $this->getMockBuilder('\Drupal\externalauth\ExternalAuth')
       ->disableOriginalConstructor()
-      ->setMethods(array('linkExistingAccount', 'userLoginFinalize'))
+      ->setMethods(['linkExistingAccount', 'userLoginFinalize'])
       ->getMock();
 
     // Set up expectations for ExternalAuth service.
@@ -306,15 +306,15 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Set up a mock for SimplesamlphpDrupalAuth class,
     // mocking synchronizeUserAttributes() method.
     $simplesaml_drupalauth = $this->getMockBuilder('Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth')
-      ->setMethods(array('synchronizeUserAttributes'))
-      ->setConstructorArgs(array(
+      ->setMethods(['synchronizeUserAttributes'])
+      ->setConstructorArgs([
         $this->simplesaml,
         $config_factory,
         $this->entityManager,
         $this->logger,
         $externalauth,
         $this->entityAccount,
-      ))
+      ])
       ->getMock();
 
     // Mock some methods on SimplesamlphpDrupalAuth, since they are out of scope
@@ -334,7 +334,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Create a Mock SimplesamlphpAuthManager object.
     $simplesaml = $this->getMockBuilder('\Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager')
       ->disableOriginalConstructor()
-      ->setMethods(array('getDefaultName', 'getDefaultEmail'))
+      ->setMethods(['getDefaultName', 'getDefaultEmail'])
       ->getMock();
 
     // Mock the getDefaultName() & getDefaultEmail methods.
@@ -350,7 +350,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Expect the entity storage to return no existing user.
     $entity_storage->expects($this->any())
       ->method('loadByProperties')
-      ->will($this->returnValue(array()));
+      ->will($this->returnValue([]));
 
     $this->entityManager->expects($this->any())
       ->method('getStorage')
@@ -388,18 +388,18 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
    */
   public function testRoleMatching($rolemap, $attributes, $expected_roles) {
     // Set up specific configuration to test role matching.
-    $config_factory = $this->getConfigFactoryStub(array(
-      'simplesamlphp_auth.settings' => array(
+    $config_factory = $this->getConfigFactoryStub([
+      'simplesamlphp_auth.settings' => [
         'register_users' => TRUE,
         'activate' => 1,
         'role.population' => $rolemap,
-      ),
-    ));
+      ],
+    ]);
 
     // Create a Mock SimplesamlphpAuthManager object.
     $simplesaml = $this->getMockBuilder('\Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager')
       ->disableOriginalConstructor()
-      ->setMethods(array('getAttributes'))
+      ->setMethods(['getAttributes'])
       ->getMock();
 
     // Mock the getAttributes() method on SimplesamlphpAuthManager.
@@ -430,44 +430,44 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
    * @see \Drupal\Tests\simplesamlphp_auth\Unit\Service\SimplesamlphpDrupalAuthTest::testRoleMatching
    */
   public function roleMatchingDataProvider() {
-    return array(
+    return [
       // Test matching of exact attribute value.
-      array(
+      [
         'admin:userName,=,externalAdmin|test:something,=,something',
-        array('userName' => array('externalAdmin')),
-        array('admin' => 'admin'),
-      ),
+        ['userName' => ['externalAdmin']],
+        ['admin' => 'admin'],
+      ],
       // Test matching of attribute portion.
-      array(
+      [
         'employee:mail,@=,company.com',
-        array('mail' => array('joe@company.com')),
-        array('employee' => 'employee'),
-      ),
+        ['mail' => ['joe@company.com']],
+        ['employee' => 'employee'],
+      ],
       // Test non-matching of attribute portion.
-      array(
+      [
         'employee:mail,@=,company.com',
-        array('mail' => array('joe@anothercompany.com')),
-        array(),
-      ),
+        ['mail' => ['joe@anothercompany.com']],
+        [],
+      ],
       // Test matching of any attribute portion.
-      array(
+      [
         'employee:affiliate,~=,xyz',
-        array('affiliate' => array('abcd', 'wxyz')),
-        array('employee' => 'employee'),
-      ),
+        ['affiliate' => ['abcd', 'wxyz']],
+        ['employee' => 'employee'],
+      ],
       // Test multiple roles.
-      array(
+      [
         'admin:userName,=,externalAdmin|employee:mail,@=,company.com',
-        array('userName' => array('externalAdmin'), 'mail' => array('externalAdmin@company.com')),
-        array('admin' => 'admin', 'employee' => 'employee'),
-      ),
+        ['userName' => ['externalAdmin'], 'mail' => ['externalAdmin@company.com']],
+        ['admin' => 'admin', 'employee' => 'employee'],
+      ],
       // Test special characters (colon) in attribute.
-      array(
+      [
         'admin:domain,=,http://admindomain.com',
-        array('domain' => array('http://admindomain.com', 'http://drupal.org')),
-        array('admin' => 'admin'),
-      ),
-    );
+        ['domain' => ['http://admindomain.com', 'http://drupal.org']],
+        ['admin' => 'admin'],
+      ],
+    ];
   }
 
 }

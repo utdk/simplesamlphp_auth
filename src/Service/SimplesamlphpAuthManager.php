@@ -75,7 +75,7 @@ class SimplesamlphpAuthManager {
    */
   public function externalAuthenticate() {
     $uri = \Drupal::request()->getUri();
-    $this->instance->requireAuth(array('ReturnTo' => $uri));
+    $this->instance->requireAuth(['ReturnTo' => $uri]);
   }
 
   /**
