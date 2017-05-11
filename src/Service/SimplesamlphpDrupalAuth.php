@@ -223,7 +223,7 @@ class SimplesamlphpDrupalAuth {
         if ($existing_account = reset($account_search)) {
           if ($this->currentUser->id() != $existing_account->id()) {
             $existing = TRUE;
-            $this->logger->critical("Error on synchronizing name attribute: an account with the username %username already exists.", ['%username' => $name]);
+            $this->logger->critical("Error on synchronizing name attribute for uid %new_uid: an account with the username %username and uid %existing_uid already exists.", ['%username' => $name, '%new_uid' => $this->currentUser->id(), '%existing_uid' => $existing_account->id()]);
             drupal_set_message(t('Error synchronizing username: an account with this username already exists.'), 'error');
           }
         }
