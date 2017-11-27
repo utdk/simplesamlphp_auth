@@ -160,7 +160,9 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
       if (isset($redirect)) {
         // Set the cookie so we can deliver the user to the place they started.
         // @TODO probably a more symfony way of doing this
-        setrawcookie('simplesamlphp_auth_returnto', $redirect, time() + 60 * 60);
+        $cookie_secure = $this->config->get('secure');
+        $cookie_httponly = $this->config->get('httponly');
+        setrawcookie('simplesamlphp_auth_returnto', $redirect, time() + 60 * 60, "", "", $cookie_secure, $cookie_httponly);
       }
 
       // User is logged in to the SimpleSAMLphp IdP, but not to Drupal.

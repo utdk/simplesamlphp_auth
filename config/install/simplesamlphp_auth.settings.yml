@@ -23,3 +23,5 @@ sync:
   user_name: true
 autoenablesaml: false
 debug: false
+secure: false
+httponly: false

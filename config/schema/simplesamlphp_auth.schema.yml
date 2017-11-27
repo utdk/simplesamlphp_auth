@@ -82,3 +82,9 @@ simplesamlphp_auth.settings:
     debug:
       type: boolean
       label: 'Expand the level of Drupal logging to include debugging information'
+    secure:
+      type: boolean
+      label: 'Cookie only transmitted over HTTPS'
+    httponly:
+      type: boolean
+      label: 'Cookie only accessible over HTTP protocol'
