@@ -26,4 +26,5 @@ simplesamlphp_auth.saml_login:
   requirements:
     _access: 'TRUE'
   options:
-     no_cache: TRUE
+    _maintenance_access: TRUE
+    no_cache: TRUE
