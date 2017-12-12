@@ -21,6 +21,10 @@ function simplesamlphp_auth_install() {
   $config->set('user_register_original', $user_settings->get('register'));
   $user_settings->set('register', 'admin_only');
   $user_settings->save();
+  // Inform the user about disabling the open registration.
+  drupal_set_message(t('The SimpleSAMLphp Authentication module disabled the user registration. You can manually enable it again in the <a href=":user_settings_url">Account settings</a>.', [
+    ':user_settings_url' => \Drupal\Core\Url::fromRoute('entity.user.admin_form')->toString()
+  ]), 'warning');
   $config->save();
 }
 
