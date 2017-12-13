@@ -11,6 +11,8 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * SimplesamlphpAuthManager unit tests.
@@ -76,8 +78,18 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
       ->setMethods(['getValue'])
       ->disableOriginalConstructor()
       ->getMock();
-  }
 
+    $container = new ContainerBuilder();
+    $request = $this->getMockBuilder(Request::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $request_stack = $this->getMock(RequestStack::class);
+    $request_stack->expects($this->any())
+      ->method('getCurrentRequest')
+      ->will($this->returnValue($request));
+    $container->set('request_stack', $request_stack);
+    \Drupal::setContainer($container);
+  }
 
   /**
    * Tests isActivated() method.

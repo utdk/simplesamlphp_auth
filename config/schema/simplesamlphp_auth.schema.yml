@@ -1,12 +1,9 @@
 # Schema for the configuration files of the SimpleSAMLphp_auth module.
 
 simplesamlphp_auth.settings:
-  type: mapping
+  type: config_object
   label: 'SimpleSAMLphp Auth Settings'
   mapping:
-    langcode:
-      type: string
-      label: 'Language code'
     default_langcode:
       type: string
       label: 'Site default language code'
@@ -28,6 +25,9 @@ simplesamlphp_auth.settings:
     mail_attr:
       type: string
       label: 'SimpleSAMLphp attribute to be used as email address for the user'
+    header_no_cache:
+      type: boolean
+      label: 'Use Header with: Cache-Control: no-cache'
     role:
       type: mapping
       label: 'Role population'
