@@ -4,13 +4,6 @@
     "type": "drupal-module",
     "license": "GPL-2.0+",
     "homepage": "https://www.drupal.org/project/simplesamlphp_auth",
-    "authors": [
-        {
-            "name": "Adam Malone",
-            "email": "adam@adammalone.net",
-            "homepage": "https://www.adammalone.net"
-        }
-    ],
     "require": {
         "simplesamlphp/simplesamlphp": "~1.14.17"
     }
