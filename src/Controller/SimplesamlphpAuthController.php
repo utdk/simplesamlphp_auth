@@ -148,7 +148,9 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
     // otherwise, use the HTTP_REFERER. Each must point to the site to be valid.
     $request = $this->requestStack->getCurrentRequest();
 
-    if (($return_to = $request->request->get('ReturnTo')) || ($return_to = $request->server->get('HTTP_REFERER'))) {
+    if (($return_to = $request->query->get('ReturnTo')) ||
+        ($return_to = $request->request->get('ReturnTo')) ||
+        ($return_to = $request->server->get('HTTP_REFERER'))) {
       if ($this->pathValidator->isValid($return_to) && UrlHelper::externalIsLocal($return_to, $base_url)) {
         $redirect = $return_to;
       }
