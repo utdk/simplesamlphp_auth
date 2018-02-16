@@ -5,6 +5,6 @@
     "license": "GPL-2.0+",
     "homepage": "https://www.drupal.org/project/simplesamlphp_auth",
     "require": {
-        "simplesamlphp/simplesamlphp": "~1.14.17"
+        "simplesamlphp/simplesamlphp": "~1.15"
     }
 }
