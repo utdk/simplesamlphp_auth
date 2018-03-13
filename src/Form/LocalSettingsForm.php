@@ -39,7 +39,7 @@ class LocalSettingsForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Allow authentication with local Drupal accounts'),
       '#default_value' => $config->get('allow.default_login'),
-      '#description' => $this->t('Check this box if you want to let people log in with local Drupal accounts (without using simpleSAMLphp). If you want to restrict this privilege to certain users you can enter the Drupal user IDs in the field below.'),
+      '#description' => $this->t('Check this box if you want to let people log in with local Drupal accounts (without using simpleSAMLphp). If this is not selected, users will be directly redirected to the external identity provider. If this is selected, you can restrict this privilege to certain users below.'),
     ];
     $form['authentication']['allow_set_drupal_pwd'] = [
       '#type' => 'checkbox',
