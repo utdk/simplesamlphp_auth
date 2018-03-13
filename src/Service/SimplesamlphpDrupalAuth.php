@@ -61,15 +61,15 @@ class SimplesamlphpDrupalAuth {
    *
    * @param SimplesamlphpAuthManager $simplesaml_auth
    *   The SimpleSAML Authentication helper service.
-   * @param ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param LoggerInterface $logger
+   * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param ExternalAuthInterface $externalauth
+   * @param \Drupal\externalauth\ExternalAuthInterface $externalauth
    *   The ExternalAuth service.
-   * @param AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   The currently logged in user.
    */
   public function __construct(SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger, ExternalAuthInterface $externalauth, AccountInterface $account) {
@@ -257,7 +257,7 @@ class SimplesamlphpDrupalAuth {
   /**
    * Adds roles to user accounts.
    *
-   * @param UserInterface $account
+   * @param \Drupal\user\UserInterface $account
    *   The Drupal user to add roles to.
    */
   public function roleMatchAdd(UserInterface $account) {
@@ -351,7 +351,7 @@ class SimplesamlphpDrupalAuth {
         return ($after == $value);
 
       case '~=':
-        return array_filter($attribute, function($subattr) use ($value) {
+        return array_filter($attribute, function ($subattr) use ($value) {
           return strpos($subattr, $value) !== FALSE;
         });
     }

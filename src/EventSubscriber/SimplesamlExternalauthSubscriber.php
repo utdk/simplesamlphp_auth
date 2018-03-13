@@ -44,17 +44,16 @@ class SimplesamlExternalauthSubscriber implements EventSubscriberInterface {
    */
   protected $logger;
 
-
   /**
    * {@inheritdoc}
    *
-   * @param SimplesamlphpAuthManager $simplesaml
+   * @param \Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager $simplesaml
    *   The SimpleSAML Authentication helper service.
-   * @param SimplesamlphpDrupalAuth $simplesaml_drupalauth
+   * @param \Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth $simplesaml_drupalauth
    *   The SimpleSAML Drupal Authentication service.
-   * @param ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param LoggerInterface $logger
+   * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
   public function __construct(SimplesamlphpAuthManager $simplesaml, SimplesamlphpDrupalAuth $simplesaml_drupalauth, ConfigFactoryInterface $config_factory, LoggerInterface $logger) {
@@ -67,7 +66,7 @@ class SimplesamlExternalauthSubscriber implements EventSubscriberInterface {
   /**
    * React on an ExternalAuth login event.
    *
-   * @param ExternalAuthLoginEvent $event
+   * @param \Drupal\externalauth\Event\ExternalAuthLoginEvent $event
    *   The subscribed event.
    */
   public function externalauthLogin(ExternalAuthLoginEvent $event) {

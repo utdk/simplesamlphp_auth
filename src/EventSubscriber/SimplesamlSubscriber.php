@@ -44,17 +44,16 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
    */
   protected $logger;
 
-
   /**
    * {@inheritdoc}
    *
-   * @param SimplesamlphpAuthManager $simplesaml
+   * @param \Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager $simplesaml
    *   The SimpleSAML Authentication helper service.
-   * @param AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   The current account.
-   * @param ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param LoggerInterface $logger
+   * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
   public function __construct(SimplesamlphpAuthManager $simplesaml, AccountInterface $account, ConfigFactoryInterface $config_factory, LoggerInterface $logger) {
@@ -67,7 +66,7 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
   /**
    * Logs out user if not SAML authenticated and local logins are disabled.
    *
-   * @param GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The subscribed event.
    */
   public function checkAuthStatus(GetResponseEvent $event) {

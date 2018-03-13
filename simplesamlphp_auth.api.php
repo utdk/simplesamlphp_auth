@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Hooks for simpleSAMLphp Authentication module.
@@ -79,7 +80,6 @@ function hook_simplesamlphp_auth_allow_login($attributes) {
 function hook_simplesamphp_auth_account_authname_alter(&$authname, \Drupal\user\UserInterface $account) {
   $authname = $account->mail;
 }
-
 
 /**
  * Hook to map pre-existing Drupal user based on SAML attributes.

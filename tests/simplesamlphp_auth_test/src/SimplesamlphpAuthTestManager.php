@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simplesamlphp_auth_test\SimplesamlphpAuthTestManager.
- */
-
 namespace Drupal\simplesamlphp_auth_test;
 
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager;
@@ -27,11 +22,11 @@ class SimplesamlphpAuthTestManager extends SimplesamlphpAuthManager {
   /**
    * {@inheritdoc}
    *
-   * @param ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param SimpleSAML_Auth_Simple $instance
+   * @param \SimpleSAML_Auth_Simple $instance
    *   SimpleSAML_Auth_Simple instance.
-   * @param SimpleSAML_Configuration $config
+   * @param \SimpleSAML_Configuration $config
    *   SimpleSAML_Configuration instance.
    */
   public function __construct(ConfigFactoryInterface $config_factory, SimpleSAML_Auth_Simple $instance = NULL, SimpleSAML_Configuration $config = NULL) {

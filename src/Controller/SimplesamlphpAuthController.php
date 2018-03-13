@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
-
 /**
  * Controller routines for simplesamlphp_auth routes.
  */
@@ -81,21 +80,21 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
   /**
    * {@inheritdoc}
    *
-   * @param SimplesamlphpAuthManager $simplesaml
+   * @param \Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager $simplesaml
    *   The SimpleSAML Authentication helper service.
-   * @param SimplesamlphpDrupalAuth $simplesaml_drupalauth
+   * @param \Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth $simplesaml_drupalauth
    *   The SimpleSAML Drupal Authentication service.
-   * @param UrlGeneratorInterface $url_generator
+   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   The url generator service.
-   * @param RequestStack $request_stack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
-   * @param AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   The current account.
-   * @param PathValidatorInterface $path_validator
+   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
    *   The path validator.
-   * @param LoggerInterface $logger
+   * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
    */
   public function __construct(SimplesamlphpAuthManager $simplesaml, SimplesamlphpDrupalAuth $simplesaml_drupalauth, UrlGeneratorInterface $url_generator, RequestStack $request_stack, AccountInterface $account, PathValidatorInterface $path_validator, LoggerInterface $logger, ConfigFactoryInterface $config_factory) {
@@ -128,7 +127,7 @@ class SimplesamlphpAuthController extends ControllerBase implements ContainerInj
   /**
    * Logs the user in via SimpleSAML federation.
    *
-   * @return RedirectResponse
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirection to either a designated page or the user login page.
    */
   public function authenticate() {

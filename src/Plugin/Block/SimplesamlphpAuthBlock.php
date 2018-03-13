@@ -22,7 +22,7 @@ class SimplesamlphpAuthBlock extends BlockBase implements ContainerFactoryPlugin
   /**
    * SimpleSAMLphp Authentication helper.
    *
-   * @var SimplesamlphpAuthManager
+   * @var \Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager
    */
   protected $simplesamlAuth;
 
@@ -55,9 +55,9 @@ class SimplesamlphpAuthBlock extends BlockBase implements ContainerFactoryPlugin
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param SimplesamlphpAuthManager $simplesaml_auth
+   * @param \Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager $simplesaml_auth
    *   The SimpleSAML Authentication helper service.
-   * @param ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, SimplesamlphpAuthManager $simplesaml_auth, ConfigFactoryInterface $config_factory) {

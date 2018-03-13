@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\Tests\simplesamlphp_auth\Unit\Service\SimplesamlphpAuthManagerTest.
- */
-
 namespace Drupal\Tests\simplesamlphp_auth\Unit\Service;
 
 use Drupal\Tests\UnitTestCase;
