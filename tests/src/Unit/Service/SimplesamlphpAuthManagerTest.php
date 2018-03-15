@@ -37,7 +37,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   /**
    * A mocked SimpleSAML instance.
    *
-   * @var \SimpleSAML_Auth_Simple|\PHPUnit_Framework_MockObject_MockObject
+   * @var \SimpleSAML\Auth\Simple|\PHPUnit_Framework_MockObject_MockObject
    */
   public $instance;
 
@@ -59,7 +59,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
       ],
     ]);
 
-    $this->instance = $this->getMockBuilder('\SimpleSAML_Auth_Simple')
+    $this->instance = $this->getMockBuilder('\SimpleSAML\Auth\Simple')
       ->setMethods([
         'isAuthenticated',
         'requireAuth',
