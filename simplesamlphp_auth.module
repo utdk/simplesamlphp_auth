@@ -53,18 +53,21 @@ function simplesamlphp_auth_user_logout($account) {
   $logout_url = \Drupal::config('simplesamlphp_auth.settings')->get('logout_goto_url');
   $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
 
-  // Have to destroy the session here as some configurations of
-  // SimpleSAMLphp_auth can create infinite loops. By removing IdP auth before
-  // Drupal auth, checks for local authentication will trigger before the
-  // session is destroyed naturally. We must therefore destroy the session
-  // manually here.
-  session_destroy();
+  // Only interfere if this user was logged in through simplesaml
+  if ($simplesaml->isAuthenticated()) {
+    // Have to destroy the session here as some configurations of
+    // SimpleSAMLphp_auth can create infinite loops. By removing IdP auth before
+    // Drupal auth, checks for local authentication will trigger before the
+    // session is destroyed naturally. We must therefore destroy the session
+    // manually here.
+    session_destroy();
 
-  if ($logout_url) {
-    $simplesaml->logout($logout_url);
-  }
-  else {
-    $simplesaml->logout();
+    if ($logout_url) {
+      $simplesaml->logout($logout_url);
+    }
+    else {
+      $simplesaml->logout();
+    }
   }
 }
 
