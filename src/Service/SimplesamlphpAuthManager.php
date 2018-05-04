@@ -3,7 +3,7 @@
 namespace Drupal\simplesamlphp_auth\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use SimpleSAML_Auth_Simple;
+use SimpleSAML\Auth\Simple;
 use SimpleSAML_Configuration;
 use Drupal\simplesamlphp_auth\Exception\SimplesamlphpAttributeException;
 use Drupal\Core\Site\Settings;
@@ -30,7 +30,7 @@ class SimplesamlphpAuthManager {
   /**
    * A SimpleSAML instance.
    *
-   * @var \SimpleSAML_Auth_Simple
+   * @var \SimpleSAML\Auth\Simple
    */
   protected $instance;
 
@@ -46,17 +46,17 @@ class SimplesamlphpAuthManager {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \SimpleSAML_Auth_Simple $instance
-   *   SimpleSAML_Auth_Simple instance.
+   * @param \SimpleSAML\Auth\Simple $instance
+   *   Simple instance.
    * @param \SimpleSAML_Configuration $config
    *   SimpleSAML_Configuration instance.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, SimpleSAML_Auth_Simple $instance = NULL, SimpleSAML_Configuration $config = NULL) {
+  public function __construct(ConfigFactoryInterface $config_factory, Simple $instance = NULL, SimpleSAML_Configuration $config = NULL) {
     $this->checkLibrary();
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
     if (!$instance) {
       $auth_source = $this->config->get('auth_source');
-      $this->instance = new SimpleSAML_Auth_Simple($auth_source);
+      $this->instance = new Simple($auth_source);
     }
     else {
       $this->instance = $instance;
