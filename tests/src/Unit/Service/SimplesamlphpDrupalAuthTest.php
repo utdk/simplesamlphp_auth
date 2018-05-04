@@ -283,7 +283,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Create a Mock ExternalAuth object.
     $externalauth = $this->getMockBuilder('\Drupal\externalauth\ExternalAuth')
       ->disableOriginalConstructor()
-      ->setMethods(['linkExistingAccount', 'userLoginFinalize'])
+      ->setMethods(['register', 'linkExistingAccount', 'userLoginFinalize'])
       ->getMock();
 
     // Set up expectations for ExternalAuth service.
