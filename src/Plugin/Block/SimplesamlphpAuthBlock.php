@@ -75,8 +75,10 @@ class SimplesamlphpAuthBlock extends BlockBase implements ContainerFactoryPlugin
       '#title' => $this->t('SimpleSAMLphp Auth Status'),
       '#cache' => [
         'contexts' => ['user'],
+        'tags' => $this->config->getCacheTags(),
       ],
     ];
+
 
     if ($this->simplesamlAuth->isActivated()) {
 

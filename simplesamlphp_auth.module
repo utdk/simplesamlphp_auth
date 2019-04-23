@@ -149,11 +149,13 @@ function simplesamlphp_auth_user_form_includes(&$form) {
  */
 function simplesamlphp_auth_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   // Return without executing if the functionality is not enabled.
-  if (!\Drupal::config('simplesamlphp_auth.settings')->get('activate')) {
+  $config = \Drupal::config('simplesamlphp_auth.settings');
+  \Drupal::service('renderer')->addCacheableDependency($form, $config);
+  if (!$config->get('activate')) {
     return;
   }
 
-  $label = Drupal::config('simplesamlphp_auth.settings')->get('login_link_display_name');
+  $label = $config->get('login_link_display_name');
   $form['simplesamlphp_auth_login_link'] = [
     '#title' => $label,
     '#type' => 'link',
