@@ -49,9 +49,9 @@ function simplesamlphp_auth_requirements($phase) {
 
   if ($phase == 'install') {
     simplesamlphp_auth_check_library();
-    if (!class_exists('SimpleSAML_Configuration')) {
+    if (!class_exists('SimpleSAML\Configuration')) {
       $requirements['simplesamlphp_library'] = [
-        'description' => t('SimpleSAMLphp module requires the simplesamlphp library. See README file for installation instructions.'),
+        'description' => t('SimpleSAMLphp module requires the simplesamlphp library, version 1.17.2 or later. See README file for installation instructions.'),
         'severity' => REQUIREMENT_ERROR,
       ];
     }
@@ -78,7 +78,7 @@ function simplesamlphp_auth_requirements($phase) {
  * Fallback for when the library was not found via Composer.
  */
 function simplesamlphp_auth_check_library() {
-  if (!class_exists('SimpleSAML_Configuration')) {
+  if (!class_exists('SimpleSAML\Configuration')) {
     $dir = Settings::get('simplesamlphp_dir');
     include_once $dir . '/lib/_autoload.php';
   }

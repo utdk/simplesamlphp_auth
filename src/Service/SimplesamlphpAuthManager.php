@@ -4,7 +4,7 @@ namespace Drupal\simplesamlphp_auth\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use SimpleSAML\Auth\Simple;
-use SimpleSAML_Configuration;
+use SimpleSAML\Configuration;
 use Drupal\simplesamlphp_auth\Exception\SimplesamlphpAttributeException;
 use Drupal\Core\Site\Settings;
 
@@ -23,7 +23,7 @@ class SimplesamlphpAuthManager {
   /**
    * A SimpleSAML configuration instance.
    *
-   * @var \SimpleSAML_Configuration
+   * @var \SimpleSAML\Configuration
    */
   protected $simplesamlConfig;
 
@@ -48,25 +48,26 @@ class SimplesamlphpAuthManager {
    *   The configuration factory.
    * @param \SimpleSAML\Auth\Simple $instance
    *   Simple instance.
-   * @param \SimpleSAML_Configuration $config
-   *   SimpleSAML_Configuration instance.
+   * @param \SimpleSAML\Configuration $config
+   *   \SimpleSAML\Configuration instance.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, Simple $instance = NULL, SimpleSAML_Configuration $config = NULL) {
+  public function __construct(ConfigFactoryInterface $config_factory, Simple $instance = NULL, Configuration $config = NULL) {
     $this->checkLibrary();
     $this->config = $config_factory->get('simplesamlphp_auth.settings');
-    if (!$instance) {
-      $auth_source = $this->config->get('auth_source');
-      $this->instance = new Simple($auth_source);
-    }
-    else {
-      $this->instance = $instance;
-    }
 
     if (!$config) {
-      $this->simplesamlConfig = \SimpleSAML_Configuration::getInstance();
+      $this->simplesamlConfig = Configuration::getInstance();
     }
     else {
       $this->simplesamlConfig = $config;
+    }
+
+    if (!$instance) {
+      $auth_source = $this->config->get('auth_source');
+      $this->instance = new Simple($auth_source, $this->simplesamlConfig);
+    }
+    else {
+      $this->instance = $instance;
     }
   }
 
@@ -213,7 +214,7 @@ class SimplesamlphpAuthManager {
    * Fallback for when the library was not found via Composer.
    */
   protected function checkLibrary() {
-    if (!class_exists('SimpleSAML_Configuration')) {
+    if (!class_exists('SimpleSAML\Configuration')) {
       $dir = Settings::get('simplesamlphp_dir');
       include_once $dir . '/lib/_autoload.php';
     }

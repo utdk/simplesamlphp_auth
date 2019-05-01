@@ -6,6 +6,8 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use SimpleSAML\Auth\Simple;
+use SimpleSAML\Configuration;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -30,7 +32,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   /**
    * A mocked SimpleSAML configuration instance.
    *
-   * @var \SimpleSAML_Configuration|\PHPUnit_Framework_MockObject_MockObject
+   * @var \SimpleSAML\Configuration|\PHPUnit_Framework_MockObject_MockObject
    */
   protected $simplesamlConfig;
 
@@ -59,7 +61,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
       ],
     ]);
 
-    $this->instance = $this->getMockBuilder('\SimpleSAML\Auth\Simple')
+    $this->instance = $this->getMockBuilder(Simple::class)
       ->setMethods([
         'isAuthenticated',
         'requireAuth',
@@ -69,7 +71,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->simplesamlConfig = $this->getMockBuilder('\SimpleSAML_Configuration')
+    $this->simplesamlConfig = $this->getMockBuilder(Configuration::class)
       ->setMethods(['getValue'])
       ->disableOriginalConstructor()
       ->getMock();
