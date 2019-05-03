@@ -335,9 +335,12 @@ class SimplesamlphpAuthManager {
    * Fallback for when the library was not found via Composer.
    */
   protected function checkLibrary() {
-    if (!class_exists('SimpleSAML\Configuration')) {
-      $dir = Settings::get('simplesamlphp_dir');
+    if ($dir = Settings::get('simplesamlphp_dir')) {
       include_once $dir . '/lib/_autoload.php';
+    }
+
+    if (!class_exists('SimpleSAML\Configuration')) {
+      $this->messenger->addError($this->t('The SimpleSAMLphp library cannot be found.'));
     }
   }
 

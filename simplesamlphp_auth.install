@@ -78,8 +78,7 @@ function simplesamlphp_auth_requirements($phase) {
  * Fallback for when the library was not found via Composer.
  */
 function simplesamlphp_auth_check_library() {
-  if (!class_exists('SimpleSAML\Configuration')) {
-    $dir = Settings::get('simplesamlphp_dir');
+  if ($dir = Settings::get('simplesamlphp_dir')) {
     include_once $dir . '/lib/_autoload.php';
   }
 }
