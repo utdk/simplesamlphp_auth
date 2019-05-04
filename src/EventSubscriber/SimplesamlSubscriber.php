@@ -5,6 +5,7 @@ namespace Drupal\simplesamlphp_auth\EventSubscriber;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -133,7 +134,7 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
     if ($this->account->isAnonymous() && $this->routeMatcht->getRouteName() == 'user.login') {
 
       // Get the path (default: '/saml_login') from the 'simplesamlphp_auth.saml_login' route.
-      $saml_login_path = \Drupal::url('simplesamlphp_auth.saml_login');
+      $saml_login_path = Url::fromRoute('simplesamlphp_auth.saml_login')->toString();
 
       // Redirect directly to the external IdP.
       $response = new RedirectResponse($saml_login_path, RedirectResponse::HTTP_FOUND);

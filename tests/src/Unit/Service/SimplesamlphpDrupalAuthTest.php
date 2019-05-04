@@ -7,6 +7,7 @@ use Drupal\user\UserInterface;
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpDrupalAuth;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 
 /**
  * SimplesamlphpDrupalAuth unit tests.
@@ -61,25 +62,46 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
   protected $entityAccount;
 
   /**
+   * A mocked messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $messenger;
+
+  /**
+   * A mocked ModuleHandlerInterface.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $moduleHandler;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
 
-    // Create a Mock EntityManager object.
     $this->entityManager = $this->getMock('\Drupal\Core\Entity\EntityManagerInterface');
 
-    // Create a Mock Logger object.
     $this->logger = $this->getMockBuilder('\Psr\Log\LoggerInterface')
       ->disableOriginalConstructor()
       ->getMock();
 
-    // Create a Mock SimplesamlphpAuthManager object.
+    $this->messenger = $this->getMockBuilder(MessengerInterface::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->moduleHandler = $this->getMockBuilder(ModuleHandlerInterface::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->moduleHandler->expects($this->any())
+      ->method('alter');
+
     $this->simplesaml = $this->getMockBuilder('\Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager')
       ->disableOriginalConstructor()
       ->getMock();
 
-    // Set up default test configuration Mock object.
     $this->configFactory = $this->getConfigFactoryStub([
       'simplesamlphp_auth.settings' => [
         'register_users' => TRUE,
@@ -92,12 +114,6 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     // Create a Mock User object to test against.
     $this->entityAccount = $this->getMock('Drupal\user\UserInterface');
 
-    $container = new ContainerBuilder();
-    $module_handler = $this->getMock(ModuleHandlerInterface::class);
-    $module_handler->expects($this->any())
-      ->method('alter');
-    $container->set('module_handler', $module_handler);
-    \Drupal::setContainer($container);
   }
 
   /**
@@ -122,6 +138,8 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->logger,
         $this->externalauth,
         $this->entityAccount,
+        $this->messenger,
+        $this->moduleHandler,
       ])
       ->getMock();
 
@@ -190,6 +208,8 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->logger,
         $this->externalauth,
         $this->entityAccount,
+        $this->messenger,
+        $this->moduleHandler,
       ])
       ->getMock();
 
@@ -238,6 +258,8 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->logger,
         $externalauth,
         $this->entityAccount,
+        $this->messenger,
+        $this->moduleHandler,
       ])
       ->getMock();
 
@@ -306,6 +328,8 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         $this->logger,
         $externalauth,
         $this->entityAccount,
+        $this->messenger,
+        $this->moduleHandler,
       ])
       ->getMock();
 
@@ -364,7 +388,9 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       $this->entityManager,
       $this->logger,
       $this->externalauth,
-      $this->entityAccount
+      $this->entityAccount,
+      $this->messenger,
+      $this->moduleHandler
     );
 
     $simplesaml_drupalauth->synchronizeUserAttributes($this->entityAccount, TRUE);
@@ -405,7 +431,9 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       $this->entityManager,
       $this->logger,
       $this->externalauth,
-      $this->entityAccount
+      $this->entityAccount,
+      $this->messenger,
+      $this->moduleHandler
     );
 
     $matching_roles = $simplesaml_drupalauth->getMatchingRoles();
