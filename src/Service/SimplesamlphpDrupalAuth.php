@@ -266,7 +266,7 @@ class SimplesamlphpDrupalAuth {
       }
     }
 
-    if ($sync_mail) {
+    if ($sync_mail && $this->config->get('mail_attr')) {
       $mail = $this->simplesamlAuth->getDefaultEmail();
       if ($mail) {
         $account->setEmail($mail);
