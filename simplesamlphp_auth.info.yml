@@ -4,5 +4,5 @@ description: Allows users to authenticate to a remote SAML identity provider (Id
 core: 8.x
 configure: simplesamlphp_auth.admin_settings
 dependencies:
- - user
- - externalauth
+ - drupal:user
+ - externalauth:externalauth
