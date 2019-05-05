@@ -72,6 +72,20 @@ function simplesamlphp_auth_user_logout($account) {
 }
 
 /**
+ * Implements hook_entity_extra_field_info().
+ */
+function simplesamlphp_auth_entity_extra_field_info() {
+  $fields = [];
+  $fields['user']['user']['form']['simplesamlphp_auth_user_enable'] = [
+    'label' => t('SAML authentication settings'),
+    'description' => '',
+    'weight' => 0,
+    'visible' => TRUE,
+  ];
+  return $fields;
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  *
  * Alters the user register form to include a checkbox signifying the user
