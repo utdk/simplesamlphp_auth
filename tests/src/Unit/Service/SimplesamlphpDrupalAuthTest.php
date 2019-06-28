@@ -411,6 +411,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
         'register_users' => TRUE,
         'activate' => 1,
         'role.population' => $rolemap,
+        'mail_attr' => 'mail'
       ],
     ]);
 
