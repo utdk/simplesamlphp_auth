@@ -131,7 +131,7 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
     }
 
     // Check if an anonymous user tries to access the Drupal login page.
-    if ($this->account->isAnonymous() && $this->routeMatcht->getRouteName() == 'user.login') {
+    if ($this->account->isAnonymous() && $this->routeMatch->getRouteName() == 'user.login') {
 
       // Get the path (default: '/saml_login') from the 'simplesamlphp_auth.saml_login' route.
       $saml_login_path = Url::fromRoute('simplesamlphp_auth.saml_login')->toString();
