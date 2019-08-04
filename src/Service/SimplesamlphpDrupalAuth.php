@@ -251,7 +251,11 @@ class SimplesamlphpDrupalAuth {
         if ($existing_account = reset($account_search)) {
           if ($this->currentUser->id() != $existing_account->id()) {
             $existing = TRUE;
-            $this->logger->critical("Error on synchronizing name attribute for uid %new_uid: an account with the username %username and uid %existing_uid already exists.", ['%username' => $name, '%new_uid' => $this->currentUser->id(), '%existing_uid' => $existing_account->id()]);
+            $logger_params = [
+              '%username' => $name, '%new_uid' => $this->currentUser->id(),
+              '%existing_uid' => $existing_account->id(),
+            ];
+            $this->logger->critical("Error on synchronizing name attribute for uid %new_uid: an account with the username %username and uid %existing_uid already exists.", $logger_params);
             $this->messenger->addMessage($this->t('Error synchronizing username: an account with this username already exists.'), 'error');
           }
         }

@@ -134,7 +134,7 @@ class SimplesamlphpAuthManager {
   /**
    * Returns a SimpleSAML Simple class instance.
    *
-   * @return \SimpleSAML\Auth\Simple|NULL
+   * @return \SimpleSAML\Auth\Simple|null
    *   The SimpleSAML Simple instance.
    */
   protected function getSimpleSamlInstance() {
@@ -153,7 +153,7 @@ class SimplesamlphpAuthManager {
       catch (CriticalConfigurationError $e) {
         if ($this->currentUser->hasPermission('administer simplesamlphp authentication')
           && $this->adminContext->isAdminRoute()) {
-          $this->messenger->addError($this->t('There is a Simplesamlphp configuration problem. ' . $e->getMessage()), 'error');
+          $this->messenger->addError($this->t('There is a Simplesamlphp configuration problem. @message', ['@message' => $e->getMessage()]), 'error');
         }
         return NULL;
       }
@@ -163,7 +163,7 @@ class SimplesamlphpAuthManager {
   /**
    * Returns a SimpleSAML configuration instance.
    *
-   * @return \SimpleSAML\Configuration|NULL
+   * @return \SimpleSAML\Configuration|null
    *   The SimpleSAML Configuration instance.
    */
   protected function getSimpleSamlConfiguration() {
@@ -181,7 +181,7 @@ class SimplesamlphpAuthManager {
       catch (CriticalConfigurationError $e) {
         if ($this->currentUser->hasPermission('administer simplesamlphp authentication')
           && $this->currentUser->isAdminRoute()) {
-          $this->messenger->addError($this->t('There is a Simplesamlphp configuration problem. ' . $e->getMessage()), 'error');
+          $this->messenger->addError($this->t('There is a Simplesamlphp configuration problem. @message', ['@message' => $e->getMessage()]), 'error');
         }
         return NULL;
       }
@@ -269,7 +269,7 @@ class SimplesamlphpAuthManager {
    * @return mixed|bool
    *   The attribute value or FALSE.
    *
-   * @throws SimplesamlphpAttributeException
+   * @throws \Drupal\simplesamlphp_auth\Exception\SimplesamlphpAttributeException
    *   Exception when attribute is not set.
    */
   public function getAttribute($attribute) {

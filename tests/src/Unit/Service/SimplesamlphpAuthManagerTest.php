@@ -156,6 +156,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
    * Get a new manager instance using mocked constructor arguments.
    *
    * @return \Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager
+   *   A mocked manager.
    */
   protected function getManagerInContext() {
     return new SimplesamlphpAuthManager(

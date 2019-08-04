@@ -79,7 +79,6 @@ class SimplesamlphpAuthBlock extends BlockBase implements ContainerFactoryPlugin
       ],
     ];
 
-
     if ($this->simplesamlAuth->isActivated()) {
 
       if ($this->simplesamlAuth->isAuthenticated()) {

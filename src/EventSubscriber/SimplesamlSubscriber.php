@@ -119,9 +119,9 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Redirect anonymous users from the Drupal login page directly to the external IdP.
+   * Redirect anonymous users to the external IdP from the Drupal login page.
    *
-   * @param GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The subscribed event.
    */
   public function login_directly_with_external_IdP(GetResponseEvent $event) {
@@ -132,8 +132,8 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
 
     // Check if an anonymous user tries to access the Drupal login page.
     if ($this->account->isAnonymous() && $this->routeMatch->getRouteName() == 'user.login') {
-
-      // Get the path (default: '/saml_login') from the 'simplesamlphp_auth.saml_login' route.
+      // Get the path (default: '/saml_login') from the
+      // 'simplesamlphp_auth.saml_login' route.
       $saml_login_path = Url::fromRoute('simplesamlphp_auth.saml_login')->toString();
 
       // Redirect directly to the external IdP.

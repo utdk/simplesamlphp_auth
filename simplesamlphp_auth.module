@@ -53,7 +53,7 @@ function simplesamlphp_auth_user_logout($account) {
   $logout_url = \Drupal::config('simplesamlphp_auth.settings')->get('logout_goto_url');
   $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
 
-  // Only interfere if this user was logged in through simplesaml
+  // Only interfere if this user was logged in through simplesaml.
   if ($simplesaml->isAuthenticated()) {
     // Have to destroy the session here as some configurations of
     // SimpleSAMLphp_auth can create infinite loops. By removing IdP auth before
@@ -143,7 +143,7 @@ function simplesamlphp_auth_form_user_register_form_alter(&$form, FormStateInter
  * @see simplesamlphp_auth_form_user_register_form_alter()
  * @see simplesamlphp_auth_user_form_submit()
  */
-function simplesamlphp_auth_user_form_includes(&$form) {
+function simplesamlphp_auth_user_form_includes(array &$form) {
   $form['simplesamlphp_auth_user_enable'] = [
     '#type' => 'checkbox',
     '#title' => t('Enable this user to leverage SAML authentication'),
