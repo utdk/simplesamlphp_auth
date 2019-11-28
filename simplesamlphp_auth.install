@@ -51,7 +51,7 @@ function simplesamlphp_auth_requirements($phase) {
     simplesamlphp_auth_check_library();
     if (!class_exists('SimpleSAML\Configuration')) {
       $requirements['simplesamlphp_library'] = [
-        'description' => t('SimpleSAMLphp module requires the simplesamlphp library, version 1.17.2 or later. See README file for installation instructions.'),
+        'description' => t('SimpleSAMLphp module requires the simplesamlphp library, version 1.18.2 or later. See README file for installation instructions.'),
         'severity' => REQUIREMENT_ERROR,
       ];
     }
