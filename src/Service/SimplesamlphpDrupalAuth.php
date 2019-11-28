@@ -4,13 +4,13 @@ namespace Drupal\simplesamlphp_auth\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\user\UserInterface;
 use Drupal\Core\Session\AccountInterface;
-use Psr\Log\LoggerInterface;
 use Drupal\externalauth\ExternalAuthInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\user\UserInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Service to link SimpleSAMLphp authentication with Drupal users.
@@ -124,7 +124,7 @@ class SimplesamlphpDrupalAuth {
     if ($account) {
       // Determine if roles should be evaluated upon login.
       if ($this->config->get('role.eval_every_time')) {
-        $this->roleMatchAdd($account);
+        $this->roleMatchSync($account);
       }
     }
 
@@ -287,25 +287,43 @@ class SimplesamlphpDrupalAuth {
   }
 
   /**
-   * Adds roles to user accounts.
+   * Synchronizes (adds/removes) user account roles.
    *
    * @param \Drupal\user\UserInterface $account
-   *   The Drupal user to add roles to.
+   *   The Drupal user to sync roles for.
    */
-  public function roleMatchAdd(UserInterface $account) {
+  public function roleMatchSync(UserInterface $account) {
     // Get matching roles based on retrieved SimpleSAMLphp attributes.
     $matching_roles = $this->getMatchingRoles();
+    // Get user's current roles, excluding locked roles (e.g. Authenticated).
+    $current_roles = $account->getRoles(TRUE);
+    // Set boolean to only update account when needed.
+    $account_updated = FALSE;
 
-    if ($matching_roles) {
-      foreach ($matching_roles as $role_id) {
-        if ($this->config->get('debug')) {
-          $this->logger->debug('Adding role %role to user %name', [
-            '%role' => $role_id,
-            '%name' => $account->getAccountName(),
-          ]);
-        }
-        $account->addRole($role_id);
+    // Remove non-locked roles not mapped to the user via SAML.
+    foreach (array_diff($current_roles, $matching_roles) as $role_id) {
+      if ($this->config->get('debug')) {
+        $this->logger->debug('Removing role %role from user %name', [
+          '%role' => $role_id,
+          '%name' => $account->getAccountName(),
+        ]);
       }
+      $account->removeRole($role_id);
+      $account_updated = TRUE;
+    }
+
+    // Add roles mapped to the user via SAML.
+    foreach (array_diff($matching_roles, $current_roles) as $role_id) {
+      if ($this->config->get('debug')) {
+        $this->logger->debug('Adding role %role to user %name', [
+          '%role' => $role_id,
+          '%name' => $account->getAccountName(),
+        ]);
+      }
+      $account->addRole($role_id);
+      $account_updated = TRUE;
+    }
+    if ($account_updated) {
       $account->save();
     }
   }

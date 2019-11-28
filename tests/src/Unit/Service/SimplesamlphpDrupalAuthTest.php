@@ -158,7 +158,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
    * Tests external login with role matching.
    *
    * @covers ::externalLoginRegister
-   * @covers ::roleMatchAdd
+   * @covers ::roleMatchSync
    * @covers ::evalRoleRule
    * @covers ::__construct
    */
@@ -175,9 +175,16 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
 
     // Get a Mock User object to test the external login method.
     // Expect the role "student" to be added to the user entity.
+    // Expect the role "teacher" to be removed from user entity.
+    $this->entityAccount->expects($this->once())
+      ->method('getRoles')
+      ->will($this->returnValue(['teacher']));
     $this->entityAccount->expects($this->once())
       ->method('addRole')
       ->with($this->equalTo('student'));
+    $this->entityAccount->expects($this->once())
+      ->method('removeRole')
+      ->with($this->equalTo('teacher'));
     $this->entityAccount->expects($this->once())
       ->method('save');
 
@@ -236,7 +243,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->will($this->returnValue($entity_storage));
 
     // Create a Mock ExternalAuth object.
-    $externalauth = $this->createMock('\Drupal\externalauth\ExternalAuthInterface');
+    $externalauth = $this->createMock('Drupal\externalauth\ExternalAuthInterface');
 
     // Set up expectations for ExternalAuth service.
     $externalauth->expects($this->once())
