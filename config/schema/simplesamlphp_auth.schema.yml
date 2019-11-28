@@ -16,6 +16,9 @@ simplesamlphp_auth.settings:
     login_link_display_name:
       type: label
       label: 'Federated Log In Link Display Name'
+    login_link_show:
+      type: boolean
+      label: 'Display a link to the Federated Login page on the user login form'
     user_name:
       type: string
       label: 'SimpleSAMLphp attribute to be used as username for the user'

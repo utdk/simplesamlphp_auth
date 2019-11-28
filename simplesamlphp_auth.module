@@ -165,7 +165,7 @@ function simplesamlphp_auth_form_user_login_form_alter(&$form, FormStateInterfac
   // Return without executing if the functionality is not enabled.
   $config = \Drupal::config('simplesamlphp_auth.settings');
   \Drupal::service('renderer')->addCacheableDependency($form, $config);
-  if (!$config->get('activate')) {
+  if (!$config->get('activate') || !$config->get('login_link_show')) {
     return;
   }
 

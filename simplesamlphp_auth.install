@@ -96,3 +96,12 @@ function simplesamlphp_auth_update_8001() {
 function simplesamlphp_auth_update_8002() {
   \Drupal::service('router.builder')->rebuild();
 }
+
+/**
+ * Provide a default value for the new login_link_show configuration option.
+ */
+function simplesamlphp_auth_update_8301() {
+  \Drupal::configFactory()->getEditable('simplesamlphp_auth.settings')
+    ->set('login_link_show', TRUE)
+    ->save(TRUE);
+}

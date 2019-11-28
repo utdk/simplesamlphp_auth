@@ -53,7 +53,11 @@ class BasicSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('login_link_display_name'),
       '#description' => $this->t('Text to display as the link to the external federated login page.'),
     ];
-
+    $form['basic']['login_link_show'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Display a link to the Federated Login page on the user login form'),
+      '#default_value' => $config->get('login_link_show'),
+    ];
     $form['basic']['header_no_cache'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Use Header with: Cache-Control: no-cache'),
@@ -116,6 +120,7 @@ class BasicSettingsForm extends ConfigFormBase {
     $config->set('activate', $form_state->getValue('activate'));
     $config->set('auth_source', $form_state->getValue('auth_source'));
     $config->set('login_link_display_name', $form_state->getValue('login_link_display_name'));
+    $config->set('login_link_show', $form_state->getValue('login_link_show'));
     $config->set('debug', $form_state->getValue('debug'));
     $config->set('secure', $form_state->getValue('secure'));
     $config->set('httponly', $form_state->getValue('httponly'));

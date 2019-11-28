@@ -60,6 +60,11 @@ class SimplesamlphpAuthTest extends BrowserTestBase {
     $this->drupalGet('user/login');
     $this->assertSession()->pageTextContains(t('Federated test login'));
 
+    // Check the auth link is not displayed when disabled in configuration.
+    $this->config('simplesamlphp_auth.settings')->set('login_link_show', FALSE)->save();
+    $this->drupalGet('user/login');
+    $this->assertSession()->pageTextNotContains(t('Federated test login'));
+
     $this->drupalLogin($this->adminUser);
     $default_theme = $this->config('system.theme')->get('default');
 
