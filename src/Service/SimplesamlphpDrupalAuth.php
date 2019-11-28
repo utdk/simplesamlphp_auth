@@ -249,7 +249,7 @@ class SimplesamlphpDrupalAuth {
         $existing = FALSE;
         $account_search = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $name]);
         if ($existing_account = reset($account_search)) {
-          if ($this->currentUser->id() != $existing_account->id()) {
+          if ($account->id() != $existing_account->id()) {
             $existing = TRUE;
             $logger_params = [
               '%username' => $name, '%new_uid' => $this->currentUser->id(),
