@@ -108,12 +108,12 @@ function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $for
 
   if ($saml_enabled) {
     $form['simplesamlphp_auth_user_enable']['#default_value'] = TRUE;
-    $form['account']['current_pass']['#access'] = FALSE;
 
     // If the user is a simplesamlphp_auth user and is NOT allowed to set their
     // Drupal password, remove the fields from the form.
     $config = \Drupal::config('simplesamlphp_auth.settings');
     if (!$config->get('allow.set_drupal_pwd')) {
+      $form['account']['current_pass']['#access'] = FALSE;
       $form['account']['pass']['#access'] = FALSE;
     }
   }
