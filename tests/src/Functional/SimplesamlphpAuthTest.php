@@ -12,6 +12,11 @@ use Drupal\Tests\BrowserTestBase;
 class SimplesamlphpAuthTest extends BrowserTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
+
+  /**
    * Modules to enable for this test.
    *
    * @var string[]
@@ -30,6 +35,13 @@ class SimplesamlphpAuthTest extends BrowserTestBase {
   protected $adminUser;
 
   /**
+   * An authenticated user.
+   *
+   * @var \Drupal\user\Entity\User
+   */
+  protected $authenticatedUser;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp() {
@@ -38,7 +50,10 @@ class SimplesamlphpAuthTest extends BrowserTestBase {
       'access administration pages',
       'administer users',
       'administer blocks',
+      'administer simplesamlphp authentication',
     ]);
+    $this->authenticatedUser = $this->drupalCreateUser();
+    $this->drupalPlaceBlock('page_title_block');
 
     // Configure SimpleSAMLphp for testing purposes.
     $this->config('simplesamlphp_auth.settings')
@@ -47,7 +62,7 @@ class SimplesamlphpAuthTest extends BrowserTestBase {
       ->set('unique_id', 'uid')
       ->set('user_name', 'displayName')
       ->set('login_link_display_name', "Federated test login")
-      ->set('allow.default_login_users', $this->adminUser->id())
+      ->set('allow.default_login_users', $this->adminUser->id() . ',' . $this->authenticatedUser->id())
       ->save();
   }
 
@@ -87,7 +102,45 @@ class SimplesamlphpAuthTest extends BrowserTestBase {
 
     $this->drupalGet('user/login');
     $this->assertSession()->pageTextNotContains(t('Federated test login'));
+  }
 
+  /**
+   * Tests access to the administrative UI pages.
+   */
+  public function testAdminPageAccess() {
+    $paths = [
+      'admin/config/people/simplesamlphp_auth',
+      'admin/config/people/simplesamlphp_auth/local',
+      'admin/config/people/simplesamlphp_auth/sync',
+    ];
+
+    // Anonymous user.
+    foreach ($paths as $path) {
+      $this->drupalGet($path);
+      $this->assertSession()->statusCodeEquals(403);
+    }
+
+    // Authenticated user.
+    $this->drupalLogin($this->authenticatedUser);
+    foreach ($paths as $path) {
+      $this->drupalGet($path);
+      $this->assertSession()->statusCodeEquals(403);
+    }
+    $this->drupalLogout();
+
+    $this->drupalLogin($this->adminUser);
+
+    $this->drupalGet('admin/config/people/simplesamlphp_auth');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->elementContains('css', 'h1', 'SimpleSAMLphp Auth Settings');
+
+    $this->drupalGet('admin/config/people/simplesamlphp_auth/local');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->elementContains('css', 'h1', 'Local authentication');
+
+    $this->drupalGet('admin/config/people/simplesamlphp_auth/sync');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->elementContains('css', 'h1', 'User info and syncing');
   }
 
 }
