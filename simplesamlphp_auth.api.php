@@ -102,7 +102,7 @@ function hook_simplesamphp_auth_account_authname_alter(&$authname, \Drupal\user\
  */
 function hook_simplesamlphp_auth_existing_user($attributes) {
   $saml_mail = $attributes['mail'];
-  $existing_users = \Drupal::service('entity.manager')->getStorage('user')->loadByProperties(['mail' => $saml_mail]);
+  $existing_users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(['mail' => $saml_mail]);
   if ($existing_users) {
     $existing_user = is_array($existing_users) ? reset($existing_users) : FALSE;
     if ($existing_user) {

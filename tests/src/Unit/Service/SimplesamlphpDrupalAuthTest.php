@@ -26,11 +26,11 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
   protected $simplesaml;
 
   /**
-   * The mocked Entity Manager.
+   * The mocked entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * The mocked logger instance.
@@ -80,7 +80,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
   protected function setUp() {
     parent::setUp();
 
-    $this->entityManager = $this->createMock('\Drupal\Core\Entity\EntityManagerInterface');
+    $this->entityTypeManager = $this->createMock('\Drupal\Core\Entity\EntityTypeManagerInterface');
 
     $this->logger = $this->getMockBuilder('\Psr\Log\LoggerInterface')
       ->disableOriginalConstructor()
@@ -134,7 +134,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->setConstructorArgs([
         $this->simplesaml,
         $this->configFactory,
-        $this->entityManager,
+        $this->entityTypeManager,
         $this->logger,
         $this->externalauth,
         $this->entityAccount,
@@ -211,7 +211,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->setConstructorArgs([
         $simplesaml,
         $config_factory,
-        $this->entityManager,
+        $this->entityTypeManager,
         $this->logger,
         $this->externalauth,
         $this->entityAccount,
@@ -238,7 +238,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->method('loadByProperties')
       ->will($this->returnValue([]));
 
-    $this->entityManager->expects($this->any())
+    $this->entityTypeManager->expects($this->any())
       ->method('getStorage')
       ->will($this->returnValue($entity_storage));
 
@@ -261,7 +261,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->setConstructorArgs([
         $this->simplesaml,
         $this->configFactory,
-        $this->entityManager,
+        $this->entityTypeManager,
         $this->logger,
         $externalauth,
         $this->entityAccount,
@@ -302,7 +302,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->method('loadByProperties')
       ->will($this->returnValue([$this->entityAccount]));
 
-    $this->entityManager->expects($this->any())
+    $this->entityTypeManager->expects($this->any())
       ->method('getStorage')
       ->will($this->returnValue($entity_storage));
 
@@ -331,7 +331,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->setConstructorArgs([
         $this->simplesaml,
         $config_factory,
-        $this->entityManager,
+        $this->entityTypeManager,
         $this->logger,
         $externalauth,
         $this->entityAccount,
@@ -375,7 +375,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
       ->method('loadByProperties')
       ->will($this->returnValue([]));
 
-    $this->entityManager->expects($this->any())
+    $this->entityTypeManager->expects($this->any())
       ->method('getStorage')
       ->will($this->returnValue($entity_storage));
 
@@ -392,7 +392,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     $simplesaml_drupalauth = new SimplesamlphpDrupalAuth(
       $simplesaml,
       $this->configFactory,
-      $this->entityManager,
+      $this->entityTypeManager,
       $this->logger,
       $this->externalauth,
       $this->entityAccount,
@@ -435,7 +435,7 @@ class SimplesamlphpDrupalAuthTest extends UnitTestCase {
     $simplesaml_drupalauth = new SimplesamlphpDrupalAuth(
       $simplesaml,
       $config_factory,
-      $this->entityManager,
+      $this->entityTypeManager,
       $this->logger,
       $this->externalauth,
       $this->entityAccount,
