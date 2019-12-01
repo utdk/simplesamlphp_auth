@@ -105,3 +105,12 @@ function simplesamlphp_auth_update_8301() {
     ->set('login_link_show', TRUE)
     ->save(TRUE);
 }
+
+/**
+ * Remove Site default language from simplesamlphp_auth configuration.
+ */
+function simplesamlphp_auth_update_8302() {
+  \Drupal::configFactory()->getEditable('simplesamlphp_auth.settings')
+    ->clear('default_langcode')
+    ->save(TRUE);
+}

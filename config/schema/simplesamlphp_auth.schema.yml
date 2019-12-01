@@ -4,9 +4,6 @@ simplesamlphp_auth.settings:
   type: config_object
   label: 'SimpleSAMLphp Auth Settings'
   mapping:
-    default_langcode:
-      type: string
-      label: 'Site default language code'
     activate:
       type: boolean
       label: 'Activate authentication via SimpleSAMLphp'
