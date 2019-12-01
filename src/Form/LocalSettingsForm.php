@@ -81,7 +81,7 @@ class LocalSettingsForm extends ConfigFormBase {
 
     $config->set('allow.default_login', $form_state->getValue('allow_default_login'));
     $config->set('allow.set_drupal_pwd', $form_state->getValue('allow_set_drupal_pwd'));
-    $config->set('allow.default_login_roles', $form_state->getValue('allow_default_login_roles'));
+    $config->set('allow.default_login_roles', array_filter($form_state->getValue('allow_default_login_roles')));
     $config->set('allow.default_login_users', $form_state->getValue('allow_default_login_users'));
     $config->set('logout_goto_url', $form_state->getValue('logout_goto_url'));
     $config->save();

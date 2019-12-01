@@ -15,7 +15,7 @@ register_users: true
 allow:
   set_drupal_pwd: true
   default_login: true
-  default_login_roles: []
+  default_login_roles: {  }
   default_login_users: '1'
 logout_goto_url:
 user_register_original:
