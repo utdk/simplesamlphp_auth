@@ -146,19 +146,6 @@ class SimplesamlphpDrupalAuth {
   public function externalRegister($authname) {
     $account = FALSE;
 
-    // First we check the admin settings for simpleSAMLphp and find out if we
-    // are allowed to register users.
-    if (!$this->config->get('register_users')) {
-
-      // We're not allowed to register new users on the site through simpleSAML.
-      // We let the user know about this and redirect to the user/login page.
-      $this->messenger
-        ->addMessage($this->t('We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you.'), 'status');
-      $this->simplesamlAuth->logout(base_path());
-
-      return FALSE;
-    }
-
     // It's possible that a user with their username set to this authname
     // already exists in the Drupal database.
     $existing_user = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $authname]);
@@ -209,6 +196,19 @@ class SimplesamlphpDrupalAuth {
             $this->externalauth->linkExistingAccount($authname, 'simplesamlphp_auth', $account);
           }
         }
+      }
+
+      // Check the admin settings for simpleSAMLphp and find out if we
+      // are allowed to register users.
+      if (!$this->config->get('register_users')) {
+        // We're not allowed to register new users on the site through
+        // simpleSAML. We let the user know about this and redirect to the
+        // user/login page.
+        $this->messenger
+          ->addMessage($this->t('We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you.'), 'status');
+        $this->simplesamlAuth->logout(base_path());
+
+        return FALSE;
       }
     }
 
