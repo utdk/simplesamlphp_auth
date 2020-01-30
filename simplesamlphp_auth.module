@@ -29,6 +29,8 @@
  *         notices.
  */
 
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -48,10 +50,10 @@ function simplesamlphp_auth_help($route_name) {
 /**
  * Implements hook_user_logout().
  */
-function simplesamlphp_auth_user_logout($account) {
-
+function simplesamlphp_auth_user_logout(AccountInterface $account) {
   $logout_url = \Drupal::config('simplesamlphp_auth.settings')->get('logout_goto_url');
   $simplesaml = \Drupal::service('simplesamlphp_auth.manager');
+  $session = \Drupal::service('session_manager');
 
   // Only interfere if this user was logged in through simplesaml.
   if ($simplesaml->isAuthenticated()) {
@@ -60,7 +62,9 @@ function simplesamlphp_auth_user_logout($account) {
     // Drupal auth, checks for local authentication will trigger before the
     // session is destroyed naturally. We must therefore destroy the session
     // manually here.
-    session_destroy();
+    // Copied from user.module method user_logout().
+    $session->destroy();
+    $account->setAccount(new AnonymousUserSession());
 
     if ($logout_url) {
       $simplesaml->logout($logout_url);
