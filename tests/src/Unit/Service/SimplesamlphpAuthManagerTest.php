@@ -7,6 +7,7 @@ use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager;
+use Drupal\simplesamlphp_auth\Exception\SimplesamlphpAttributeException;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use SimpleSAML\Auth\Simple;
@@ -272,12 +273,10 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
    *
    * @covers ::__construct
    * @covers ::getAttribute
-   *
-   * @expectedException \Drupal\simplesamlphp_auth\Exception\SimplesamlphpAttributeException
-   *
-   * @expectedExceptionMessage Error in simplesamlphp_auth.module: no valid "name" attribute set.
    */
   public function testAttributesException() {
+    $this->expectException(SimplesamlphpAttributeException::class);
+    $this->expectExceptionMessage('Error in simplesamlphp_auth.module: no valid "name" attribute set.');
     // Set expectations for instance.
     $this->instance->expects($this->any())
       ->method('getAttributes')
