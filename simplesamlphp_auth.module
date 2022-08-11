@@ -109,7 +109,7 @@ function simplesamlphp_auth_form_user_form_alter(&$form, FormStateInterface $for
   // e-mail address, and set a Drupal password if they want to
   // (and are allowed).
   $account = $form_state->getFormObject()->getEntity();
-  $saml_enabled = $authmap->get($account->id(), 'simplesamlphp_auth');
+  $saml_enabled = $account->id() && $authmap->get($account->id(), 'simplesamlphp_auth');
 
   if ($saml_enabled) {
     $form['simplesamlphp_auth_user_enable']['#default_value'] = TRUE;
