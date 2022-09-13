@@ -14,14 +14,14 @@ class SimplesamlphpAuthTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * Modules to enable for this test.
    *
    * @var string[]
    */
-  public static $modules = [
+  protected static $modules = [
     'block',
     'simplesamlphp_auth',
     'simplesamlphp_auth_test',
@@ -44,7 +44,7 @@ class SimplesamlphpAuthTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->adminUser = $this->drupalCreateUser([
       'access administration pages',
@@ -87,10 +87,11 @@ class SimplesamlphpAuthTest extends BrowserTestBase {
     $this->drupalGet('admin/structure/block/add/simplesamlphp_auth_block/' . $default_theme);
     $edit = [];
     $edit['region'] = 'sidebar_first';
-    $this->drupalPostForm('admin/structure/block/add/simplesamlphp_auth_block/' . $default_theme, $edit, t('Save block'));
+    $this->drupalGet('admin/structure/block/add/simplesamlphp_auth_block/' . $default_theme);
+    $this->submitForm($edit, t('Save block'));
 
     // Assert Login link in SimplesamlphpAuthBlock.
-    $this->assertSession()->elementTextContains('css', '.region-sidebar-first .block-simplesamlphp-auth-block h2', 'SimpleSAMLphp Auth Status');
+    $this->assertSession()->elementTextContains('css', '#block-simplesamlphpauthstatus h2', 'SimpleSAMLphp Auth Status');
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains(t('Federated test login'));
     $this->assertSession()->linkByHrefExists('saml_login');

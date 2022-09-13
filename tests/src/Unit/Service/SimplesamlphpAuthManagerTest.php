@@ -85,7 +85,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Set up default test configuration Mock object.
@@ -123,7 +123,7 @@ class SimplesamlphpAuthManagerTest extends UnitTestCase {
       ->getMock();
 
     $this->moduleHandler->expects($this->any())
-      ->method('getImplementations')
+      ->method('invokeAll')
       ->with($this->equalTo('simplesamlphp_auth_allow_login'))
       ->will($this->returnValue([]));
 

@@ -98,8 +98,8 @@ class SimplesamlExternalauthSubscriber implements EventSubscriberInterface {
       // SimpleSAMLphp attributes.
       $account_altered = FALSE;
       $attributes = $this->simplesaml->getAttributes();
-      foreach ($this->moduleHandler->getImplementations('simplesamlphp_auth_user_attributes') as $module) {
-        $return_value = $this->moduleHandler->invoke($module, 'simplesamlphp_auth_user_attributes', [$account, $attributes]);
+      $this->moduleHandler->invokeAllWith('simplesamlphp_auth_user_attributes', function (callable $hook, string $module) use (&$attributes, &$account, &$account_altered) {
+        $return_value = $hook($account, $attributes);
         if ($return_value instanceof UserInterface) {
           if ($this->config->get('debug')) {
             $this->logger->debug('Drupal user attributes have altered based on SAML attributes by %module module.', [
@@ -109,7 +109,7 @@ class SimplesamlExternalauthSubscriber implements EventSubscriberInterface {
           $account_altered = TRUE;
           $account = $return_value;
         }
-      }
+      });
 
       if ($account_altered) {
         $account->save();
@@ -120,7 +120,7 @@ class SimplesamlExternalauthSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[ExternalAuthEvents::LOGIN][] = ['externalauthLogin'];
     return $events;
   }

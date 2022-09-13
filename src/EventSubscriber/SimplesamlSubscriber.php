@@ -8,8 +8,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\simplesamlphp_auth\Service\SimplesamlphpAuthManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Psr\Log\LoggerInterface;
 
@@ -78,10 +78,10 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
   /**
    * Logs out user if not SAML authenticated and local logins are disabled.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The subscribed event.
    */
-  public function checkAuthStatus(GetResponseEvent $event) {
+  public function checkAuthStatus(RequestEvent $event) {
     if ($this->account->isAnonymous()) {
       return;
     }
@@ -121,10 +121,10 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
   /**
    * Redirect anonymous users to the external IdP from the Drupal login page.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The subscribed event.
    */
-  public function login_directly_with_external_IdP(GetResponseEvent $event) {
+  public function login_directly_with_external_IdP(RequestEvent $event) {
 
     if ($this->config->get('allow.default_login')) {
       return;
@@ -147,7 +147,7 @@ class SimplesamlSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[KernelEvents::REQUEST][] = ['checkAuthStatus'];
     $events[KernelEvents::REQUEST][] = ['login_directly_with_external_IdP'];
     return $events;
