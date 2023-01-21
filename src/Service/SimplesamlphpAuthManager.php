@@ -292,8 +292,15 @@ class SimplesamlphpAuthManager {
    */
   public function allowUserByAttribute() {
     $attributes = $this->getAttributes();
-    $responses = $this->moduleHandler->invokeAll('simplesamlphp_auth_allow_login', [$attributes]);
-    return !in_array(FALSE, $responses, TRUE);
+    $return = TRUE;
+    $this->moduleHandler->invokeAllWith('simplesamlphp_auth_allow_login', function (callable $hook) use ($attributes, &$return) {
+      // Once an implementation has returned false do not call any other
+      // implementation.
+      if ($return) {
+        $return = $hook($attributes);
+      }
+    });
+    return $return;
   }
 
   /**

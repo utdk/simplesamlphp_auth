@@ -179,11 +179,11 @@ class SimplesamlphpDrupalAuth {
     else {
       // If auto-enable SAML is activated, take more action to find an existing
       // user.
-      // Allow other modules to decide if there is an existing Drupal user,
-      // based on the supplied SAML atttributes.
-      $attributes = $this->simplesamlAuth->getAttributes();
-      if (method_exists($this->moduleHandler, 'invokeAllWith')) {
-        $this->moduleHandler->invokeAllWith('simplesamlphp_auth_existing_user', function (callable $hook) use ($attributes, $authname) {
+      if ($this->config->get('autoenablesaml')) {
+        // Allow other modules to decide if there is an existing Drupal user,
+        // based on the supplied SAML atttributes.
+        $attributes = $this->simplesamlAuth->getAttributes();
+        $this->moduleHandler->invokeAllWith('simplesamlphp_auth_existing_user', function (callable $hook) use ($attributes, $authname, &$account) {
           $return_value = $hook($attributes);
           if ($return_value instanceof UserInterface) {
             $account = $return_value;
