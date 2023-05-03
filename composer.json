@@ -1,12 +1,12 @@
 {
-    "name": "drupal/simplesamlphp_auth",
-    "description": "Allows users to authenticate to a remote SAML identity provider (IdP) via a locally configured SimpleSAMLphp service point (SP).",
+    "name": "utexas/simplesamlphp_auth",
+    "description": "Fork of drupal/simplesamlphp_auth (https://drupal.org/project/simplesamlphp_auth)",
     "type": "drupal-module",
     "license": "GPL-2.0+",
-    "homepage": "https://www.drupal.org/project/simplesamlphp_auth",
+    "homepage": "https://github.austin.utexas.edu/eis1-wcs/simplesamlphp_auth",
     "require": {
         "drupal/externalauth": "^1.1||^2.0",
-        "simplesamlphp/simplesamlphp": "^1.19 | dev-master",
+        "utexas/simplesamlphp": "dev-master",
         "drupal/core": "^9.4 || ^10"
     }
 }
