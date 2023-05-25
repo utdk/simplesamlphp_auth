@@ -6,7 +6,7 @@
     "homepage": "https://github.austin.utexas.edu/eis1-wcs/simplesamlphp_auth",
     "require": {
         "drupal/externalauth": "^1.1||^2.0",
-        "simplesamlphp/simplesamlphp": "0.1.0",
+        "utexas/simplesamlphp": "0.1.1",
         "drupal/core": "^9.4 || ^10"
     }
 }
